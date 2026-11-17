@@ -29,10 +29,11 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import com.github.luben.zstd.Zstd;
 import com.github.luben.zstd.ZstdCompressCtx;
-import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.ZstdCompressor;
 import io.airlift.compress.zstd.ZstdInputStream;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
+import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
+import io.airlift.compress.zstd.io.RandomAccessOut;
 import org.apache.commons.io.IOUtils;
 import org.testng.annotations.Test;
 
@@ -163,10 +164,9 @@ public class CompressionZstdTest extends BaseTest {
         byte[] expected = buf.toString().getBytes(StandardCharsets.UTF_8);
 
         ZstdCompressor compressor = new ZstdCompressor();
-        byte[] output = new byte[compressor.maxCompressedLength(expected.length)];
-        OutByteArrayWithOffs out = new OutByteArrayWithOffs(output);
-        compressor.compress(new InByteArrayWithOffs(expected), out);
-        assertThat(Zstd.decompress(Arrays.copyOf(output, out.getOffs()), expected.length)).isEqualTo(expected);
+        RandomAccessOut rao = new ByteArrayRandomAccessOut(compressor.maxCompressedLength(expected.length));
+        compressor.compress(new InByteArrayWithOffs(expected), rao);
+        assertThat(Zstd.decompress(Arrays.copyOf(rao.getBuf(), rao.getOffs()), expected.length)).isEqualTo(expected);
     }
 
     // all-identical input leaves a short run of equal literals; EncodeLiterals emits RLE_LITERALS_BLOCK for them
@@ -175,10 +175,9 @@ public class CompressionZstdTest extends BaseTest {
         Arrays.fill(expected, (byte) 'a');
 
         ZstdCompressor compressor = new ZstdCompressor();
-        byte[] output = new byte[compressor.maxCompressedLength(expected.length)];
-        OutByteArrayWithOffs out = new OutByteArrayWithOffs(output);
-        compressor.compress(new InByteArrayWithOffs(expected), out);
-        assertThat(Zstd.decompress(Arrays.copyOf(output, out.getOffs()), expected.length)).isEqualTo(expected);
+        RandomAccessOut rao = new ByteArrayRandomAccessOut(compressor.maxCompressedLength(expected.length));
+        compressor.compress(new InByteArrayWithOffs(expected), rao);
+        assertThat(Zstd.decompress(Arrays.copyOf(rao.getBuf(), rao.getOffs()), expected.length)).isEqualTo(expected);
     }
 
     // small data compressed by this compressor and decompressed by the reference zstd: a block with less than 256
@@ -193,11 +192,10 @@ public class CompressionZstdTest extends BaseTest {
                     expected[i] = (byte) (' ' + random.nextInt(distinct) % (1 + random.nextInt(distinct)));
 
                 ZstdCompressor compressor = new ZstdCompressor();
-                byte[] output = new byte[compressor.maxCompressedLength(expected.length)];
-                OutByteArrayWithOffs out = new OutByteArrayWithOffs(output);
-                compressor.compress(new InByteArrayWithOffs(expected), out);
+                RandomAccessOut rao = new ByteArrayRandomAccessOut(compressor.maxCompressedLength(expected.length));
+                compressor.compress(new InByteArrayWithOffs(expected), rao);
 
-                assertThat(Zstd.decompress(Arrays.copyOf(output, out.getOffs()), expected.length))
+                assertThat(Zstd.decompress(Arrays.copyOf(rao.getBuf(), rao.getOffs()), expected.length))
                         .as("size=" + size + " distinct=" + distinct)
                         .isEqualTo(expected);
             }
