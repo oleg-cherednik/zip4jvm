@@ -13,14 +13,14 @@
  */
 package io.airlift.compress.zstd.fse.decompress;
 
-import io.airlift.compress.zstd.BackwardDecorator;
+import io.airlift.compress.zstd.io.BackwardDecorator;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.DecompressIn;
 import io.airlift.compress.zstd.io.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.huffman.HuffmanConst;
 
-import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
-import static io.airlift.compress.zstd.Util.verify;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_LONG;
+import static io.airlift.compress.zstd.model.Util.verify;
 import static io.airlift.compress.zstd.io.BackwardBitInputDecorator.peekBits;
 
 public class FiniteStateEntropyForDecompress {

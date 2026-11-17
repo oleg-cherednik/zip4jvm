@@ -13,7 +13,7 @@
  */
 package io.airlift.compress.zstd.fse;
 
-import io.airlift.compress.zstd.Util;
+import io.airlift.compress.zstd.model.Util;
 import io.airlift.compress.zstd.io.MaskBitOutputStream;
 import io.airlift.compress.zstd.huffman.HuffmanConst;
 

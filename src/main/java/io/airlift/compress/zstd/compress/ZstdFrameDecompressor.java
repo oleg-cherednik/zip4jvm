@@ -15,13 +15,13 @@ package io.airlift.compress.zstd.compress;
 
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
-import io.airlift.compress.zstd.BackwardDecorator;
-import io.airlift.compress.zstd.BlockHeader;
+import io.airlift.compress.zstd.io.BackwardDecorator;
+import io.airlift.compress.zstd.model.BlockHeader;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
-import io.airlift.compress.zstd.FrameHeader;
+import io.airlift.compress.zstd.model.FrameHeader;
 import io.airlift.compress.zstd.DecompressIn;
-import io.airlift.compress.zstd.LiteralsSectionHeader;
-import io.airlift.compress.zstd.SlideWindow;
+import io.airlift.compress.zstd.model.LiteralsSectionHeader;
+import io.airlift.compress.zstd.model.SlideWindow;
 import io.airlift.compress.zstd.io.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.io.SequencesInitializer;
 import io.airlift.compress.zstd.fse.decompress.FiniteStateEntropyForDecompress;
@@ -34,19 +34,19 @@ import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static io.airlift.compress.zstd.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
-import static io.airlift.compress.zstd.Constants.LITERALS_LENGTH_BITS;
-import static io.airlift.compress.zstd.Constants.LITERAL_LENGTH_TABLE_LOG;
-import static io.airlift.compress.zstd.Constants.MAGIC_NUMBER;
-import static io.airlift.compress.zstd.Constants.MATCH_LENGTH_BITS;
-import static io.airlift.compress.zstd.Constants.MATCH_LENGTH_TABLE_LOG;
-import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
-import static io.airlift.compress.zstd.Constants.MAX_LITERALS_LENGTH_SYMBOL;
-import static io.airlift.compress.zstd.Constants.MAX_MATCH_LENGTH_SYMBOL;
-import static io.airlift.compress.zstd.Constants.MIN_WINDOW_LOG;
-import static io.airlift.compress.zstd.Constants.OFFSET_TABLE_LOG;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
-import static io.airlift.compress.zstd.Util.verify;
+import static io.airlift.compress.zstd.model.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
+import static io.airlift.compress.zstd.model.Constants.LITERALS_LENGTH_BITS;
+import static io.airlift.compress.zstd.model.Constants.LITERAL_LENGTH_TABLE_LOG;
+import static io.airlift.compress.zstd.model.Constants.MAGIC_NUMBER;
+import static io.airlift.compress.zstd.model.Constants.MATCH_LENGTH_BITS;
+import static io.airlift.compress.zstd.model.Constants.MATCH_LENGTH_TABLE_LOG;
+import static io.airlift.compress.zstd.model.Constants.MAX_BLOCK_SIZE;
+import static io.airlift.compress.zstd.model.Constants.MAX_LITERALS_LENGTH_SYMBOL;
+import static io.airlift.compress.zstd.model.Constants.MAX_MATCH_LENGTH_SYMBOL;
+import static io.airlift.compress.zstd.model.Constants.MIN_WINDOW_LOG;
+import static io.airlift.compress.zstd.model.Constants.OFFSET_TABLE_LOG;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_LONG;
+import static io.airlift.compress.zstd.model.Util.verify;
 import static io.airlift.compress.zstd.io.BackwardBitInputDecorator.peekBits;
 
 @RequiredArgsConstructor

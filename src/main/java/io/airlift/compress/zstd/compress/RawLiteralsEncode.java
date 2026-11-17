@@ -1,7 +1,7 @@
 package io.airlift.compress.zstd.compress;
 
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
-import io.airlift.compress.zstd.LiteralsSectionHeader;
+import io.airlift.compress.zstd.model.LiteralsSectionHeader;
 import io.airlift.compress.zstd.Out;
 
 /**

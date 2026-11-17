@@ -13,7 +13,7 @@
  */
 package io.airlift.compress.zstd.huffman;
 
-import io.airlift.compress.zstd.BackwardDecorator;
+import io.airlift.compress.zstd.io.BackwardDecorator;
 import io.airlift.compress.zstd.DecompressIn;
 import io.airlift.compress.zstd.io.HuffmanBitOutputStream;
 import io.airlift.compress.zstd.io.HeaderDataOutDecorator;
@@ -23,8 +23,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
-import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_BYTE;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_SHORT;
 
 @RequiredArgsConstructor
 public class HuffmanCompressor {

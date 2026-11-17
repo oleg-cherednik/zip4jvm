@@ -17,10 +17,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import static io.airlift.compress.zstd.Constants.MAX_WINDOW_LOG;
-import static io.airlift.compress.zstd.Constants.MIN_WINDOW_LOG;
-import static io.airlift.compress.zstd.Util.cycleLog;
-import static io.airlift.compress.zstd.Util.highestBit;
+import static io.airlift.compress.zstd.model.Constants.MAX_WINDOW_LOG;
+import static io.airlift.compress.zstd.model.Constants.MIN_WINDOW_LOG;
+import static io.airlift.compress.zstd.model.Util.cycleLog;
+import static io.airlift.compress.zstd.model.Util.highestBit;
 
 @Getter
 public class CompressionParameters {

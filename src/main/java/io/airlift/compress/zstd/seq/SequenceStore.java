@@ -13,8 +13,8 @@
  */
 package io.airlift.compress.zstd.seq;
 
-import io.airlift.compress.zstd.Constants;
-import io.airlift.compress.zstd.Util;
+import io.airlift.compress.zstd.model.Constants;
+import io.airlift.compress.zstd.model.Util;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
 

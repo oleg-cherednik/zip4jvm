@@ -1,10 +1,10 @@
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.model;
 
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
 
-import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
+import static io.airlift.compress.zstd.model.Constants.MAX_BLOCK_SIZE;
 
 /**
  * Decoded data of the current frame: the history for matches (up to {@code Window_Size} bytes) followed by the

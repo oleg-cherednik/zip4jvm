@@ -1,6 +1,7 @@
 package io.airlift.compress.zstd;
 
 import io.airlift.compress.zstd.compress.ZstdFrameDecompressor;
+import io.airlift.compress.zstd.model.SlideWindow;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;

@@ -4,9 +4,9 @@ import io.airlift.compress.zstd.CompressIn;
 import lombok.Getter;
 import lombok.Setter;
 
-import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_BYTE;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_INT;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_LONG;
 
 /**
  * Sliding input window for block compression: history ({@code <= windowSize}) followed by the current block

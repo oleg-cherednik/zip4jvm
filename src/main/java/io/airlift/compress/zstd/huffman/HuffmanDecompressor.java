@@ -13,19 +13,19 @@
  */
 package io.airlift.compress.zstd.huffman;
 
-import io.airlift.compress.zstd.BackwardDecorator;
+import io.airlift.compress.zstd.io.BackwardDecorator;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.DecompressIn;
-import io.airlift.compress.zstd.Util;
+import io.airlift.compress.zstd.model.Util;
 import io.airlift.compress.zstd.io.BackwardBitInputStream;
 import io.airlift.compress.zstd.fse.decompress.FiniteStateEntropyForDecompress;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
-import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
-import static io.airlift.compress.zstd.Util.isPowerOf2;
-import static io.airlift.compress.zstd.Util.verify;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_INT;
+import static io.airlift.compress.zstd.model.Util.isPowerOf2;
+import static io.airlift.compress.zstd.model.Util.verify;
 
 @RequiredArgsConstructor
 public class HuffmanDecompressor {

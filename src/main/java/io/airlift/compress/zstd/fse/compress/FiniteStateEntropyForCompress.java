@@ -15,13 +15,13 @@ package io.airlift.compress.zstd.fse.compress;
 
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
-import io.airlift.compress.zstd.Util;
+import io.airlift.compress.zstd.model.Util;
 import io.airlift.compress.zstd.io.MaskBitOutputStream;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
 import io.airlift.compress.zstd.huffman.HuffmanConst;
 import io.airlift.compress.zstd.Out;
 
-import static io.airlift.compress.zstd.Util.checkArgument;
+import static io.airlift.compress.zstd.model.Util.checkArgument;
 
 public class FiniteStateEntropyForCompress {
 

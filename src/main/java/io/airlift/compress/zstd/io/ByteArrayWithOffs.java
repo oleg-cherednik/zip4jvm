@@ -4,8 +4,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_BYTE;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_LONG;
 
 /**
  * @author Oleg Cherednik

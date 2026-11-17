@@ -1,7 +1,9 @@
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.model;
 
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
+import io.airlift.compress.zstd.DecompressIn;
+import io.airlift.compress.zstd.Out;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

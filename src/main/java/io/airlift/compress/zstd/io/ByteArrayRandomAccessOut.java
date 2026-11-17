@@ -6,9 +6,9 @@ import lombok.Setter;
 
 import java.util.Arrays;
 
-import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_BYTE;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_INT;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_SHORT;
 
 /**
  * @author Oleg Cherednik

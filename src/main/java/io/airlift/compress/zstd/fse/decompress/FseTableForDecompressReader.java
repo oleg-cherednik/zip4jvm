@@ -18,8 +18,8 @@ import io.airlift.compress.zstd.fse.FseCompressionTable;
 import io.airlift.compress.zstd.huffman.HuffmanConst;
 import lombok.RequiredArgsConstructor;
 
-import static io.airlift.compress.zstd.Util.highestBit;
-import static io.airlift.compress.zstd.Util.verify;
+import static io.airlift.compress.zstd.model.Util.highestBit;
+import static io.airlift.compress.zstd.model.Util.verify;
 
 @RequiredArgsConstructor
 public class FseTableForDecompressReader {

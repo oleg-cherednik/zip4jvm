@@ -15,7 +15,7 @@ package io.airlift.compress.zstd.compress;
 
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
-import io.airlift.compress.zstd.BlockHeader;
+import io.airlift.compress.zstd.model.BlockHeader;
 import io.airlift.compress.zstd.CompressIn;
 import io.airlift.compress.zstd.Out;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
@@ -26,10 +26,10 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
-import static io.airlift.compress.zstd.Constants.MAGIC_NUMBER;
-import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
-import static io.airlift.compress.zstd.Constants.MIN_BLOCK_SIZE;
-import static io.airlift.compress.zstd.Constants.MIN_WINDOW_LOG;
+import static io.airlift.compress.zstd.model.Constants.MAGIC_NUMBER;
+import static io.airlift.compress.zstd.model.Constants.MAX_BLOCK_SIZE;
+import static io.airlift.compress.zstd.model.Constants.MIN_BLOCK_SIZE;
+import static io.airlift.compress.zstd.model.Constants.MIN_WINDOW_LOG;
 
 @RequiredArgsConstructor
 public class ZstdFrameCompressor {

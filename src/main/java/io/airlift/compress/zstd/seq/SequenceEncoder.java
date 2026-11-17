@@ -13,7 +13,7 @@
  */
 package io.airlift.compress.zstd.seq;
 
-import io.airlift.compress.zstd.Histogram;
+import io.airlift.compress.zstd.model.Histogram;
 import io.airlift.compress.zstd.io.MaskBitOutputStream;
 import io.airlift.compress.zstd.compress.CompressionContext;
 import io.airlift.compress.zstd.compress.CompressionParameters;
@@ -23,15 +23,15 @@ import io.airlift.compress.zstd.io.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.Out;
 import io.airlift.compress.zstd.io.RandomAccessOut;
 
-import static io.airlift.compress.zstd.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
-import static io.airlift.compress.zstd.Constants.LITERALS_LENGTH_BITS;
-import static io.airlift.compress.zstd.Constants.LITERAL_LENGTH_TABLE_LOG;
-import static io.airlift.compress.zstd.Constants.MATCH_LENGTH_BITS;
-import static io.airlift.compress.zstd.Constants.MATCH_LENGTH_TABLE_LOG;
-import static io.airlift.compress.zstd.Constants.MAX_LITERALS_LENGTH_SYMBOL;
-import static io.airlift.compress.zstd.Constants.MAX_MATCH_LENGTH_SYMBOL;
-import static io.airlift.compress.zstd.Constants.MAX_OFFSET_CODE_SYMBOL;
-import static io.airlift.compress.zstd.Constants.OFFSET_TABLE_LOG;
+import static io.airlift.compress.zstd.model.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
+import static io.airlift.compress.zstd.model.Constants.LITERALS_LENGTH_BITS;
+import static io.airlift.compress.zstd.model.Constants.LITERAL_LENGTH_TABLE_LOG;
+import static io.airlift.compress.zstd.model.Constants.MATCH_LENGTH_BITS;
+import static io.airlift.compress.zstd.model.Constants.MATCH_LENGTH_TABLE_LOG;
+import static io.airlift.compress.zstd.model.Constants.MAX_LITERALS_LENGTH_SYMBOL;
+import static io.airlift.compress.zstd.model.Constants.MAX_MATCH_LENGTH_SYMBOL;
+import static io.airlift.compress.zstd.model.Constants.MAX_OFFSET_CODE_SYMBOL;
+import static io.airlift.compress.zstd.model.Constants.OFFSET_TABLE_LOG;
 import static io.airlift.compress.zstd.seq.SequenceEncodingContext.MAX_SEQUENCES;
 
 public class SequenceEncoder {

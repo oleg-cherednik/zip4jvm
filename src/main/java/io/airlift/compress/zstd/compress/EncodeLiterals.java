@@ -1,10 +1,10 @@
 package io.airlift.compress.zstd.compress;
 
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
-import io.airlift.compress.zstd.Histogram;
+import io.airlift.compress.zstd.model.Histogram;
 import io.airlift.compress.zstd.DecompressIn;
 import io.airlift.compress.zstd.InputStreamToInAdapter;
-import io.airlift.compress.zstd.LiteralsSectionHeader;
+import io.airlift.compress.zstd.model.LiteralsSectionHeader;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionTable;
 import io.airlift.compress.zstd.huffman.HuffmanCompressor;
 import io.airlift.compress.zstd.huffman.HuffmanConst;

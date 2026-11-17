@@ -1,11 +1,10 @@
 package io.airlift.compress.zstd.io;
 
-import io.airlift.compress.zstd.BackwardDecorator;
 import lombok.Getter;
 
-import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
-import static io.airlift.compress.zstd.Util.highestBit;
-import static io.airlift.compress.zstd.Util.verify;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_LONG;
+import static io.airlift.compress.zstd.model.Util.highestBit;
+import static io.airlift.compress.zstd.model.Util.verify;
 
 /**
  * @author Oleg Cherednik

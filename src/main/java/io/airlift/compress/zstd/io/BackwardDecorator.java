@@ -11,16 +11,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.io;
 
+import io.airlift.compress.zstd.DecompressIn;
 import lombok.Getter;
 
 import java.io.IOException;
 
-import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
-import static io.airlift.compress.zstd.Util.highestBit;
-import static io.airlift.compress.zstd.Util.verify;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_BYTE;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_LONG;
+import static io.airlift.compress.zstd.model.Util.highestBit;
+import static io.airlift.compress.zstd.model.Util.verify;
 
 /**
  * Bit streams are encoded as a byte-aligned little-endian stream. Thus, bits are laid out

@@ -13,7 +13,6 @@
  */
 package io.airlift.compress.zstd.io;
 
-import io.airlift.compress.zstd.BackwardDecorator;
 import lombok.Getter;
 
 /**

@@ -13,12 +13,12 @@
  */
 package io.airlift.compress.zstd.seq;
 
-import io.airlift.compress.zstd.Constants;
+import io.airlift.compress.zstd.model.Constants;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
 
-import static io.airlift.compress.zstd.Constants.MAX_LITERALS_LENGTH_SYMBOL;
-import static io.airlift.compress.zstd.Constants.MAX_MATCH_LENGTH_SYMBOL;
-import static io.airlift.compress.zstd.Constants.MAX_OFFSET_CODE_SYMBOL;
+import static io.airlift.compress.zstd.model.Constants.MAX_LITERALS_LENGTH_SYMBOL;
+import static io.airlift.compress.zstd.model.Constants.MAX_MATCH_LENGTH_SYMBOL;
+import static io.airlift.compress.zstd.model.Constants.MAX_OFFSET_CODE_SYMBOL;
 
 public class SequenceEncodingContext {
 

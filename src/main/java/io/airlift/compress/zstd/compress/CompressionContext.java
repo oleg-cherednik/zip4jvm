@@ -18,7 +18,7 @@ import io.airlift.compress.zstd.seq.SequenceEncodingContext;
 import io.airlift.compress.zstd.seq.SequenceStore;
 import lombok.AllArgsConstructor;
 
-import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
+import static io.airlift.compress.zstd.model.Constants.MAX_BLOCK_SIZE;
 
 public class CompressionContext {
 

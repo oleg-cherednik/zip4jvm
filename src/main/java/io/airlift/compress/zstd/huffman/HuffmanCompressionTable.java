@@ -15,8 +15,8 @@ package io.airlift.compress.zstd.huffman;
 
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
-import io.airlift.compress.zstd.Histogram;
-import io.airlift.compress.zstd.Util;
+import io.airlift.compress.zstd.model.Histogram;
+import io.airlift.compress.zstd.model.Util;
 import io.airlift.compress.zstd.io.HuffmanBitOutputStream;
 import io.airlift.compress.zstd.io.MaskBitOutputStream;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
@@ -27,8 +27,8 @@ import io.airlift.compress.zstd.io.RandomAccessOut;
 
 import java.util.Arrays;
 
-import static io.airlift.compress.zstd.Util.checkArgument;
-import static io.airlift.compress.zstd.Util.minTableLog;
+import static io.airlift.compress.zstd.model.Util.checkArgument;
+import static io.airlift.compress.zstd.model.Util.minTableLog;
 
 public final class HuffmanCompressionTable {
 

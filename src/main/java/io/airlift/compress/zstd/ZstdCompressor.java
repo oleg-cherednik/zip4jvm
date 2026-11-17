@@ -18,7 +18,7 @@ import io.airlift.compress.zstd.compress.ZstdFrameCompressor;
 
 import java.io.IOException;
 
-import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
+import static io.airlift.compress.zstd.model.Constants.MAX_BLOCK_SIZE;
 
 public class ZstdCompressor {
 
