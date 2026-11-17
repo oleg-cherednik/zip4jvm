@@ -87,11 +87,7 @@ public class SequenceEncoder {
         SequenceHeader sequenceHeader = new SequenceHeader();
         sequenceHeader.setSequenceCount(context.sequenceStore.sequenceCount);
 
-        sequenceHeader.encodeSequenceCount(out);
-
         if (sequenceHeader.getSequenceCount() > 0) {
-            int headerAddress = out.getOffs();
-
             out.setOffs(offs + sequenceHeader.getHeaderSize());
             boolean success = foo(out, context, sequenceHeader);
 
@@ -99,11 +95,17 @@ public class SequenceEncoder {
                 encodeSequences(out, matchLengthTable, offsetCodeTable, literalLengthTable, context.sequenceStore);
 
                 int tmpOffs = out.getOffs();
-                out.setOffs(headerAddress);
+                out.setOffs(offs);
+                sequenceHeader.encodeSequenceCount(out);
                 sequenceHeader.encodeCompressionMode(out);
                 out.setOffs(tmpOffs);
                 return true;
+            } else {
+                out.setOffs(offs);
+                sequenceHeader.encodeSequenceCount(out);
             }
+        } else {
+            sequenceHeader.encodeSequenceCount(out);
         }
 
         return true;
