@@ -2,10 +2,10 @@ package io.airlift.compress.zstd.io;
 
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
@@ -17,14 +17,15 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
  * @since 17.11.2026
  */
 @Getter
+@Setter
 public class ByteArrayRandomAccessOut implements RandomAccessOut {
 
     private static final int OFFS_ZERO = 0;
 
-    public final byte[] buf;
-    @Setter
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    private final byte[] buf;
     private int offs;
-    @Setter
     private int limit;
 
     public ByteArrayRandomAccessOut(int limit) {
@@ -44,6 +45,8 @@ public class ByteArrayRandomAccessOut implements RandomAccessOut {
         Arrays.fill(buf, (byte) 0);
     }
 
+    // ---------- Out ----------
+
     @Override
     public int available() {
         return limit - offs;
@@ -62,6 +65,7 @@ public class ByteArrayRandomAccessOut implements RandomAccessOut {
         offs += SIZE_OF_SHORT;
     }
 
+    @Override
     public void putInt(int x) {
         buf[offs] = (byte) (x & 0xFF);
         buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
@@ -70,17 +74,27 @@ public class ByteArrayRandomAccessOut implements RandomAccessOut {
         offs += SIZE_OF_INT;
     }
 
+    @Override
     public void copyMemory(ByteArrayWithOffs in) {
         System.arraycopy(in.buf, 0, buf, offs, in.getOffs());
         offs += in.getOffs();
     }
 
-    //    @Override
-    public void copyMemory(OutByteArrayWithOffs in, int size) {
-        System.arraycopy(in.buf, 0, buf, offs, size);
+    @Override
+    public void copyMemory(RandomAccessOut rao) {
+        int nowRead = rao.read(buf, offs, rao.available());
+        offs += nowRead;
+    }
+
+    @Override
+    public void copyMemory(InByteArrayWithOffs in, int size) {
+        System.arraycopy(in.buf, in.getOffs(), buf, offs, size);
         offs += size;
     }
 
+    // ---------- RandomAccessOut ----------
+
+    @Override
     public int read(byte[] buf, int offs, int len) {
         int available = Math.min(available(), len);
         System.arraycopy(this.buf, this.offs, buf, offs, available);
@@ -88,25 +102,11 @@ public class ByteArrayRandomAccessOut implements RandomAccessOut {
         return available;
     }
 
-    public void copyMemory(InByteArrayWithOffs in, int size) {
-        System.arraycopy(in.buf, in.getOffs(), buf, offs, size);
-        offs += size;
-    }
-
-    public void copyMemory(ByteArrayRandomAccessOut in, int size) {
-        System.arraycopy(in.buf, 0, buf, offs, size);
-        offs += size;
-    }
-
     // ---------- Objects ----------
 
     @Override
     public String toString() {
-        return String.format("size: %s, offs: %s", buf.length, offs);
+        return String.format("size: %s, offs: %s", limit, offs);
     }
 
-    @Override
-    public void close() throws IOException {
-
-    }
 }

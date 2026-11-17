@@ -23,8 +23,7 @@ public interface Out extends Closeable {
 
     void copyMemory(ByteArrayWithOffs in);
 
-    default void copyMemory(RandomAccessOut rao) {
-    }
+    void copyMemory(RandomAccessOut rao);
 
     void copyMemory(InByteArrayWithOffs in, int size);
 
