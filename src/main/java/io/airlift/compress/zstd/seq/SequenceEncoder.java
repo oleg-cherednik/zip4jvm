@@ -95,11 +95,12 @@ public class SequenceEncoder {
             boolean success = foo(out, context, sequenceHeader);
 
             if (success) {
+                encodeSequences(out, matchLengthTable, offsetCodeTable, literalLengthTable, context.sequenceStore);
+
                 int tmpOffs = out.getOffs();
                 out.setOffs(headerAddress);
                 sequenceHeader.encodeCompressionMode(out);
                 out.setOffs(tmpOffs);
-                encodeSequences(out, matchLengthTable, offsetCodeTable, literalLengthTable, context.sequenceStore);
                 return true;
             }
         }
