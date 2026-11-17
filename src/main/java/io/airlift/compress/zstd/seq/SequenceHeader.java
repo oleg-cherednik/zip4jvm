@@ -60,9 +60,13 @@ public class SequenceHeader {
     }
 
     public void encodeCompressionMode(OutByteArrayWithOffs out) {
-        out.putByte((byte) ((literalsLengthCompressionMode.id << 6)
-                | (offsetCompressionMode.id << 4)
-                | (matchLengthCompressionMode.id << 2)));
+        if (literalsLengthCompressionMode != null
+                && offsetCompressionMode != null
+                && matchLengthCompressionMode != null) {
+            out.putByte((byte) ((literalsLengthCompressionMode.id << 6)
+                    | (offsetCompressionMode.id << 4)
+                    | (matchLengthCompressionMode.id << 2)));
+        }
     }
 
     public int getHeaderSize() {
