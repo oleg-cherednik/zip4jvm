@@ -50,7 +50,7 @@ public class SequenceHeader {
     public void encodeSequenceCount(OutByteArrayWithOffs out) {
         if (sequenceCount <= SEQ_1_BYTE)
             out.putByte((byte) sequenceCount);
-        else if (sequenceCount < LONG_NUMBER_OF_SEQUENCES) {
+        else if (sequenceCount <= LONG_NUMBER_OF_SEQUENCES) {
             out.putByte((byte) (sequenceCount >>> 8 | 0x80));
             out.putByte((byte) sequenceCount);
         } else {
@@ -66,11 +66,16 @@ public class SequenceHeader {
     }
 
     public int getHeaderSize() {
+        int size = sequenceCount > 0 ? 1 : 0;
+
         if (sequenceCount <= SEQ_1_BYTE)
-            return 2;
-        if (sequenceCount < LONG_NUMBER_OF_SEQUENCES)
-            return 3;
-        return 4;
+            size++;
+        if (sequenceCount <= LONG_NUMBER_OF_SEQUENCES)
+            size++;
+        if (sequenceCount > LONG_NUMBER_OF_SEQUENCES)
+            size++;
+
+        return size;
     }
 
     @Getter
