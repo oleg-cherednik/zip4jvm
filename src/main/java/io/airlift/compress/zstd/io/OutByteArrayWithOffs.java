@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.io.IOException;
-
 import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
@@ -17,20 +15,15 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
  * @since 03.09.2026
  */
 @Getter
+@Setter
 @RequiredArgsConstructor
 public class OutByteArrayWithOffs implements RandomAccessOut {
 
-    public String id;
     public final byte[] buf;
-    @Getter
     private int offs;
-    @Setter
-    @Getter
     private int limit;
 
-    public void setOffs(int offs) {
-        this.offs = offs;
-    }
+    // ---------- Out ----------
 
     @Override
     public int available() {
@@ -50,6 +43,7 @@ public class OutByteArrayWithOffs implements RandomAccessOut {
         offs += SIZE_OF_SHORT;
     }
 
+    @Override
     public void putInt(int x) {
         buf[offs] = (byte) (x & 0xFF);
         buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
@@ -58,23 +52,21 @@ public class OutByteArrayWithOffs implements RandomAccessOut {
         offs += SIZE_OF_INT;
     }
 
+    @Override
     public void copyMemory(ByteArrayWithOffs in) {
         System.arraycopy(in.buf, 0, buf, offs, in.getOffs());
         offs += in.getOffs();
     }
 
-    public void copyMemory(InByteArrayWithOffs in, int size) {
-        System.arraycopy(in.buf, in.getOffs(), buf, offs, size);
-        offs += size;
-    }
-
+    @Override
     public void copyMemory(RandomAccessOut rao) {
         int nowRead = rao.read(buf, offs, rao.available());
         offs += nowRead;
     }
 
-    public void copyMemory(OutByteArrayWithOffs in, int size) {
-        System.arraycopy(in.buf, 0, buf, offs, size);
+    @Override
+    public void copyMemory(InByteArrayWithOffs in, int size) {
+        System.arraycopy(in.buf, in.getOffs(), buf, offs, size);
         offs += size;
     }
 
@@ -82,11 +74,7 @@ public class OutByteArrayWithOffs implements RandomAccessOut {
 
     @Override
     public String toString() {
-        return String.format("[%s] size: %s, offs: %s", id, buf.length, offs);
+        return String.format("limit: %s, offs: %s", limit, offs);
     }
 
-    @Override
-    public void close() throws IOException {
-
-    }
 }

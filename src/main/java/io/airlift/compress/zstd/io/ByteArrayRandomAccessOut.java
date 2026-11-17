@@ -106,7 +106,7 @@ public class ByteArrayRandomAccessOut implements RandomAccessOut {
 
     @Override
     public String toString() {
-        return String.format("size: %s, offs: %s", limit, offs);
+        return String.format("limit: %s, offs: %s", limit, offs);
     }
 
 }
