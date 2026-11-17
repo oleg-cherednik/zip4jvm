@@ -3,6 +3,7 @@ package io.airlift.compress.zstd.io;
 import io.airlift.compress.zstd.CompressIn;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.io.IOUtils;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
@@ -67,8 +68,9 @@ public final class InByteArrayWithOffs implements CompressIn {
     @Override
     public int read(byte[] buf, int offs, int len) {
         int available = available();
+
         if (available <= 0)
-            return -1;
+            return IOUtils.EOF;
 
         int nowRead = Math.min(available, len);
         System.arraycopy(this.buf, this.offs, buf, offs, nowRead);

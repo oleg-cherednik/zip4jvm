@@ -121,25 +121,25 @@ public class ZstdFrameCompressor {
         BlockHeader blockHeader = new BlockHeader();
         // a block is compressed into this buffer first; it is copied to out only when the block is really compressed
         ByteArrayRandomAccessOut barao = new ByteArrayRandomAccessOut(blockSize);
-        ByteArrayRandomAccessIn raIn = new ByteArrayRandomAccessIn(parameters.getWindowSize(), blockSize);
+        ByteArrayRandomAccessIn barai = new ByteArrayRandomAccessIn(parameters.getWindowSize(), blockSize);
         XXHash64 checksum = new XXHash64();
 
         while (remaining > 0) {
-            int delta = raIn.slide();
+            int delta = barai.slide();
             if (delta > 0)
                 context.blockCompressionState.rebase(delta);
 
-            int read = raIn.fill(in, Math.min(blockSize, remaining));
+            int read = barai.fill(in, Math.min(blockSize, remaining));
             if (read <= 0)
                 break;
 
-            checksum.update(raIn.getBuf(), raIn.getBlockStart(), read);
+            checksum.update(barai.getBuf(), barai.getBlockStart(), read);
 
             blockHeader.setLastBlock(read >= remaining);
             barao.reset();
             barao.setLimit(read);
 
-            boolean success = compressBlock(barao, context, raIn);
+            boolean success = compressBlock(barao, context, barai);
 
             if (success) {
                 blockHeader.setBlockType(BlockHeader.BlockType.COMPRESSED_BLOCK);
@@ -154,8 +154,8 @@ public class ZstdFrameCompressor {
             if (success)
                 out.copyMemory(barao.getOutForCopy());
             else {
-                raIn.setOffs(raIn.getBlockStart());
-                out.copyMemory(raIn, read);
+                barai.setOffs(barai.getBlockStart());
+                out.copyMemory(barai, read);
             }
 
             remaining -= read;
