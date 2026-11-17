@@ -8,6 +8,9 @@ import java.io.IOException;
  */
 public interface RandomAccessOut extends Out {
 
+    @Deprecated
+    byte[] getBuf();
+
     void setOffs(int offs);
 
     default int read(byte[] buf, int offs, int len) {
