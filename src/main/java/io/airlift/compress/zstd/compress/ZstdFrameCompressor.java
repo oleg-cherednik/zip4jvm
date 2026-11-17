@@ -16,8 +16,9 @@ package io.airlift.compress.zstd.compress;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.zstd.BlockHeader;
-import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
+import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.io.RandomAccessOut;
 import io.airlift.compress.zstd.seq.SequenceEncoder;
 import lombok.RequiredArgsConstructor;
 
@@ -159,8 +160,8 @@ public class ZstdFrameCompressor {
         return out.getOffs() - startOffs;
     }
 
-    private boolean compressBlock(OutByteArrayWithOffs out, CompressionContext context) throws IOException {
-        final int offs = out.getOffs();
+    private boolean compressBlock(RandomAccessOut rao, CompressionContext context) throws IOException {
+        final int offs = rao.getOffs();
 
         if (in.getSize() < MIN_BLOCK_SIZE + BlockHeader.HEADER_SIZE + 1) {
             //  don't even attempt compression below a certain input size
@@ -179,12 +180,12 @@ public class ZstdFrameCompressor {
         // convert length/offsets into codes
         context.sequenceStore.generateCodes();
 
-        boolean success = EncodeLiterals.encodeLiterals(out, context);
+        boolean success = EncodeLiterals.encodeLiterals(rao, context);
 
         if (!success)
             return false;
 
-        success = SequenceEncoder.compressSequences(out, context);
+        success = SequenceEncoder.compressSequences(rao, context);
 
         if (!success)
             return false; // sequences section does not fit into the output
@@ -192,7 +193,7 @@ public class ZstdFrameCompressor {
         // Check compressibility
         int maxCompressedSize = in.getSize() - context.calculateMinimumGain(in.getSize());
 
-        if (out.getOffs() - offs > maxCompressedSize)
+        if (rao.getOffs() - offs > maxCompressedSize)
             return false; // not compressed
 
         // confirm repeated offsets and entropy tables

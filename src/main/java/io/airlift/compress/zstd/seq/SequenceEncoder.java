@@ -14,14 +14,14 @@
 package io.airlift.compress.zstd.seq;
 
 import io.airlift.compress.zstd.Histogram;
-import io.airlift.compress.zstd.io.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.bos.MaskBitOutputStream;
 import io.airlift.compress.zstd.compress.CompressionContext;
 import io.airlift.compress.zstd.compress.CompressionParameters;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
 import io.airlift.compress.zstd.fse.compress.FiniteStateEntropyForCompress;
+import io.airlift.compress.zstd.io.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.io.Out;
-import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.io.RandomAccessOut;
 
 import static io.airlift.compress.zstd.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
 import static io.airlift.compress.zstd.Constants.LITERALS_LENGTH_BITS;
@@ -81,20 +81,20 @@ public class SequenceEncoder {
     private SequenceEncoder() {
     }
 
-    public static boolean compressSequences(OutByteArrayWithOffs out, CompressionContext context) {
-        if (out.available() < MAX_SEQUENCES_SECTION_HEADER_SIZE)
+    public static boolean compressSequences(RandomAccessOut rao, CompressionContext context) {
+        if (rao.available() < MAX_SEQUENCES_SECTION_HEADER_SIZE)
             return false;
 
         SequenceHeader sequenceHeader = new SequenceHeader();
         sequenceHeader.setSequenceCount(context.sequenceStore.sequenceCount);
 
-        HeaderDataOutDecorator hdod = new HeaderDataOutDecorator(out);
+        HeaderDataOutDecorator hdod = new HeaderDataOutDecorator(rao);
         hdod.setHeaderSize(sequenceHeader.getHeaderSize());
 
         boolean success = true;
 
         if (sequenceHeader.getSequenceCount() > 0) {
-            OutByteArrayWithOffs dataOut = hdod.getOutForData();
+            Out dataOut = hdod.getOutForData();
             success = foo(dataOut, context, sequenceHeader);
 
             if (success)
@@ -289,7 +289,7 @@ public class SequenceEncoder {
     }
 
     private static void encodeSequences(
-            OutByteArrayWithOffs out,
+            Out out,
             FseCompressionTable matchLengthTable,
             FseCompressionTable offsetsTable,
             FseCompressionTable literalLengthTable,

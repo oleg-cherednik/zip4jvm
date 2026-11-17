@@ -16,6 +16,7 @@ package io.airlift.compress.zstd.huffman;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.zstd.Histogram;
+import io.airlift.compress.zstd.io.Out;
 import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.io.HeaderDataOutDecorator;
@@ -23,6 +24,7 @@ import io.airlift.compress.zstd.bos.HuffmanBitOutputStream;
 import io.airlift.compress.zstd.bos.MaskBitOutputStream;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
 import io.airlift.compress.zstd.fse.compress.FiniteStateEntropyForCompress;
+import io.airlift.compress.zstd.io.RandomAccessOut;
 
 import java.util.Arrays;
 
@@ -199,8 +201,8 @@ public final class HuffmanCompressionTable {
 
     private static final int HEADER_SIZE_BYTES = 1;
 
-    public void write(OutByteArrayWithOffs out) {
-        HeaderDataOutDecorator hdod = new HeaderDataOutDecorator(out);
+    public void write(RandomAccessOut rao) {
+        HeaderDataOutDecorator hdod = new HeaderDataOutDecorator(rao);
         hdod.setHeaderSize(HEADER_SIZE_BYTES);
 
         HuffmanTableWriterWorkspace workspace = new HuffmanTableWriterWorkspace();
@@ -238,11 +240,11 @@ public final class HuffmanCompressionTable {
             // encode number of symbols
             // header = #entries + 127 per RFC
             hdod.reset();
-            out.putByte((byte) (127 + entryCount));
+            rao.putByte((byte) (127 + entryCount));
 
             workspace.weights[maxSymbol] = 0; // last weight is implicit, so set to 0 so that it doesn't get encoded below
             for (int i = 0; i < entryCount; i += 2)
-                out.putByte((byte) ((workspace.weights[i] << 4) + workspace.weights[i + 1]));
+                rao.putByte((byte) ((workspace.weights[i] << 4) + workspace.weights[i + 1]));
         }
     }
 
@@ -379,9 +381,7 @@ public final class HuffmanCompressionTable {
     /**
      * All elements within weightTable must be <= Huffman.MAX_TABLE_LOG
      */
-    private static void compressWeights(OutByteArrayWithOffs out,
-                                        int weightsLength,
-                                        HuffmanTableWriterWorkspace workspace) {
+    private static void compressWeights(Out out, int weightsLength, HuffmanTableWriterWorkspace workspace) {
         if (weightsLength <= 2)
             return; // too short for FSE: it needs more than 2 symbols (two interleaved states)
 

@@ -5,11 +5,11 @@ import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.InputStreamToInAdapter;
 import io.airlift.compress.zstd.LiteralsSectionHeader;
-import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
-import io.airlift.compress.zstd.io.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionTable;
 import io.airlift.compress.zstd.huffman.HuffmanCompressor;
 import io.airlift.compress.zstd.huffman.HuffmanConst;
+import io.airlift.compress.zstd.io.HeaderDataOutDecorator;
+import io.airlift.compress.zstd.io.RandomAccessOut;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -36,14 +36,14 @@ public final class EncodeLiterals {
     private static final RleLiteralsEncode rleLiteralsEncode = new RleLiteralsEncode();
     private static final RawLiteralsEncode rawLiteralsEncode = new RawLiteralsEncode();
 
-    public static boolean encodeLiterals(OutByteArrayWithOffs out, CompressionContext context) throws IOException {
-        final int offs = out.getOffs();
+    public static boolean encodeLiterals(RandomAccessOut rao, CompressionContext context) throws IOException {
+        final int offs = rao.getOffs();
         boolean bypassCompression = context.parameters.isBypassCompression();
         ByteArrayWithOffs literalsBuf = context.sequenceStore.literalsBuf;
         int literalSize = literalsBuf.getOffs();
 
         if (bypassCompression || literalSize <= MINIMUM_LITERALS_SIZE)
-            rawLiteralsEncode.encode(out, literalsBuf);
+            rawLiteralsEncode.encode(rao, literalsBuf);
         else {
             Histogram histogram = new Histogram(HuffmanConst.MAX_SYMBOL_COUNT);
             histogram.count(literalsBuf);
@@ -53,25 +53,25 @@ public final class EncodeLiterals {
 
             if (largestCount == literalsBuf.getOffs())
                 // all bytes in input are equal
-                rleLiteralsEncode.encode(out, literalsBuf);
+                rleLiteralsEncode.encode(rao, literalsBuf);
             else if (largestCount <= (literalsBuf.getOffs() >>> 7) + 4)
                 // heuristic: probably not compressible enough
-                rawLiteralsEncode.encode(out, literalsBuf);
+                rawLiteralsEncode.encode(rao, literalsBuf);
             else {
                 int headerSize = LiteralsSectionHeader.CompressedTreeless.calcHeaderSize(literalsBuf.getOffs());
 
-                if (out.available() < headerSize + MAX_HUFFMAN_TABLE_DESCRIPTION_SIZE) {
+                if (rao.available() < headerSize + MAX_HUFFMAN_TABLE_DESCRIPTION_SIZE) {
                     // no room for a new Huffman tree description
-                    rawLiteralsEncode.encode(out, literalsBuf);
+                    rawLiteralsEncode.encode(rao, literalsBuf);
                 } else
-                    huffmanCompressing(out, context, histogram, maxSymbol);
+                    huffmanCompressing(rao, context, histogram, maxSymbol);
             }
         }
 
-        return out.getOffs() > offs;
+        return rao.getOffs() > offs;
     }
 
-    private static void huffmanCompressing(OutByteArrayWithOffs out, CompressionContext context,
+    private static void huffmanCompressing(RandomAccessOut rao, CompressionContext context,
                                            Histogram histogram, int maxSymbol) throws IOException {
         HuffmanCompressionTable prevTable = context.huffmanCompressionContext.getPrevTable();
         ByteArrayWithOffs literalsBuf = context.sequenceStore.literalsBuf;
@@ -83,10 +83,10 @@ public final class EncodeLiterals {
         boolean canReuse = prevTable.isValid(histogram.getCounts(), maxSymbol);
         boolean preferReuse = context.isPreferReuse();
 
-        HeaderDataOutDecorator hdod = new HeaderDataOutDecorator(out);
+        HeaderDataOutDecorator hdod = new HeaderDataOutDecorator(rao);
         hdod.setHeaderSize(LiteralsSectionHeader.CompressedTreeless.calcHeaderSize(literalsBuf.getOffs()));
 
-        OutByteArrayWithOffs dataOut = hdod.getOutForData();
+        RandomAccessOut dataOut = hdod.getOutForData();
 
         if (preferReuse && canReuse) {
             table = prevTable;
@@ -122,10 +122,10 @@ public final class EncodeLiterals {
         // Huffman streams do not check the output limit, so they are written only when there is room for them
         int maxStreamsSize = table.estimateCompressedSize(histogram.getCounts(), maxSymbol) + HUFFMAN_STREAMS_OVERHEAD;
 
-        if (hdod.getHeaderSize() + serializedTableSize + maxStreamsSize > out.available()) {
+        if (hdod.getHeaderSize() + serializedTableSize + maxStreamsSize > rao.available()) {
             context.huffmanCompressionContext.discardTemporaryTable();
             hdod.reset();
-            rawLiteralsEncode.encode(out, literalsBuf);
+            rawLiteralsEncode.encode(rao, literalsBuf);
         } else {
             In in = new InputStreamToInAdapter(new ByteArrayInputStream(literalsBuf.buf));
             HuffmanCompressor huffmanCompressor = new HuffmanCompressor(in, table);
@@ -142,7 +142,7 @@ public final class EncodeLiterals {
                 // discard any temporary table we might have borrowed above
                 context.huffmanCompressionContext.discardTemporaryTable();
                 hdod.reset();
-                rawLiteralsEncode.encode(out, literalsBuf);
+                rawLiteralsEncode.encode(rao, literalsBuf);
             } else {
                 LiteralsSectionHeader.CompressedTreeless header =
                         reuseTable ? LiteralsSectionHeader.createForTreeless()
@@ -154,24 +154,24 @@ public final class EncodeLiterals {
         }
     }
 
-    private static int writeTable(OutByteArrayWithOffs dataOut, HuffmanCompressionTable newTable) {
-        int loOffs = dataOut.getOffs();
-        newTable.write(dataOut);
-        return dataOut.getOffs() - loOffs;
+    private static int writeTable(RandomAccessOut rao, HuffmanCompressionTable newTable) {
+        int loOffs = rao.getOffs();
+        newTable.write(rao);
+        return rao.getOffs() - loOffs;
     }
 
-    private static int compressStream(OutByteArrayWithOffs dataOut,
+    private static int compressStream(RandomAccessOut rao,
                                       boolean singleStream,
                                       HuffmanCompressor huffmanCompressor,
                                       int regeneratedSize) throws IOException {
-        int offs = dataOut.getOffs();
+        int offs = rao.getOffs();
 
         if (singleStream)
-            huffmanCompressor.compressSingleStream(dataOut, regeneratedSize);
+            huffmanCompressor.compressSingleStream(rao, regeneratedSize);
         else
-            huffmanCompressor.compressFourStreams(dataOut, regeneratedSize);
+            huffmanCompressor.compressFourStreams(rao, regeneratedSize);
 
-        return dataOut.getOffs() - offs;
+        return rao.getOffs() - offs;
     }
 
 }

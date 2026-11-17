@@ -23,7 +23,7 @@ import lombok.Setter;
  */
 public final class HeaderDataOutDecorator {
 
-    private final OutByteArrayWithOffs delegate;
+    private final RandomAccessOut rao;
     @Getter
     private final int startOffs;
     @Setter
@@ -31,25 +31,25 @@ public final class HeaderDataOutDecorator {
     private int headerSize = -1;
     private int dataSize = -1;
 
-    public HeaderDataOutDecorator(OutByteArrayWithOffs delegate) {
-        this.delegate = delegate;
-        startOffs = delegate.getOffs();
+    public HeaderDataOutDecorator(RandomAccessOut rao) {
+        this.rao = rao;
+        startOffs = rao.getOffs();
     }
 
-    public OutByteArrayWithOffs getOutForData() {
+    public RandomAccessOut getOutForData() {
         assert headerSize > 0;
-        delegate.setOffs(startOffs + headerSize);
-        return delegate;
+        rao.setOffs(startOffs + headerSize);
+        return rao;
     }
 
-    public OutByteArrayWithOffs getOutForHeader() {
-        delegate.setOffs(startOffs);
-        return delegate;
+    public RandomAccessOut getOutForHeader() {
+        rao.setOffs(startOffs);
+        return rao;
     }
 
     public void saveDataSize() {
         assert headerSize > 0;
-        dataSize = Math.max(delegate.getOffs() - startOffs - headerSize, 0);
+        dataSize = Math.max(rao.getOffs() - startOffs - headerSize, 0);
     }
 
     public int saveAndGetDataSize() {
@@ -57,22 +57,16 @@ public final class HeaderDataOutDecorator {
         return dataSize;
     }
 
-    public int getOverallSize() {
-        assert headerSize > 0;
-        assert dataSize > 0;
-        return headerSize + dataSize;
-    }
-
     public void reset() {
         headerSize = -1;
         dataSize = -1;
-        delegate.setOffs(startOffs);
+        rao.setOffs(startOffs);
     }
 
     public void close() {
         assert headerSize >= 0;
         assert dataSize >= 0;
-        delegate.setOffs(startOffs + headerSize + dataSize);
+        rao.setOffs(startOffs + headerSize + dataSize);
     }
 
 }

@@ -2,7 +2,7 @@ package io.airlift.compress.zstd.compress;
 
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.LiteralsSectionHeader;
-import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.io.Out;
 
 /**
  * @author Oleg Cherednik
@@ -10,7 +10,7 @@ import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
  */
 public class RawLiteralsEncode {
 
-    public void encode(OutByteArrayWithOffs out, ByteArrayWithOffs in) {
+    public void encode(Out out, ByteArrayWithOffs in) {
         LiteralsSectionHeader.RawRle header = LiteralsSectionHeader.createForRaw();
         header.withRegeneratedSize(in.getOffs());
 

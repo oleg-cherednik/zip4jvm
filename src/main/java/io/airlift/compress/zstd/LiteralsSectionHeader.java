@@ -1,6 +1,6 @@
 package io.airlift.compress.zstd;
 
-import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.io.Out;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -61,7 +61,7 @@ public abstract class LiteralsSectionHeader {
         return new CompressedTreeless(BlockType.TREELESS_LITERALS_BLOCK);
     }
 
-    public abstract void encode(OutByteArrayWithOffs out);
+    public abstract void encode(Out out);
 
     public boolean isRawBlock() {
         return blockType == BlockType.RAW_LITERALS_BLOCK;
@@ -176,7 +176,7 @@ public abstract class LiteralsSectionHeader {
         }
 
         @Override
-        public void encode(OutByteArrayWithOffs out) {
+        public void encode(Out out) {
             int data;
 
             if (headerSize == 1)
@@ -287,7 +287,7 @@ public abstract class LiteralsSectionHeader {
         }
 
         @Override
-        public void encode(OutByteArrayWithOffs out) {
+        public void encode(Out out) {
             // format in bits [3 bytes]: DDDDDDDD_DDCCCCCC_CCCCBBAA
             // format in bits [4 bytes]: DDDDDDDD_DDDDDDCC_CCCCCCCC_CCCCBBAA
             // format in bits [5 bytes]: DDDDDDDD_DDDDDDDD_DDCCCCCC_CCCCCCCC_CCCCBBAA

@@ -2,7 +2,6 @@ package io.airlift.compress.zstd.seq;
 
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.io.Out;
-import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +47,7 @@ public class SequenceHeader {
         return sequenceHeader;
     }
 
-    public void encode(OutByteArrayWithOffs out) {
+    public void encode(Out out) {
         encodeSequenceCount(out);
         encodeCompressionMode(out);
     }
