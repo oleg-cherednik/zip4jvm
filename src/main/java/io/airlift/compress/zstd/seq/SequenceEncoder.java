@@ -90,9 +90,11 @@ public class SequenceEncoder {
         HeaderDataOutDecorator hdod = new HeaderDataOutDecorator(out);
         hdod.setHeaderSize(sequenceHeader.getHeaderSize());
 
+        boolean success = true;
+
         if (sequenceHeader.getSequenceCount() > 0) {
             OutByteArrayWithOffs dataOut = hdod.getOutForData();
-            boolean success = foo(dataOut, context, sequenceHeader);
+            success = foo(dataOut, context, sequenceHeader);
 
             if (success)
                 encodeSequences(dataOut, matchLengthTable, offsetCodeTable, literalLengthTable, context.sequenceStore);
@@ -100,12 +102,13 @@ public class SequenceEncoder {
             hdod.saveDataSize();
             sequenceHeader.encode(hdod.getOutForHeader());
             hdod.close();
-
-            return success;
+        } else {
+            hdod.saveDataSize();
+            sequenceHeader.encode(out);
+            hdod.close();
         }
 
-        sequenceHeader.encode(out);
-        return true;
+        return success;
     }
 
     private static FseCompressionTable literalLengthTable;

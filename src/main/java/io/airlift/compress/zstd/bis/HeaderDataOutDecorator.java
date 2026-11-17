@@ -50,7 +50,7 @@ public final class HeaderDataOutDecorator {
 
     public void saveDataSize() {
         assert headerSize > 0;
-        dataSize = delegate.getOffs() - startOffs - headerSize;
+        dataSize = Math.max(delegate.getOffs() - startOffs - headerSize, 0);
     }
 
     public int saveAndGetDataSize() {
@@ -71,8 +71,8 @@ public final class HeaderDataOutDecorator {
     }
 
     public void close() {
-        assert headerSize > 0;
-        assert dataSize > 0;
+        assert headerSize >= 0;
+        assert dataSize >= 0;
         delegate.setOffs(startOffs + headerSize + dataSize);
     }
 
