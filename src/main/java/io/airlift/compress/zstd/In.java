@@ -21,8 +21,8 @@ public interface In extends Closeable {
 
     int available() throws IOException;
 
-    int read(byte[] b) throws IOException;
+    int read(byte[] buf) throws IOException;
 
-    int read(byte[] b, int off, int len) throws IOException;
+    int read(byte[] buf, int offs, int len) throws IOException;
 
 }

@@ -16,6 +16,7 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
  * @author Oleg Cherednik
  * @since 03.09.2026
  */
+@Getter
 @RequiredArgsConstructor
 public class OutByteArrayWithOffs implements RandomAccessOut {
 
@@ -65,6 +66,11 @@ public class OutByteArrayWithOffs implements RandomAccessOut {
     public void copyMemory(InByteArrayWithOffs in, int size) {
         System.arraycopy(in.buf, in.getOffs(), buf, offs, size);
         offs += size;
+    }
+
+    public void copyMemory(RandomAccessOut rao) {
+        int nowRead = rao.read(buf, offs, rao.available());
+        offs += nowRead;
     }
 
     public void copyMemory(OutByteArrayWithOffs in, int size) {

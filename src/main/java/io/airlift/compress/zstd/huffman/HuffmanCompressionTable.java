@@ -16,14 +16,13 @@ package io.airlift.compress.zstd.huffman;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.zstd.Histogram;
-import io.airlift.compress.zstd.io.Out;
-import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
-import io.airlift.compress.zstd.io.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.bos.HuffmanBitOutputStream;
 import io.airlift.compress.zstd.bos.MaskBitOutputStream;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
 import io.airlift.compress.zstd.fse.compress.FiniteStateEntropyForCompress;
+import io.airlift.compress.zstd.io.HeaderDataOutDecorator;
+import io.airlift.compress.zstd.io.Out;
 import io.airlift.compress.zstd.io.RandomAccessOut;
 
 import java.util.Arrays;

@@ -17,14 +17,13 @@ import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.zstd.BlockHeader;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
+import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
 import io.airlift.compress.zstd.io.Out;
-import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.io.RandomAccessOut;
 import io.airlift.compress.zstd.seq.SequenceEncoder;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import static io.airlift.compress.zstd.Constants.MAGIC_NUMBER;
 import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
@@ -122,26 +121,23 @@ public class ZstdFrameCompressor {
         CompressionContext context = new CompressionContext(parameters, in.available());
         BlockHeader blockHeader = new BlockHeader();
         // a block is compressed into this buffer first; it is copied to out only when the block is really compressed
-        OutByteArrayWithOffs blockOut = new OutByteArrayWithOffs(new byte[blockSize]);
-        blockOut.id = "block_out";
+        ByteArrayRandomAccessOut barao = new ByteArrayRandomAccessOut(blockSize);
 
         while (remaining > 0) {
             blockHeader.setLastBlock(blockSize >= remaining);
             blockSize = Math.min(blockSize, remaining);
-
-            blockOut.setOffs(0);
-            blockOut.setLimit(blockSize);
-            Arrays.fill(blockOut.buf, (byte) 0);
+            barao.reset();
+            barao.setLimit(blockSize);
 
             in.setOffs(inOffs);
             // TODO it looks not correct: blockSize is not related to input
             in.setSize(blockSize);
             in.setLimit(inOffs + blockSize);
-            boolean success = compressBlock(blockOut, context);
+            boolean success = compressBlock(barao, context);
 
             if (success) {
                 blockHeader.setBlockType(BlockHeader.BlockType.COMPRESSED_BLOCK);
-                blockHeader.setBlockSize(blockOut.getOffs());
+                blockHeader.setBlockSize(barao.getOffs());
             } else {
                 blockHeader.setBlockType(BlockHeader.BlockType.RAW_BLOCK);
                 blockHeader.setBlockSize(blockSize);
@@ -150,7 +146,7 @@ public class ZstdFrameCompressor {
             blockHeader.encode(out);
 
             if (success)
-                out.copyMemory(blockOut, blockHeader.getBlockSize());
+                out.copyMemory(barao.getOutForCopy());
             else {
                 int offs = in.getOffs();
                 in.setOffs(inOffs);

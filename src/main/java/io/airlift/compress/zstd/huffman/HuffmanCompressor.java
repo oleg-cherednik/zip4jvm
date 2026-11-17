@@ -18,7 +18,6 @@ import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.bos.HuffmanBitOutputStream;
 import io.airlift.compress.zstd.io.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.io.Out;
-import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.io.RandomAccessOut;
 import lombok.RequiredArgsConstructor;
 

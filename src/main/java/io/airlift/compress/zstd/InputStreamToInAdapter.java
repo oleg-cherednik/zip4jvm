@@ -112,8 +112,8 @@ public class InputStreamToInAdapter extends FilterInputStream implements In {
     }
 
     @Override
-    public int read(byte[] b) throws IOException {
-        int nowRead = getIn().read(b);
+    public int read(byte[] buf) throws IOException {
+        int nowRead = getIn().read(buf);
 
         if (nowRead != -1)
             pos += nowRead;
@@ -122,8 +122,8 @@ public class InputStreamToInAdapter extends FilterInputStream implements In {
     }
 
     @Override
-    public int read(byte[] b, int off, int len) throws IOException {
-        int nowRead = getIn().read(b, off, len);
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        int nowRead = getIn().read(buf, offs, len);
 
         if (nowRead != -1)
             pos += nowRead;
