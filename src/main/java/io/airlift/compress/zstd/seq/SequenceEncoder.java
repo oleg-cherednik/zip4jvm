@@ -88,162 +88,163 @@ public class SequenceEncoder {
 
         sequenceHeader.encodeSequenceCount(out);
 
-        if (sequenceHeader.getSequenceCount() == 0)
+        if (sequenceHeader.getSequenceCount() > 0) {
+            // flags for FSE encoding type
+            int headerAddress = out.getOffs();
+            out.putByte((byte) 0xFF);
+
+            int maxSymbol;
+            int largestCount;
+
+            // literal lengths
+            Histogram histogram = new Histogram(MAX_SEQUENCES + 1);
+            histogram.count(context.sequenceStore.literalLengthCodes, sequenceHeader.getSequenceCount());
+            maxSymbol = histogram.findMaxSymbol(MAX_LITERALS_LENGTH_SYMBOL);
+            largestCount = histogram.findLargestCount(maxSymbol);
+
+            // ---------- literalsLengthCompressionMode ----------
+
+            sequenceHeader.setLiteralsLengthCompressionMode(
+                    selectCompressionMode(largestCount,
+                                          sequenceHeader.getSequenceCount(),
+                                          DEFAULT_LITERAL_LENGTH_NORMALIZED_COUNTS_LOG,
+                                          true,
+                                          context.parameters.getStrategy())
+            );
+
+            if (!hasRoomForTable(sequenceHeader.getLiteralsLengthCompressionMode(), out.available()))
+                return false;
+
+            FseCompressionTable literalLengthTable;
+
+            switch (sequenceHeader.getLiteralsLengthCompressionMode()) {
+                case RLE:
+                    out.putByte(context.sequenceStore.literalLengthCodes[0]);
+                    context.sequenceEncodingContext.literalLengthTable.initializeRleTable(maxSymbol);
+                    literalLengthTable = context.sequenceEncodingContext.literalLengthTable;
+                    break;
+                case PREDEFINED:
+                    literalLengthTable = DEFAULT_LITERAL_LENGTHS_TABLE;
+                    break;
+                case FSE_COMPRESSED:
+                    buildCompressionTable(
+                            context.sequenceEncodingContext.literalLengthTable,
+                            out,
+                            sequenceHeader.getSequenceCount(),
+                            LITERAL_LENGTH_TABLE_LOG,
+                            context.sequenceStore.literalLengthCodes,
+                            histogram.getCounts(),
+                            maxSymbol,
+                            context.sequenceEncodingContext.normalizedCounts);
+                    literalLengthTable = context.sequenceEncodingContext.literalLengthTable;
+                    break;
+                default:
+                    throw new UnsupportedOperationException("not yet implemented");
+            }
+
+            // offsets
+            histogram = new Histogram(MAX_SEQUENCES + 1);
+            histogram.count(context.sequenceStore.offsetCodes, sequenceHeader.getSequenceCount());
+            maxSymbol = histogram.findMaxSymbol(MAX_OFFSET_CODE_SYMBOL);
+            largestCount = histogram.findLargestCount(maxSymbol);
+
+            // We can only use the basic table if max <= DEFAULT_MAX_OFFSET_CODE_SYMBOL, otherwise the offsets are too large .
+            boolean defaultAllowed = maxSymbol < DEFAULT_MAX_OFFSET_CODE_SYMBOL;
+
+            // ---------- offsetCompressionMode ----------
+
+            sequenceHeader.setOffsetCompressionMode(
+                    selectCompressionMode(largestCount,
+                                          sequenceHeader.getSequenceCount(),
+                                          DEFAULT_OFFSET_NORMALIZED_COUNTS_LOG,
+                                          defaultAllowed,
+                                          context.parameters.getStrategy())
+            );
+
+            FseCompressionTable offsetCodeTable;
+
+            if (!hasRoomForTable(sequenceHeader.getOffsetCompressionMode(), out.available()))
+                return false;
+
+            switch (sequenceHeader.getOffsetCompressionMode()) {
+                case RLE:
+                    out.putByte(context.sequenceStore.offsetCodes[0]);
+                    context.sequenceEncodingContext.offsetCodeTable.initializeRleTable(maxSymbol);
+                    offsetCodeTable = context.sequenceEncodingContext.offsetCodeTable;
+                    break;
+                case PREDEFINED:
+                    offsetCodeTable = DEFAULT_OFFSETS_TABLE;
+                    break;
+                case FSE_COMPRESSED:
+                    buildCompressionTable(
+                            context.sequenceEncodingContext.offsetCodeTable,
+                            out,
+                            sequenceHeader.getSequenceCount(),
+                            OFFSET_TABLE_LOG,
+                            context.sequenceStore.offsetCodes,
+                            histogram.getCounts(),
+                            maxSymbol,
+                            context.sequenceEncodingContext.normalizedCounts);
+                    offsetCodeTable = context.sequenceEncodingContext.offsetCodeTable;
+                    break;
+                default:
+                    throw new UnsupportedOperationException("not yet implemented");
+            }
+
+            // match lengths
+            histogram = new Histogram(MAX_SEQUENCES + 1);
+            histogram.count(context.sequenceStore.matchLengthCodes, sequenceHeader.getSequenceCount());
+            maxSymbol = histogram.findMaxSymbol(MAX_MATCH_LENGTH_SYMBOL);
+            largestCount = histogram.findLargestCount(maxSymbol);
+
+            // ---------- matchLengthCompressionMode ----------
+
+            sequenceHeader.setMatchLengthCompressionMode(
+                    selectCompressionMode(largestCount,
+                                          sequenceHeader.getSequenceCount(),
+                                          DEFAULT_MATCH_LENGTH_NORMALIZED_COUNTS_LOG,
+                                          true,
+                                          context.parameters.getStrategy())
+            );
+
+            FseCompressionTable matchLengthTable;
+            if (!hasRoomForTable(sequenceHeader.getMatchLengthCompressionMode(), out.available()))
+                return false;
+
+            switch (sequenceHeader.getMatchLengthCompressionMode()) {
+                case RLE:
+                    out.putByte(context.sequenceStore.matchLengthCodes[0]);
+                    context.sequenceEncodingContext.matchLengthTable.initializeRleTable(maxSymbol);
+                    matchLengthTable = context.sequenceEncodingContext.matchLengthTable;
+                    break;
+                case PREDEFINED:
+                    matchLengthTable = DEFAULT_MATCH_LENGTHS_TABLE;
+                    break;
+                case FSE_COMPRESSED:
+                    buildCompressionTable(
+                            context.sequenceEncodingContext.matchLengthTable,
+                            out,
+                            sequenceHeader.getSequenceCount(),
+                            MATCH_LENGTH_TABLE_LOG,
+                            context.sequenceStore.matchLengthCodes,
+                            histogram.getCounts(),
+                            maxSymbol,
+                            context.sequenceEncodingContext.normalizedCounts);
+
+                    matchLengthTable = context.sequenceEncodingContext.matchLengthTable;
+                    break;
+                default:
+                    throw new UnsupportedOperationException("not yet implemented");
+            }
+
+            int tmpOffs = out.getOffs();
+            out.setOffs(headerAddress);
+            sequenceHeader.encodeCompressionMode(out);
+            out.setOffs(tmpOffs);
+            encodeSequences(out, matchLengthTable, offsetCodeTable, literalLengthTable, context.sequenceStore);
             return true;
-
-        // flags for FSE encoding type
-        int headerAddress = out.getOffs();
-        out.putByte((byte) 0xFF);
-
-        int maxSymbol;
-        int largestCount;
-
-        // literal lengths
-        Histogram histogram = new Histogram(MAX_SEQUENCES + 1);
-        histogram.count(context.sequenceStore.literalLengthCodes, sequenceHeader.getSequenceCount());
-        maxSymbol = histogram.findMaxSymbol(MAX_LITERALS_LENGTH_SYMBOL);
-        largestCount = histogram.findLargestCount(maxSymbol);
-
-        // ---------- literalsLengthCompressionMode ----------
-
-        sequenceHeader.setLiteralsLengthCompressionMode(
-                selectCompressionMode(largestCount,
-                                      sequenceHeader.getSequenceCount(),
-                                      DEFAULT_LITERAL_LENGTH_NORMALIZED_COUNTS_LOG,
-                                      true,
-                                      context.parameters.getStrategy())
-        );
-
-        if (!hasRoomForTable(sequenceHeader.getLiteralsLengthCompressionMode(), out.available()))
-            return false;
-
-        FseCompressionTable literalLengthTable;
-
-        switch (sequenceHeader.getLiteralsLengthCompressionMode()) {
-            case RLE:
-                out.putByte(context.sequenceStore.literalLengthCodes[0]);
-                context.sequenceEncodingContext.literalLengthTable.initializeRleTable(maxSymbol);
-                literalLengthTable = context.sequenceEncodingContext.literalLengthTable;
-                break;
-            case PREDEFINED:
-                literalLengthTable = DEFAULT_LITERAL_LENGTHS_TABLE;
-                break;
-            case FSE_COMPRESSED:
-                buildCompressionTable(
-                        context.sequenceEncodingContext.literalLengthTable,
-                        out,
-                        sequenceHeader.getSequenceCount(),
-                        LITERAL_LENGTH_TABLE_LOG,
-                        context.sequenceStore.literalLengthCodes,
-                        histogram.getCounts(),
-                        maxSymbol,
-                        context.sequenceEncodingContext.normalizedCounts);
-                literalLengthTable = context.sequenceEncodingContext.literalLengthTable;
-                break;
-            default:
-                throw new UnsupportedOperationException("not yet implemented");
         }
 
-        // offsets
-        histogram = new Histogram(MAX_SEQUENCES + 1);
-        histogram.count(context.sequenceStore.offsetCodes, sequenceHeader.getSequenceCount());
-        maxSymbol = histogram.findMaxSymbol(MAX_OFFSET_CODE_SYMBOL);
-        largestCount = histogram.findLargestCount(maxSymbol);
-
-        // We can only use the basic table if max <= DEFAULT_MAX_OFFSET_CODE_SYMBOL, otherwise the offsets are too large .
-        boolean defaultAllowed = maxSymbol < DEFAULT_MAX_OFFSET_CODE_SYMBOL;
-
-        // ---------- offsetCompressionMode ----------
-
-        sequenceHeader.setOffsetCompressionMode(
-                selectCompressionMode(largestCount,
-                                      sequenceHeader.getSequenceCount(),
-                                      DEFAULT_OFFSET_NORMALIZED_COUNTS_LOG,
-                                      defaultAllowed,
-                                      context.parameters.getStrategy())
-        );
-
-        FseCompressionTable offsetCodeTable;
-
-        if (!hasRoomForTable(sequenceHeader.getOffsetCompressionMode(), out.available()))
-            return false;
-
-        switch (sequenceHeader.getOffsetCompressionMode()) {
-            case RLE:
-                out.putByte(context.sequenceStore.offsetCodes[0]);
-                context.sequenceEncodingContext.offsetCodeTable.initializeRleTable(maxSymbol);
-                offsetCodeTable = context.sequenceEncodingContext.offsetCodeTable;
-                break;
-            case PREDEFINED:
-                offsetCodeTable = DEFAULT_OFFSETS_TABLE;
-                break;
-            case FSE_COMPRESSED:
-                buildCompressionTable(
-                        context.sequenceEncodingContext.offsetCodeTable,
-                        out,
-                        sequenceHeader.getSequenceCount(),
-                        OFFSET_TABLE_LOG,
-                        context.sequenceStore.offsetCodes,
-                        histogram.getCounts(),
-                        maxSymbol,
-                        context.sequenceEncodingContext.normalizedCounts);
-                offsetCodeTable = context.sequenceEncodingContext.offsetCodeTable;
-                break;
-            default:
-                throw new UnsupportedOperationException("not yet implemented");
-        }
-
-        // match lengths
-        histogram = new Histogram(MAX_SEQUENCES + 1);
-        histogram.count(context.sequenceStore.matchLengthCodes, sequenceHeader.getSequenceCount());
-        maxSymbol = histogram.findMaxSymbol(MAX_MATCH_LENGTH_SYMBOL);
-        largestCount = histogram.findLargestCount(maxSymbol);
-
-        // ---------- matchLengthCompressionMode ----------
-
-        sequenceHeader.setMatchLengthCompressionMode(
-                selectCompressionMode(largestCount,
-                                      sequenceHeader.getSequenceCount(),
-                                      DEFAULT_MATCH_LENGTH_NORMALIZED_COUNTS_LOG,
-                                      true,
-                                      context.parameters.getStrategy())
-        );
-
-        FseCompressionTable matchLengthTable;
-        if (!hasRoomForTable(sequenceHeader.getMatchLengthCompressionMode(), out.available()))
-            return false;
-
-        switch (sequenceHeader.getMatchLengthCompressionMode()) {
-            case RLE:
-                out.putByte(context.sequenceStore.matchLengthCodes[0]);
-                context.sequenceEncodingContext.matchLengthTable.initializeRleTable(maxSymbol);
-                matchLengthTable = context.sequenceEncodingContext.matchLengthTable;
-                break;
-            case PREDEFINED:
-                matchLengthTable = DEFAULT_MATCH_LENGTHS_TABLE;
-                break;
-            case FSE_COMPRESSED:
-                buildCompressionTable(
-                        context.sequenceEncodingContext.matchLengthTable,
-                        out,
-                        sequenceHeader.getSequenceCount(),
-                        MATCH_LENGTH_TABLE_LOG,
-                        context.sequenceStore.matchLengthCodes,
-                        histogram.getCounts(),
-                        maxSymbol,
-                        context.sequenceEncodingContext.normalizedCounts);
-
-                matchLengthTable = context.sequenceEncodingContext.matchLengthTable;
-                break;
-            default:
-                throw new UnsupportedOperationException("not yet implemented");
-        }
-
-        int tmpOffs = out.getOffs();
-        out.setOffs(headerAddress);
-        sequenceHeader.encodeCompressionMode(out);
-        out.setOffs(tmpOffs);
-        encodeSequences(out, matchLengthTable, offsetCodeTable, literalLengthTable, context.sequenceStore);
         return true;
     }
 
