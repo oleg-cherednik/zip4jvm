@@ -13,10 +13,10 @@
  */
 package io.airlift.compress.zstd.seq;
 
-import io.airlift.compress.zstd.CompressIn;
 import io.airlift.compress.zstd.Constants;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
+import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
 
 public class SequenceStore {
 
@@ -74,7 +74,7 @@ public class SequenceStore {
         literalsBuf.setOffs(literalsBuf.getOffs() + inputSize);
     }
 
-    public void storeSequence(CompressIn in,
+    public void storeSequence(ByteArrayRandomAccessIn in,
                               int literalLength,
                               int offsetCode,
                               int matchLengthBase) {

@@ -1,6 +1,5 @@
 package io.airlift.compress.zstd.io;
 
-import io.airlift.compress.zstd.CompressIn;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -86,7 +85,7 @@ public class ByteArrayRandomAccessOut implements RandomAccessOut {
     }
 
     @Override
-    public void copyMemory(CompressIn in, int size) {
+    public void copyMemory(ByteArrayRandomAccessIn in, int size) {
         System.arraycopy(in.getBuf(), in.getOffs(), buf, offs, size);
         offs += size;
     }

@@ -43,4 +43,24 @@ public class BlockCompressionState {
             windowBaseOffs = newOffs;
     }
 
+    /**
+     * After the input window slides left by {@code delta}, rebase absolute indices stored in the hash tables and
+     * {@link #windowBaseOffs}. Entries that would point before the new buffer start are cleared.
+     */
+    public void rebase(int delta) {
+        if (delta <= 0)
+            return;
+
+        rebaseTable(hashTable, delta);
+        rebaseTable(chainTable, delta);
+        windowBaseOffs = Math.max(0, windowBaseOffs - delta);
+    }
+
+    private static void rebaseTable(int[] table, int delta) {
+        for (int i = 0; i < table.length; i++) {
+            int v = table[i];
+            table[i] = v >= delta ? v - delta : 0;
+        }
+    }
+
 }

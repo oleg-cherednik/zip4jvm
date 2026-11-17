@@ -19,6 +19,7 @@ import io.airlift.compress.zstd.BlockHeader;
 import io.airlift.compress.zstd.CompressIn;
 import io.airlift.compress.zstd.Out;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
+import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
 import io.airlift.compress.zstd.io.RandomAccessOut;
 import io.airlift.compress.zstd.seq.SequenceEncoder;
 import lombok.RequiredArgsConstructor;
@@ -42,18 +43,18 @@ public class ZstdFrameCompressor {
     private final CompressIn in;
     private final int compressionLevel;
 
-    private void writeFrameHeader(Out out, CompressionParameters parameters) {
-        boolean singleSegment = parameters.getWindowSize() >= in.available();
-        int frameContentSizeFlag = writeFrameHeaderDescriptor(out, singleSegment);
+    private void writeFrameHeader(Out out, CompressionParameters parameters, int contentSize) {
+        boolean singleSegment = parameters.getWindowSize() >= contentSize;
+        int frameContentSizeFlag = writeFrameHeaderDescriptor(out, singleSegment, contentSize);
 
         if (!singleSegment)
             writeWindowDescriptor(out, parameters.getWindowSize());
 
-        writeFrameContentSize(out, singleSegment, frameContentSizeFlag);
+        writeFrameContentSize(out, singleSegment, frameContentSizeFlag, contentSize);
     }
 
-    private int writeFrameHeaderDescriptor(Out out, boolean singleSegment) {
-        int frameContentSizeFlag = (in.available() >= 256 ? 1 : 0) + (in.available() >= 65536 + 256 ? 1 : 0);
+    private static int writeFrameHeaderDescriptor(Out out, boolean singleSegment, int contentSize) {
+        int frameContentSizeFlag = (contentSize >= 256 ? 1 : 0) + (contentSize >= 65536 + 256 ? 1 : 0);
         int frameHeaderDescriptor = (frameContentSizeFlag << 6) | CHECKSUM_FLAG;
 
         if (singleSegment)
@@ -84,63 +85,68 @@ public class ZstdFrameCompressor {
         out.putByte((byte) encoded);
     }
 
-    private void writeFrameContentSize(Out out, boolean singleSegment, int frameContentSizeFlag) {
+    private static void writeFrameContentSize(Out out, boolean singleSegment, int frameContentSizeFlag,
+                                              int contentSize) {
         if (frameContentSizeFlag == 0) {
             if (singleSegment)
-                out.putByte((byte) in.available());
+                out.putByte((byte) contentSize);
         } else if (frameContentSizeFlag == 1)
-            out.putShort((short) (in.available() - 256));
+            out.putShort((short) (contentSize - 256));
         else if (frameContentSizeFlag == 2)
-            out.putInt(in.available());
+            out.putInt(contentSize);
         else
             throw new AssertionError();
     }
 
-    private void writeChecksum(Out out) {
+    private static void writeChecksum(Out out, XXHash64 checksum) {
         // TODO check the flag
-        XXHash64 checksum = new XXHash64();
-        checksum.update(in.getBuf());
         out.putInt((int) checksum.getValue());
     }
 
     public void compress(Out out) throws IOException {
-        CompressionParameters parameters = CompressionParameters.compute(compressionLevel, in.available());
+        int contentSize = in.available();
+        CompressionParameters parameters = CompressionParameters.compute(compressionLevel, contentSize);
 
         writeMagic(out);
-        writeFrameHeader(out, parameters);
-        compressFrame(out, parameters);
-        writeChecksum(out);
+        writeFrameHeader(out, parameters, contentSize);
+        XXHash64 checksum = compressFrame(out, parameters, contentSize);
+        writeChecksum(out, checksum);
     }
 
-    private int compressFrame(Out out, CompressionParameters parameters) throws IOException {
-        final int startOffs = out.getOffs();
+    private XXHash64 compressFrame(Out out, CompressionParameters parameters, int contentSize) throws IOException {
         int blockSize = Math.min(MAX_BLOCK_SIZE, parameters.getWindowSize());
-        int remaining = in.available();
-        int inOffs = 0;
+        int remaining = contentSize;
 
-        CompressionContext context = new CompressionContext(parameters, in.available());
+        CompressionContext context = new CompressionContext(parameters, contentSize);
         BlockHeader blockHeader = new BlockHeader();
         // a block is compressed into this buffer first; it is copied to out only when the block is really compressed
         ByteArrayRandomAccessOut barao = new ByteArrayRandomAccessOut(blockSize);
+        ByteArrayRandomAccessIn raIn = new ByteArrayRandomAccessIn(parameters.getWindowSize(), blockSize);
+        XXHash64 checksum = new XXHash64();
 
         while (remaining > 0) {
-            blockHeader.setLastBlock(blockSize >= remaining);
-            blockSize = Math.min(blockSize, remaining);
-            barao.reset();
-            barao.setLimit(blockSize);
+            int delta = raIn.slide();
+            if (delta > 0)
+                context.blockCompressionState.rebase(delta);
 
-            in.setOffs(inOffs);
-            // TODO it looks not correct: blockSize is not related to input
-            in.setSize(blockSize);
-            in.setLimit(inOffs + blockSize);
-            boolean success = compressBlock(barao, context);
+            int read = raIn.fill(in, Math.min(blockSize, remaining));
+            if (read <= 0)
+                break;
+
+            checksum.update(raIn.getBuf(), raIn.getBlockStart(), read);
+
+            blockHeader.setLastBlock(read >= remaining);
+            barao.reset();
+            barao.setLimit(read);
+
+            boolean success = compressBlock(barao, context, raIn);
 
             if (success) {
                 blockHeader.setBlockType(BlockHeader.BlockType.COMPRESSED_BLOCK);
                 blockHeader.setBlockSize(barao.getOffs());
             } else {
                 blockHeader.setBlockType(BlockHeader.BlockType.RAW_BLOCK);
-                blockHeader.setBlockSize(blockSize);
+                blockHeader.setBlockSize(read);
             }
 
             blockHeader.encode(out);
@@ -148,35 +154,32 @@ public class ZstdFrameCompressor {
             if (success)
                 out.copyMemory(barao.getOutForCopy());
             else {
-                int offs = in.getOffs();
-                in.setOffs(inOffs);
-                out.copyMemory(in, blockHeader.getBlockSize());
-                in.setOffs(offs);
+                raIn.setOffs(raIn.getBlockStart());
+                out.copyMemory(raIn, read);
             }
 
-            inOffs += blockSize;
-            remaining -= blockSize;
+            remaining -= read;
         }
 
-        return out.getOffs() - startOffs;
+        return checksum;
     }
 
-    private boolean compressBlock(RandomAccessOut rao, CompressionContext context) throws IOException {
-        final int offs = rao.getOffs();
-
-        if (in.getSize() < MIN_BLOCK_SIZE + BlockHeader.HEADER_SIZE + 1) {
+    private static boolean compressBlock(RandomAccessOut rao, CompressionContext context, ByteArrayRandomAccessIn raIn)
+            throws IOException {
+        if (raIn.getSize() < MIN_BLOCK_SIZE + BlockHeader.HEADER_SIZE + 1)
             //  don't even attempt compression below a certain input size
             return false;
-        }
 
-        context.blockCompressionState.enforceMaxDistance(in.getLimit(), context.parameters.getWindowSize());
+        final int offs = rao.getOffs();
+
+        context.blockCompressionState.enforceMaxDistance(raIn.getLimit(), context.parameters.getWindowSize());
         context.sequenceStore.reset();
 
-        int lastLiteralsSize = context.parameters.getStrategy().getCompressor().compressBlock(in, context);
-        int lastLiteralsAddress = in.getLimit() - lastLiteralsSize;
+        int lastLiteralsSize = context.parameters.getStrategy().getCompressor().compressBlock(raIn, context);
+        int lastLiteralsAddress = raIn.getLimit() - lastLiteralsSize;
 
         // append [lastLiteralsAddress .. lastLiteralsSize] to sequenceStore literals buffer
-        context.sequenceStore.appendLiterals(in.getBuf(), lastLiteralsAddress, lastLiteralsSize);
+        context.sequenceStore.appendLiterals(raIn.getBuf(), lastLiteralsAddress, lastLiteralsSize);
 
         // convert length/offsets into codes
         context.sequenceStore.generateCodes();
@@ -192,7 +195,7 @@ public class ZstdFrameCompressor {
             return false; // sequences section does not fit into the output
 
         // Check compressibility
-        int maxCompressedSize = in.getSize() - context.calculateMinimumGain(in.getSize());
+        int maxCompressedSize = raIn.getSize() - context.calculateMinimumGain(raIn.getSize());
 
         if (rao.getOffs() - offs > maxCompressedSize)
             return false; // not compressed

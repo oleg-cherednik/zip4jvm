@@ -153,6 +153,22 @@ public class CompressionZstdTest extends BaseTest {
         assertThat(out.toByteArray()).isEqualTo(expected);
     }
 
+    // input larger than windowSize + blockSize forces the compressor sliding window to slide and rebase hash tables
+    public void shouldCompressZstdWhenInputLargerThanSlidingWindow() throws IOException {
+        // default level 3: windowSize = 1 MiB, blockSize = 128 KiB → capacity = 1 MiB + 128 KiB
+        final int size = (1024 + 128 + 64) * 1024;
+        byte[] expected = new byte[size];
+        Random random = new Random(42);
+
+        for (int i = 0; i < size; i++)
+            expected[i] = (byte) ("zip4jvm sliding window ".charAt(i % 23) + random.nextInt(3));
+
+        ZstdCompressor compressor = new ZstdCompressor();
+        RandomAccessOut rao = new ByteArrayRandomAccessOut(compressor.maxCompressedLength(expected.length));
+        compressor.compress(new InByteArrayWithOffs(expected), rao);
+        assertThat(Zstd.decompress(Arrays.copyOf(rao.getBuf(), rao.getOffs()), expected.length)).isEqualTo(expected);
+    }
+
     // repetitive data compressed by this compressor and decompressed by the reference zstd: the last match runs up to
     // the end of the input, so the byte-at-a-time tail of the match length counting is used
     public void shouldCompressZstdWhenLastMatchEndsAtInputEnd() throws IOException {

@@ -65,6 +65,18 @@ public final class InByteArrayWithOffs implements CompressIn {
     }
 
     @Override
+    public int read(byte[] buf, int offs, int len) {
+        int available = available();
+        if (available <= 0)
+            return -1;
+
+        int nowRead = Math.min(available, len);
+        System.arraycopy(this.buf, this.offs, buf, offs, nowRead);
+        this.offs += nowRead;
+        return nowRead;
+    }
+
+    @Override
     public String toString() {
         return String.format("size: %s, offs: %s", buf.length, offs);
     }

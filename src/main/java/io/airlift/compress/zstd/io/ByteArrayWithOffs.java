@@ -1,6 +1,5 @@
 package io.airlift.compress.zstd.io;
 
-import io.airlift.compress.zstd.CompressIn;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -80,7 +79,7 @@ public final class ByteArrayWithOffs {
         offs += SIZE_OF_BYTE;
     }
 
-    public void copyMemory(CompressIn in, int bytes) {
+    public void copyMemory(ByteArrayRandomAccessIn in, int bytes) {
         for (int i = 0; i < bytes; i++)
             putByte((byte) in.getByte());
     }
