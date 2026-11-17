@@ -15,11 +15,11 @@ package io.airlift.compress.zstd.fse.compress;
 
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
-import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.bos.MaskBitOutputStream;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
 import io.airlift.compress.zstd.huffman.HuffmanConst;
+import io.airlift.compress.zstd.io.Out;
 
 import static io.airlift.compress.zstd.Util.checkArgument;
 
@@ -236,7 +236,7 @@ public class FiniteStateEntropyForCompress {
         return 0;
     }
 
-    public void writeNormalizedCounts(OutByteArrayWithOffs out,
+    public void writeNormalizedCounts(Out out,
                                       short[] normalizedCounts,
                                       int maxSymbol,
                                       int tableLog) {

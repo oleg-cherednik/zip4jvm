@@ -17,7 +17,7 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
  * @since 03.09.2026
  */
 @RequiredArgsConstructor
-public class OutByteArrayWithOffs implements Out {
+public class OutByteArrayWithOffs implements RandomAccessOut {
 
     public String id;
     public final byte[] buf;
@@ -31,6 +31,7 @@ public class OutByteArrayWithOffs implements Out {
         this.offs = offs;
     }
 
+    @Override
     public int available() {
         return buf.length - offs;
     }
@@ -41,6 +42,7 @@ public class OutByteArrayWithOffs implements Out {
         offs += SIZE_OF_BYTE;
     }
 
+    @Override
     public void putShort(short x) {
         buf[offs] = (byte) (x & 0xFF);
         buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);

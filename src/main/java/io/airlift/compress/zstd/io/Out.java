@@ -8,6 +8,10 @@ import java.io.Closeable;
  */
 public interface Out extends Closeable {
 
+    int available();
+
     void putByte(byte x);
+
+    void putShort(short x);
 
 }

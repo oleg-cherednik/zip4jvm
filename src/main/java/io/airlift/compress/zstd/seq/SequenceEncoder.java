@@ -14,13 +14,14 @@
 package io.airlift.compress.zstd.seq;
 
 import io.airlift.compress.zstd.Histogram;
-import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
-import io.airlift.compress.zstd.bis.HeaderDataOutDecorator;
+import io.airlift.compress.zstd.io.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.bos.MaskBitOutputStream;
 import io.airlift.compress.zstd.compress.CompressionContext;
 import io.airlift.compress.zstd.compress.CompressionParameters;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
 import io.airlift.compress.zstd.fse.compress.FiniteStateEntropyForCompress;
+import io.airlift.compress.zstd.io.Out;
+import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
 
 import static io.airlift.compress.zstd.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
 import static io.airlift.compress.zstd.Constants.LITERALS_LENGTH_BITS;
@@ -111,7 +112,7 @@ public class SequenceEncoder {
     private static FseCompressionTable offsetCodeTable;
     private static FseCompressionTable matchLengthTable;
 
-    private static boolean foo(OutByteArrayWithOffs out, CompressionContext context, SequenceHeader sequenceHeader) {
+    private static boolean foo(Out out, CompressionContext context, SequenceHeader sequenceHeader) {
         int maxSymbol;
         int largestCount;
 
@@ -263,7 +264,7 @@ public class SequenceEncoder {
     }
 
     private static void buildCompressionTable(FseCompressionTable table,
-                                              OutByteArrayWithOffs out,
+                                              Out out,
                                               int sequenceCount,
                                               int maxTableLog,
                                               byte[] codes,
