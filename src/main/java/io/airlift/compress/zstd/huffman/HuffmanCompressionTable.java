@@ -22,7 +22,7 @@ import io.airlift.compress.zstd.io.MaskBitOutputStream;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
 import io.airlift.compress.zstd.fse.compress.FiniteStateEntropyForCompress;
 import io.airlift.compress.zstd.io.HeaderDataOutDecorator;
-import io.airlift.compress.zstd.io.Out;
+import io.airlift.compress.zstd.Out;
 import io.airlift.compress.zstd.io.RandomAccessOut;
 
 import java.util.Arrays;

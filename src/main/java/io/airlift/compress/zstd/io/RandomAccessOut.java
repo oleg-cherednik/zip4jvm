@@ -1,5 +1,7 @@
 package io.airlift.compress.zstd.io;
 
+import io.airlift.compress.zstd.Out;
+
 import java.io.IOException;
 
 /**

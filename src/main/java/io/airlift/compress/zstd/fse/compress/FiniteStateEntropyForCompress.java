@@ -19,7 +19,7 @@ import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.io.MaskBitOutputStream;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
 import io.airlift.compress.zstd.huffman.HuffmanConst;
-import io.airlift.compress.zstd.io.Out;
+import io.airlift.compress.zstd.Out;
 
 import static io.airlift.compress.zstd.Util.checkArgument;
 
