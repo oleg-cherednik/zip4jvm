@@ -11,11 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd.bos;
+package io.airlift.compress.zstd.io;
 
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
-import io.airlift.compress.zstd.io.Out;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

@@ -13,9 +13,6 @@
  */
 package io.airlift.compress.zstd.compress;
 
-import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
-import io.airlift.compress.zstd.seq.SequenceStore;
-
 interface BlockCompressor {
 
     BlockCompressor UNSUPPORTED = (inputBase, context) -> {

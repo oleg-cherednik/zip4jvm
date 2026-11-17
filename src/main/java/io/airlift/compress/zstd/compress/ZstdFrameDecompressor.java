@@ -22,8 +22,8 @@ import io.airlift.compress.zstd.FrameHeader;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.LiteralsSectionHeader;
 import io.airlift.compress.zstd.SlideWindow;
-import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
-import io.airlift.compress.zstd.bis.SequencesInitializer;
+import io.airlift.compress.zstd.io.BackwardBitInputDecorator;
+import io.airlift.compress.zstd.io.SequencesInitializer;
 import io.airlift.compress.zstd.fse.decompress.FiniteStateEntropyForDecompress;
 import io.airlift.compress.zstd.fse.decompress.FseTableForDecompressReader;
 import io.airlift.compress.zstd.huffman.HuffmanDecompressor;
@@ -47,7 +47,7 @@ import static io.airlift.compress.zstd.Constants.MIN_WINDOW_LOG;
 import static io.airlift.compress.zstd.Constants.OFFSET_TABLE_LOG;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Util.verify;
-import static io.airlift.compress.zstd.bis.BackwardBitInputDecorator.peekBits;
+import static io.airlift.compress.zstd.io.BackwardBitInputDecorator.peekBits;
 
 @RequiredArgsConstructor
 public class ZstdFrameDecompressor implements AutoCloseable {

@@ -31,7 +31,7 @@ import com.github.luben.zstd.Zstd;
 import com.github.luben.zstd.ZstdCompressCtx;
 import io.airlift.compress.zstd.ZstdCompressor;
 import io.airlift.compress.zstd.ZstdInputStream;
-import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
+import io.airlift.compress.zstd.compress.InByteArrayWithOffs;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
 import io.airlift.compress.zstd.io.RandomAccessOut;
 import org.apache.commons.io.IOUtils;

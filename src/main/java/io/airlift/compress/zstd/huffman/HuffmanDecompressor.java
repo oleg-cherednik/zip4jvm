@@ -17,7 +17,7 @@ import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.Util;
-import io.airlift.compress.zstd.bis.BackwardBitInputStream;
+import io.airlift.compress.zstd.io.BackwardBitInputStream;
 import io.airlift.compress.zstd.fse.decompress.FiniteStateEntropyForDecompress;
 import lombok.RequiredArgsConstructor;
 

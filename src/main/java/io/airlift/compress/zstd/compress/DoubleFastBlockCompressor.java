@@ -15,7 +15,6 @@ package io.airlift.compress.zstd.compress;
 
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Constants;
-import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;

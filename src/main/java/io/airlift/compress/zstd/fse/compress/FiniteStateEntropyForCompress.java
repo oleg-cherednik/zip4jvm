@@ -16,7 +16,7 @@ package io.airlift.compress.zstd.fse.compress;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.zstd.Util;
-import io.airlift.compress.zstd.bos.MaskBitOutputStream;
+import io.airlift.compress.zstd.io.MaskBitOutputStream;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
 import io.airlift.compress.zstd.huffman.HuffmanConst;
 import io.airlift.compress.zstd.io.Out;

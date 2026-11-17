@@ -14,7 +14,7 @@
 package io.airlift.compress.zstd.seq;
 
 import io.airlift.compress.zstd.Histogram;
-import io.airlift.compress.zstd.bos.MaskBitOutputStream;
+import io.airlift.compress.zstd.io.MaskBitOutputStream;
 import io.airlift.compress.zstd.compress.CompressionContext;
 import io.airlift.compress.zstd.compress.CompressionParameters;
 import io.airlift.compress.zstd.fse.FseCompressionTable;

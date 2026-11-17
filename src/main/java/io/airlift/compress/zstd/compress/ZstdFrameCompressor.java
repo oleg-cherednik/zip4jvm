@@ -16,7 +16,6 @@ package io.airlift.compress.zstd.compress;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.zstd.BlockHeader;
-import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
 import io.airlift.compress.zstd.io.Out;
 import io.airlift.compress.zstd.io.RandomAccessOut;

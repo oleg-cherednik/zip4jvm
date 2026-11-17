@@ -1,7 +1,6 @@
-package io.airlift.compress.zstd.bis;
+package io.airlift.compress.zstd.io;
 
 import io.airlift.compress.zstd.BackwardDecorator;
-import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import lombok.Getter;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;

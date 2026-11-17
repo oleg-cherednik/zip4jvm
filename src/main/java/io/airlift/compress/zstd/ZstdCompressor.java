@@ -15,7 +15,7 @@ package io.airlift.compress.zstd;
 
 import io.airlift.compress.zstd.compress.CompressionParameters;
 import io.airlift.compress.zstd.compress.ZstdFrameCompressor;
-import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
+import io.airlift.compress.zstd.compress.InByteArrayWithOffs;
 import io.airlift.compress.zstd.io.Out;
 
 import java.io.IOException;
