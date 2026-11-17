@@ -83,6 +83,7 @@ public class SequenceEncoder {
         if (out.available() < MAX_SEQUENCES_SECTION_HEADER_SIZE)
             return false;
 
+        final int offs = out.getOffs();
         SequenceHeader sequenceHeader = new SequenceHeader();
         sequenceHeader.setSequenceCount(context.sequenceStore.sequenceCount);
 
@@ -90,8 +91,8 @@ public class SequenceEncoder {
 
         if (sequenceHeader.getSequenceCount() > 0) {
             int headerAddress = out.getOffs();
-            out.putByte((byte) 0xFF);
 
+            out.setOffs(offs + sequenceHeader.getHeaderSize());
             boolean success = foo(out, context, sequenceHeader);
 
             if (success) {
