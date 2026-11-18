@@ -13,9 +13,21 @@
  */
 package io.airlift.compress.zstd.model;
 
+import io.airlift.compress.zstd.In;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import static io.airlift.compress.zstd.model.Constants.MIN_WINDOW_LOG;
+import static io.airlift.compress.zstd.model.Util.verify;
+
+/**
+ * <ul>
+ * Frame_Header_Descriptor
+ * <li>[Window_Descriptor]</li>
+ * <li>[Dictionary_ID]</li>
+ * <li>[Frame_Content_Size]</li>
+ * </ul>
+ */
 @Getter
 @RequiredArgsConstructor
 public class FrameHeader {
@@ -30,5 +42,63 @@ public class FrameHeader {
     private final long contentSize;
     private final long dictionaryId;
     private final boolean hasChecksum;
+
+    public static FrameHeader decode(In in) {
+        FrameHeaderDescriptor frameHeaderDescriptor = FrameHeaderDescriptor.decode(in);
+        long windowSize = readWindowDescriptorAndGetWindowSize(in, frameHeaderDescriptor);
+        long dictionaryId = readDictionaryId(in, frameHeaderDescriptor);
+        long frameContentSize = readFrameContentSize(in, frameHeaderDescriptor);
+
+        // if Single_Segment_flag == true => windowSize = frameContentSize
+        if (windowSize == FrameHeader.UNKNOWN_SIZE)
+            windowSize = frameContentSize;
+
+        verify(windowSize != FrameHeader.UNKNOWN_SIZE, "Frame content size is unknown");
+        verify(windowSize <= FrameHeader.MAX_WINDOW_SIZE, "Frame requires too much memory");
+
+        boolean hasChecksum = frameHeaderDescriptor.isContentChecksumFlag();
+        return new FrameHeader((int) windowSize, frameContentSize, dictionaryId, hasChecksum);
+    }
+
+    private static long readWindowDescriptorAndGetWindowSize(In in, FrameHeaderDescriptor frameHeaderDescriptor) {
+        if (frameHeaderDescriptor.isSingleSegmentFlag())
+            return UNKNOWN_SIZE;
+
+        int windowDescriptor = in.readByte();
+        // bit7_3 - Exponent
+        int exponent = (windowDescriptor >> 3) & 0b11111;
+        // bit2-0 - Mantissa
+        int mantissa = windowDescriptor & 0b111;
+
+        long base = 1L << (MIN_WINDOW_LOG + exponent);
+        return base + (base / 8) * mantissa;
+    }
+
+    private static long readDictionaryId(In in, FrameHeaderDescriptor frameHeaderDescriptor) {
+        int dictionaryIdFlag = frameHeaderDescriptor.getDictionaryIdFlag();
+
+        if (dictionaryIdFlag == 0)
+            return 0;
+        if (dictionaryIdFlag == 1)
+            return in.readByte();
+        if (dictionaryIdFlag == 2)
+            return in.readWord() & 0xFFFF;
+        // dictionaryIdFlag == 3
+        return in.readDword() & 0xFFFF_FFFFL;
+    }
+
+    private static long readFrameContentSize(In in, FrameHeaderDescriptor frameHeaderDescriptor) {
+        int frameContentSizeFlag = frameHeaderDescriptor.getFrameContentSizeFlag();
+
+        if (frameContentSizeFlag == 0)
+            return frameHeaderDescriptor.isSingleSegmentFlag() ? in.readByte() : UNKNOWN_SIZE;
+        if (frameContentSizeFlag == 1)
+            return (in.readWord() & 0xFFFF) + 256;
+        if (frameContentSizeFlag == 2)
+            return in.readDword() & 0xFFFF_FFFFL;
+        // frameContentSizeFlag == e
+        return in.readQword();
+    }
+
 
 }

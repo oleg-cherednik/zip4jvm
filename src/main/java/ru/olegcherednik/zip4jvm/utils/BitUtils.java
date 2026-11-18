@@ -96,6 +96,18 @@ public final class BitUtils {
         return (byte) updateBits((int) val, bits, value);
     }
 
+    public static int getValue(int val, int bits) {
+        if (bits == 0)
+            return 0;
+
+        while (isBitClear(bits, BIT0)) {
+            val >>>= 1;
+            bits >>>= 1;
+        }
+
+        return val & bits;
+    }
+
     public static int toBytes(int numberOfBits) {
         return numberOfBits >>> 3;
     }

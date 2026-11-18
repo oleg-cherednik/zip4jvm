@@ -13,8 +13,6 @@
  */
 package io.airlift.compress.zstd.compress;
 
-import ru.olegcherednik.zip4jvm.utils.BitUtils;
-
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.fse.decompress.FiniteStateEntropyForDecompress;
 import io.airlift.compress.zstd.fse.decompress.FseTableForDecompressReader;
@@ -45,7 +43,6 @@ import static io.airlift.compress.zstd.model.Constants.MATCH_LENGTH_TABLE_LOG;
 import static io.airlift.compress.zstd.model.Constants.MAX_BLOCK_SIZE;
 import static io.airlift.compress.zstd.model.Constants.MAX_LITERALS_LENGTH_SYMBOL;
 import static io.airlift.compress.zstd.model.Constants.MAX_MATCH_LENGTH_SYMBOL;
-import static io.airlift.compress.zstd.model.Constants.MIN_WINDOW_LOG;
 import static io.airlift.compress.zstd.model.Constants.OFFSET_TABLE_LOG;
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.model.Util.verify;
@@ -185,7 +182,7 @@ public class ZstdFrameDecompressor implements AutoCloseable {
          * [Content_Checksum]
          */
         verifyMagic();
-        frameHeader = readFrameHeader();
+        frameHeader = FrameHeader.decode(in);
         slideWindow.init(frameHeader.getWindowSize(), frameHeader.getContentSize());
         doInitFrame = false;
     }
@@ -605,82 +602,6 @@ public class ZstdFrameDecompressor implements AutoCloseable {
         literalsBase = new byte[header.getRegeneratedSize()];
         in.read(literalsBase);
         literalsLimit = header.getRegeneratedSize();
-    }
-
-    private FrameHeader readFrameHeader() {
-        /*
-         * Frame_Header_Descriptor
-         * [Window_Descriptor]
-         * [Dictionary_ID]
-         * [Frame_Content_Size]
-         */
-
-        int frameHeaderDescriptor = readFrameHeaderDescriptor();
-        long windowSize = readWindowDescriptorAndGetWindowSize(frameHeaderDescriptor);
-        long dictionaryId = readDictionaryId(frameHeaderDescriptor);
-        long frameContentSize = readFrameContentSize(frameHeaderDescriptor);
-
-        // if Single_Segment_flag == true => windowSize = frameContentSize
-        if (windowSize == FrameHeader.UNKNOWN_SIZE)
-            windowSize = frameContentSize;
-
-        verify(windowSize != FrameHeader.UNKNOWN_SIZE, "Frame content size is unknown");
-        verify(windowSize <= FrameHeader.MAX_WINDOW_SIZE, "Frame requires too much memory");
-
-        boolean hasChecksum = BitUtils.isBitSet(frameHeaderDescriptor, BitUtils.BIT2);
-        return new FrameHeader((int) windowSize, frameContentSize, dictionaryId, hasChecksum);
-    }
-
-    private int readFrameHeaderDescriptor() {
-        return in.readByte();
-    }
-
-    private long readWindowDescriptorAndGetWindowSize(int frameHeaderDescriptor) {
-        // bit5 - Single_Segment_flag
-        boolean singleSegment = BitUtils.isBitSet(frameHeaderDescriptor, BitUtils.BIT5);
-
-        // singleSegment == true => windowSize == Frame_Content_Size
-        if (singleSegment)
-            return FrameHeader.UNKNOWN_SIZE;
-
-        int windowDescriptor = in.readByte();
-        // bit7_3 - Exponent
-        int exponent = (windowDescriptor >> 3) & 0b11111;
-        // bit2-0 - Mantissa
-        int mantissa = windowDescriptor & 0b111;
-
-        long base = 1L << (MIN_WINDOW_LOG + exponent);
-        return base + (base / 8) * mantissa;
-    }
-
-    private long readDictionaryId(int frameHeaderDescriptor) {
-        // bit1_0 - Dictionary_ID_flag
-        int dictionaryIdFlag = frameHeaderDescriptor & 0b11;
-
-        if (dictionaryIdFlag == 0)
-            return 0;
-        if (dictionaryIdFlag == 1)
-            return in.readByte();
-        if (dictionaryIdFlag == 2)
-            return in.readWord() & 0xFFFF;
-        // dictionaryIdFlag == 3
-        return in.readDword() & 0xFFFF_FFFFL;
-    }
-
-    private long readFrameContentSize(int frameHeaderDescriptor) {
-        // bit7_6 - Frame_Content_Size_flag
-        int frameContentSizeFlag = (frameHeaderDescriptor >> 6) & 0b11;
-        // bit5 - Single_Segment_flag
-        boolean singleSegment = BitUtils.isBitSet(frameHeaderDescriptor, BitUtils.BIT5);
-
-        if (frameContentSizeFlag == 0)
-            return singleSegment ? in.readByte() : FrameHeader.UNKNOWN_SIZE;
-        if (frameContentSizeFlag == 1)
-            return (in.readWord() & 0xFFFF) + 256;
-        if (frameContentSizeFlag == 2)
-            return in.readDword() & 0xFFFF_FFFFL;
-        // frameContentSizeFlag == e
-        return in.readQword();
     }
 
     private void verifyMagic() {
