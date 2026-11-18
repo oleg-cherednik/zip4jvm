@@ -98,6 +98,11 @@ public class ByteArrayRandomAccessOut implements RandomAccessOut {
     // ---------- RandomAccessOut ----------
 
     @Override
+    public RandomAccessOut slice(int offs, int len) {
+        return new ByteArrayRandomAccessOut(buf, offs, Math.min(limit, len));
+    }
+
+    @Override
     public int read(byte[] buf, int offs, int len) {
         int available = Math.min(available(), len);
         System.arraycopy(this.buf, this.offs, buf, offs, available);

@@ -13,6 +13,8 @@ public interface RandomAccessOut extends Out {
     @Deprecated
     byte[] getBuf();
 
+    RandomAccessOut slice(int offs, int len);
+
     void setOffs(int offs);
 
     default int read(byte[] buf, int offs, int len) {

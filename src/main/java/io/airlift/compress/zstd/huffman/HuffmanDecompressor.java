@@ -177,10 +177,10 @@ public class HuffmanDecompressor {
         int outputStart3 = segmentSize + segmentSize;
         int outputStart4 = outputStart3 + segmentSize;
 
-        RandomAccessOut out1 = new ByteArrayRandomAccessOut(rao.getBuf(), 0, outputStart2);
-        RandomAccessOut out2 = new ByteArrayRandomAccessOut(rao.getBuf(), outputStart2, outputStart3);
-        RandomAccessOut out3 = new ByteArrayRandomAccessOut(rao.getBuf(), outputStart3, outputStart4);
-        RandomAccessOut out4 = new ByteArrayRandomAccessOut(rao.getBuf(), outputStart4, rao.available());
+        RandomAccessOut out1 = rao.slice(0, outputStart2);
+        RandomAccessOut out2 = rao.slice(outputStart2, outputStart3);
+        RandomAccessOut out3 = rao.slice(outputStart3, outputStart4);
+        RandomAccessOut out4 = rao.slice(outputStart4, rao.available());
 
         while (out4.getOffs() < fastOutputLimit) {
             for (int i = 0; i < 4; i++) {
