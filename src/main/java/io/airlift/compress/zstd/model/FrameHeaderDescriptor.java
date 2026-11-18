@@ -1,6 +1,7 @@
 package io.airlift.compress.zstd.model;
 
 import io.airlift.compress.zstd.In;
+import io.airlift.compress.zstd.Out;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,6 +43,15 @@ public class FrameHeaderDescriptor {
         return descriptor;
     }
 
+    public void encode(Out out) {
+        int data = (frameContentSizeFlag & 0b11) << 6
+                | (singleSegmentFlag ? 1 : 0) << 5
+                | (contentChecksumFlag ? 1 : 0) << 2
+                | (dictionaryIdFlag & 0b11);
+
+        out.putByte((byte) (data & 0xFF));
+    }
+
     public long readDictionaryId(In in) {
         if (dictionaryIdFlag == 0)
             return 0;
@@ -64,8 +74,9 @@ public class FrameHeaderDescriptor {
         return in.readQword();
     }
 
-    public void calcFrameContentSizeFlag(int contentSize) {
-        frameContentSizeFlag = (contentSize > 0xFF ? 1 : 0) + (contentSize >= 65536 + 256 ? 1 : 0);
+    public void withContentSize(int contentSize) {
+        frameContentSizeFlag = (contentSize > 0xFF ? 1 : 0)
+                + (contentSize >= 65536 + 256 ? 1 : 0);
     }
 
 }

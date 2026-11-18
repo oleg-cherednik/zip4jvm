@@ -15,6 +15,7 @@ package io.airlift.compress.zstd.model;
 
 import io.airlift.compress.zstd.In;
 import lombok.Getter;
+import lombok.Setter;
 
 import static io.airlift.compress.zstd.model.Util.verify;
 
@@ -27,6 +28,7 @@ import static io.airlift.compress.zstd.model.Util.verify;
  * </ul>
  */
 @Getter
+@Setter
 public class FrameHeader {
 
     public static final long UNKNOWN_SIZE = -1;

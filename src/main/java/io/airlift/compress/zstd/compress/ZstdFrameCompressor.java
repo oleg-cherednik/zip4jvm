@@ -13,14 +13,14 @@
  */
 package io.airlift.compress.zstd.compress;
 
-import ru.olegcherednik.zip4jvm.utils.BitUtils;
-
 import io.airlift.compress.zstd.CompressIn;
 import io.airlift.compress.zstd.Out;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
 import io.airlift.compress.zstd.io.RandomAccessOut;
 import io.airlift.compress.zstd.model.BlockHeader;
+import io.airlift.compress.zstd.model.FrameHeader;
+import io.airlift.compress.zstd.model.FrameHeaderDescriptor;
 import io.airlift.compress.zstd.seq.SequenceEncoder;
 import lombok.RequiredArgsConstructor;
 
@@ -34,8 +34,6 @@ import static io.airlift.compress.zstd.model.Constants.MIN_WINDOW_LOG;
 @RequiredArgsConstructor
 public class ZstdFrameCompressor {
 
-    private static final int CHECKSUM_FLAG = 0b100;
-
     private static void writeMagic(Out out) {
         out.putInt(MAGIC_NUMBER);
     }
@@ -44,25 +42,30 @@ public class ZstdFrameCompressor {
     private final int compressionLevel;
 
     private void writeFrameHeader(Out out, CompressionParameters parameters, int contentSize) {
-        boolean singleSegment = parameters.getWindowSize() >= contentSize;
-        int frameContentSizeFlag = writeFrameHeaderDescriptor(out, singleSegment, contentSize);
+        FrameHeader frameHeader = new FrameHeader();
+        frameHeader.setFrameHeaderDescriptor(createFrameHeaderDescriptor(parameters, contentSize));
 
-        if (!singleSegment)
+        frameHeader.getFrameHeaderDescriptor().encode(out);
+
+        if (!frameHeader.getFrameHeaderDescriptor().isSingleSegmentFlag())
             writeWindowDescriptor(out, parameters.getWindowSize());
 
-        writeFrameContentSize(out, singleSegment, frameContentSizeFlag, contentSize);
+        writeFrameContentSize(out,
+                              frameHeader.getFrameHeaderDescriptor().isSingleSegmentFlag(),
+                              frameHeader.getFrameHeaderDescriptor().getFrameContentSizeFlag(),
+                              contentSize);
     }
 
-    private static int writeFrameHeaderDescriptor(Out out, boolean singleSegment, int contentSize) {
-        int frameContentSizeFlag = (contentSize >= 256 ? 1 : 0) + (contentSize >= 65536 + 256 ? 1 : 0);
-        int frameHeaderDescriptor = (frameContentSizeFlag << 6) | CHECKSUM_FLAG;
-
-        if (singleSegment)
-            frameHeaderDescriptor = BitUtils.setBits(frameHeaderDescriptor, BitUtils.BIT5);
-
-        out.putByte((byte) frameHeaderDescriptor);
-        return frameContentSizeFlag;
+    private static FrameHeaderDescriptor createFrameHeaderDescriptor(CompressionParameters parameters,
+                                                                     int contentSize) {
+        FrameHeaderDescriptor fhd = new FrameHeaderDescriptor();
+        fhd.setDictionaryIdFlag(0);
+        fhd.setContentChecksumFlag(true);
+        fhd.setSingleSegmentFlag(parameters.getWindowSize() >= contentSize);
+        fhd.withContentSize(contentSize);
+        return fhd;
     }
+
 
     private static void writeWindowDescriptor(Out out, int windowSize) {
         int base = Integer.highestOneBit(windowSize);

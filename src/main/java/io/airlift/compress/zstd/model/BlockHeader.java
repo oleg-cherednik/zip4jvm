@@ -1,12 +1,13 @@
 package io.airlift.compress.zstd.model;
 
-import ru.olegcherednik.zip4jvm.utils.BitUtils;
-
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.Out;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+
+import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
+import static ru.olegcherednik.zip4jvm.utils.BitUtils.isBitSet;
 
 /**
  * see: 3.1.1.2
@@ -34,7 +35,7 @@ public final class BlockHeader {
         int data = b2 << 16 | b1 << 8 | b0;
 
         BlockHeader blockHeader = new BlockHeader();
-        blockHeader.setLastBlock(BitUtils.isBitSet(data, BitUtils.BIT0));
+        blockHeader.setLastBlock(isBitSet(data, BIT0));
         blockHeader.setBlockType(BlockType.parseId((data >> 1) & MASK_BLOCK_TYPE));
         blockHeader.setBlockSize((data >> 3) & MASK_BLOCK_SIZE);
 
