@@ -14,10 +14,8 @@
 package io.airlift.compress.zstd.model;
 
 import io.airlift.compress.zstd.In;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import static io.airlift.compress.zstd.model.Constants.MIN_WINDOW_LOG;
 import static io.airlift.compress.zstd.model.Util.verify;
@@ -42,39 +40,37 @@ public class FrameHeader {
 
     private FrameHeaderDescriptor frameHeaderDescriptor;
     private WindowDescriptor windowDescriptor;
+    private long dictionaryId;
+    private long frameContentSize;
 
     private int windowSize;
-    private long contentSize;
-    private long dictionaryId;
-    private boolean hasChecksum;
 
-    public FrameHeader(int windowSize, long contentSize, long dictionaryId, boolean hasChecksum) {
+    public FrameHeader(int windowSize, long dictionaryId) {
         this.windowSize = windowSize;
-        this.contentSize = contentSize;
         this.dictionaryId = dictionaryId;
-        this.hasChecksum = hasChecksum;
     }
 
     public static FrameHeader decode(In in) {
-        FrameHeader fh = new FrameHeader();
-        fh.frameHeaderDescriptor = FrameHeaderDescriptor.decode(in);
+        FrameHeader frameHeader = new FrameHeader();
+        frameHeader.frameHeaderDescriptor = FrameHeaderDescriptor.decode(in);
 
-        if (!fh.frameHeaderDescriptor.isSingleSegmentFlag())
-            fh.windowDescriptor = WindowDescriptor.decode(in);
+        if (!frameHeader.frameHeaderDescriptor.isSingleSegmentFlag())
+            frameHeader.windowDescriptor = WindowDescriptor.decode(in);
 
-        long windowSize = readWindowDescriptorAndGetWindowSize(fh);
-        long dictionaryId = readDictionaryId(in, fh.frameHeaderDescriptor);
-        long frameContentSize = readFrameContentSize(in, fh.frameHeaderDescriptor);
+        long windowSize = readWindowDescriptorAndGetWindowSize(frameHeader);
+        frameHeader.dictionaryId = readDictionaryId(in, frameHeader.frameHeaderDescriptor);
+        frameHeader.frameContentSize = readFrameContentSize(in, frameHeader.frameHeaderDescriptor);
 
         // if Single_Segment_flag == true => windowSize = frameContentSize
         if (windowSize == UNKNOWN_SIZE)
-            windowSize = frameContentSize;
+            windowSize = frameHeader.frameContentSize;
 
         verify(windowSize != UNKNOWN_SIZE, "Frame content size is unknown");
         verify(windowSize <= MAX_WINDOW_SIZE, "Frame requires too much memory");
 
-        boolean hasChecksum = fh.frameHeaderDescriptor.isContentChecksumFlag();
-        return new FrameHeader((int) windowSize, frameContentSize, dictionaryId, hasChecksum);
+        frameHeader.windowSize = (int) windowSize;
+
+        return frameHeader;
     }
 
     private static long readWindowDescriptorAndGetWindowSize(FrameHeader frameHeader) {
@@ -118,5 +114,8 @@ public class FrameHeader {
         return in.readQword();
     }
 
+    public boolean isHasChecksum() {
+        return frameHeaderDescriptor.isContentChecksumFlag();
+    }
 
 }
