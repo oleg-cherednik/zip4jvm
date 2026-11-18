@@ -127,17 +127,15 @@ public class HuffmanDecompressor {
         return outputSize;
     }
 
-    private static void readWeightsAsFse(In in, int totalBytes, ByteArrayWithOffs weights)
-            throws IOException {
+    private static void readWeightsAsFse(In in, int totalBytes, ByteArrayWithOffs weights) throws IOException {
         long lo = in.getPos();
         FiniteStateEntropyForDecompress fse = new FiniteStateEntropyForDecompress().readFseTable(in, totalBytes);
         totalBytes -= (int) (in.getPos() - lo);
         fse.decompress(new BackwardDecorator(in, totalBytes), weights);
     }
 
-    public void decodeSingleStream(In in, long inputLimit, ByteArrayRandomAccessOut out) throws IOException {
-        // inputLimit is an absolute position in 'in', the stream is the rest of the literals section
-        BackwardDecorator bwd = new BackwardDecorator(in, (int) (inputLimit - in.getPos()));
+    public void decodeSingleStream(In in, ByteArrayRandomAccessOut out) throws IOException {
+        BackwardDecorator bwd = new BackwardDecorator(in, in.available());
         BackwardBitInputStream bitStream = new BackwardBitInputStream(bwd, tableLog, symbols, numbersOfBits);
 
         // 4 symbols at a time
@@ -156,17 +154,18 @@ public class HuffmanDecompressor {
         bitStream.decodeTail(out);
     }
 
-    public void decode4Streams(In in, long inputLimit, RandomAccessOut rao) throws IOException {
-        verify(inputLimit - in.getPos() >= 10, "Input is corrupted"); // jump table + 1 byte per stream
+    public void decode4Streams(In in, RandomAccessOut rao) throws IOException {
+        verify(in.available() >= 10, "Input is corrupted"); // jump table + 1 byte per stream
 
         int size1 = in.readWord();
         int size2 = in.readWord();
         int size3 = in.readWord();
+        int size4 = in.available() - size1 - size2 - size3;
 
         BackwardBitInputStream bbis1 = createStream(in, size1);
         BackwardBitInputStream bbis2 = createStream(in, size2);
         BackwardBitInputStream bbis3 = createStream(in, size3);
-        BackwardBitInputStream bbis4 = createStream(in, (int) (inputLimit - in.getPos()));
+        BackwardBitInputStream bbis4 = createStream(in, size4);
 
         int segmentSize = (rao.available() + 3) / 4;
         long fastOutputLimit = rao.available() - 7;
