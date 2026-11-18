@@ -2,7 +2,7 @@ package io.airlift.compress.zstd.model;
 
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
-import io.airlift.compress.zstd.DecompressIn;
+import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.Out;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public final class BlockHeader {
     @Getter
     private int blockSize;
 
-    public static BlockHeader decode(DecompressIn in) {
+    public static BlockHeader decode(In in) {
         int b0 = in.readByte();
         int b1 = in.readByte();
         int b2 = in.readByte();

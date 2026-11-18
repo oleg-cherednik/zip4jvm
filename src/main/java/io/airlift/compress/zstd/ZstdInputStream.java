@@ -21,10 +21,10 @@ public class ZstdInputStream extends InputStream {
     private boolean eof;
 
     public ZstdInputStream(InputStream is) {
-        this((DecompressIn) new InputStreamToInAdapter(is));
+        this((In) new InputStreamToInAdapter(is));
     }
 
-    public ZstdInputStream(DecompressIn in) {
+    public ZstdInputStream(In in) {
         decompressor = new ZstdFrameDecompressor(in);
     }
 

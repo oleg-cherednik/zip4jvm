@@ -1,6 +1,6 @@
 package io.airlift.compress.zstd.seq;
 
-import io.airlift.compress.zstd.DecompressIn;
+import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.Out;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -25,7 +25,7 @@ public class SequenceHeader {
     private CompressionMode offsetCompressionMode;
     private CompressionMode matchLengthCompressionMode;
 
-    public static SequenceHeader decode(DecompressIn in) {
+    public static SequenceHeader decode(In in) {
         int b0 = in.readByte();
 
         SequenceHeader sequenceHeader = new SequenceHeader();

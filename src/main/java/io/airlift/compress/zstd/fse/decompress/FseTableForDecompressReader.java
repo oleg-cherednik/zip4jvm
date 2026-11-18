@@ -13,7 +13,7 @@
  */
 package io.airlift.compress.zstd.fse.decompress;
 
-import io.airlift.compress.zstd.DecompressIn;
+import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
 import io.airlift.compress.zstd.huffman.HuffmanConst;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ public class FseTableForDecompressReader {
     // 4.1.1. FSE Table Description
     // bytes are read from 'in' sequentially; when the method returns, 'in' points to the first byte behind the table
     // (the bit stream of the table is padded to a whole number of bytes)
-    public FiniteStateEntropyForDecompress.Table readFseTable(DecompressIn in, int totalBytes, int maxSymbol) {
+    public FiniteStateEntropyForDecompress.Table readFseTable(In in, int totalBytes, int maxSymbol) {
         BitReader bits = new BitReader(in, totalBytes);
 
         int symbolNumber = 0;

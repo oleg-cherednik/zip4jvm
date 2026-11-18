@@ -1,6 +1,6 @@
 package io.airlift.compress.zstd.io;
 
-import io.airlift.compress.zstd.In;
+import io.airlift.compress.zstd.CompressIn;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.io.IOUtils;
@@ -13,7 +13,7 @@ import org.apache.commons.io.IOUtils;
  */
 @Getter
 @Setter
-public final class InByteArrayWithOffs implements In {
+public final class InByteArrayWithOffs implements CompressIn {
 
     private final byte[] buf;
     private int offs;

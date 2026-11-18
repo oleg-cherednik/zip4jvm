@@ -14,7 +14,7 @@
 package io.airlift.compress.zstd.huffman;
 
 import io.airlift.compress.zstd.io.BackwardDecorator;
-import io.airlift.compress.zstd.DecompressIn;
+import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.io.HuffmanBitOutputStream;
 import io.airlift.compress.zstd.io.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.Out;
@@ -29,7 +29,7 @@ import static io.airlift.compress.zstd.model.Constants.SIZE_OF_SHORT;
 @RequiredArgsConstructor
 public class HuffmanCompressor {
 
-    private final DecompressIn in;
+    private final In in;
     private final HuffmanCompressionTable table;
 
     public void compressFourStreams(RandomAccessOut rao, final int totalBytes) throws IOException {

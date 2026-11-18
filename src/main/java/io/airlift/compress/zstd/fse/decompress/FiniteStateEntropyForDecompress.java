@@ -15,7 +15,7 @@ package io.airlift.compress.zstd.fse.decompress;
 
 import io.airlift.compress.zstd.io.BackwardDecorator;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
-import io.airlift.compress.zstd.DecompressIn;
+import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.io.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.huffman.HuffmanConst;
 
@@ -28,7 +28,7 @@ public class FiniteStateEntropyForDecompress {
     private final FiniteStateEntropyForDecompress.Table table =
             new FiniteStateEntropyForDecompress.Table(HuffmanConst.MAX_FSE_TABLE_LOG);
 
-    public FiniteStateEntropyForDecompress readFseTable(DecompressIn in, int totalBytes) {
+    public FiniteStateEntropyForDecompress readFseTable(In in, int totalBytes) {
         new FseTableForDecompressReader(table, HuffmanConst.MAX_TABLE_LOG)
                 .readFseTable(in, totalBytes, HuffmanConst.MAX_SYMBOL);
         return this;

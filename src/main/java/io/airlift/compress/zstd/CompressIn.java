@@ -1,0 +1,18 @@
+package io.airlift.compress.zstd;
+
+/**
+ * @author Oleg Cherednik
+ * @since 17.11.2026
+ */
+public interface CompressIn {
+
+    int available();
+
+    /**
+     * Reads up to {@code len} bytes into {@code buf} starting at {@code offs}.
+     * Returns the number of bytes read, or {@code -1} at end of input when
+     * nothing was read.
+     */
+    int read(byte[] buf, int offs, int len);
+
+}
