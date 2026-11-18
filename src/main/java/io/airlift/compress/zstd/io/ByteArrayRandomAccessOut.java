@@ -27,7 +27,12 @@ public class ByteArrayRandomAccessOut implements RandomAccessOut {
     private int limit;
 
     public ByteArrayRandomAccessOut(int limit) {
-        buf = new byte[limit];
+        this(new byte[limit], 0, limit);
+    }
+
+    public ByteArrayRandomAccessOut(byte[] buf, int offs, int limit) {
+        this.buf = buf;
+        this.offs = offs;
         this.limit = limit;
     }
 

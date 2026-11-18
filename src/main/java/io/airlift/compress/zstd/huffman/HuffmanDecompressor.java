@@ -17,7 +17,9 @@ import io.airlift.compress.zstd.DecompressIn;
 import io.airlift.compress.zstd.fse.decompress.FiniteStateEntropyForDecompress;
 import io.airlift.compress.zstd.io.BackwardBitInputStream;
 import io.airlift.compress.zstd.io.BackwardDecorator;
+import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
+import io.airlift.compress.zstd.io.RandomAccessOut;
 import io.airlift.compress.zstd.model.Util;
 import lombok.RequiredArgsConstructor;
 
@@ -135,7 +137,7 @@ public class HuffmanDecompressor {
         fse.decompress(new BackwardDecorator(in, totalBytes), weights);
     }
 
-    public void decodeSingleStream(long inputLimit, ByteArrayWithOffs out) throws IOException {
+    public void decodeSingleStream(long inputLimit, ByteArrayRandomAccessOut out) throws IOException {
         // inputLimit is an absolute position in 'in', the stream is the rest of the literals section
         BackwardDecorator bwd = new BackwardDecorator(in, (int) (inputLimit - in.getPos()));
         BackwardBitInputStream bitStream = new BackwardBitInputStream(bwd, tableLog, symbols, numbersOfBits);
@@ -156,7 +158,7 @@ public class HuffmanDecompressor {
         bitStream.decodeTail(out);
     }
 
-    public void decode4Streams(long inputLimit, ByteArrayWithOffs out) throws IOException {
+    public void decode4Streams(long inputLimit, RandomAccessOut rao) throws IOException {
         verify(inputLimit - in.getPos() >= 10, "Input is corrupted"); // jump table + 1 byte per stream
 
         int size1 = in.readWord();
@@ -168,18 +170,17 @@ public class HuffmanDecompressor {
         BackwardBitInputStream bbis3 = createStream(size3);
         BackwardBitInputStream bbis4 = createStream((int) (inputLimit - in.getPos()));
 
-        int segmentSize = (out.getLimit() + 3) / 4;
+        int segmentSize = (rao.available() + 3) / 4;
+        long fastOutputLimit = rao.available() - 7;
 
         int outputStart2 = segmentSize;
         int outputStart3 = segmentSize + segmentSize;
         int outputStart4 = outputStart3 + segmentSize;
 
-        ByteArrayWithOffs out1 = new ByteArrayWithOffs(out.buf, 0, outputStart2);
-        ByteArrayWithOffs out2 = new ByteArrayWithOffs(out.buf, outputStart2, outputStart3);
-        ByteArrayWithOffs out3 = new ByteArrayWithOffs(out.buf, outputStart3, outputStart4);
-        ByteArrayWithOffs out4 = new ByteArrayWithOffs(out.buf, outputStart4, out.getLimit());
-
-        long fastOutputLimit = out.getLimit() - 7;
+        RandomAccessOut out1 = new ByteArrayRandomAccessOut(rao.getBuf(), 0, outputStart2);
+        RandomAccessOut out2 = new ByteArrayRandomAccessOut(rao.getBuf(), outputStart2, outputStart3);
+        RandomAccessOut out3 = new ByteArrayRandomAccessOut(rao.getBuf(), outputStart3, outputStart4);
+        RandomAccessOut out4 = new ByteArrayRandomAccessOut(rao.getBuf(), outputStart4, rao.available());
 
         while (out4.getOffs() < fastOutputLimit) {
             for (int i = 0; i < 4; i++) {

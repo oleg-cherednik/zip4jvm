@@ -1,5 +1,6 @@
 package io.airlift.compress.zstd.io;
 
+import io.airlift.compress.zstd.Out;
 import lombok.Getter;
 
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_LONG;
@@ -70,7 +71,7 @@ public class BackwardBitInputStream {
         return val;
     }
 
-    public void decodeTail(ByteArrayWithOffs out) {
+    public void decodeTail(Out out) {
         while (out.available() > 0) {
             BackwardBitInputDecorator bbid = new BackwardBitInputDecorator(in, bits, bitsConsumed);
             bitsConsumed = bbid.getBitsConsumed();
@@ -90,7 +91,7 @@ public class BackwardBitInputStream {
         verify(in.getOffs() < 0 && bitsConsumed == Long.SIZE, "Bit stream is not fully consumed");
     }
 
-    public void decodeSymbol(ByteArrayWithOffs out) {
+    public void decodeSymbol(Out out) {
         int value = (int) BackwardBitInputDecorator.peekBitsFast(bitsConsumed, bits, tableLog);
         out.putByte(symbols[value]);
         bitsConsumed += numbersOfBits[value];
