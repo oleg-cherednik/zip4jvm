@@ -13,9 +13,8 @@ import static io.airlift.compress.zstd.model.Constants.SIZE_OF_LONG;
 public final class ByteArrayWithOffs {
 
     public final byte[] buf;
-    private final int startOffs;
-    @Getter
     @Setter
+    @Getter
     private int offs;
     @Setter
     @Getter
@@ -33,7 +32,6 @@ public final class ByteArrayWithOffs {
         this.buf = buf;
         this.offs = offs;
         this.limit = limit;
-        startOffs = offs;
     }
 
     public int available() {
@@ -85,7 +83,7 @@ public final class ByteArrayWithOffs {
 
     @Override
     public String toString() {
-        return String.format("size: %s, offs: %s (startOffs: %s)", buf.length, offs, startOffs);
+        return String.format("size: %s, offs: %s", buf.length, offs);
     }
 
 }
