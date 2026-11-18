@@ -4,7 +4,7 @@ package io.airlift.compress.zstd;
  * @author Oleg Cherednik
  * @since 17.11.2026
  */
-public interface CompressIn {
+public interface In {
 
     int available();
 
