@@ -14,7 +14,9 @@
 package io.airlift.compress.zstd.model;
 
 import io.airlift.compress.zstd.In;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import static io.airlift.compress.zstd.model.Constants.MIN_WINDOW_LOG;
@@ -22,14 +24,14 @@ import static io.airlift.compress.zstd.model.Util.verify;
 
 /**
  * <ul>
- * Frame_Header_Descriptor
+ * Frame_Header_Descriptor:
  * <li>[Window_Descriptor]</li>
  * <li>[Dictionary_ID]</li>
  * <li>[Frame_Content_Size]</li>
  * </ul>
  */
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class FrameHeader {
 
     public static final long UNKNOWN_SIZE = -1;
@@ -38,37 +40,53 @@ public class FrameHeader {
     // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.1.2
     public static final int MAX_WINDOW_SIZE = 1 << 27;
 
-    private final int windowSize;
-    private final long contentSize;
-    private final long dictionaryId;
-    private final boolean hasChecksum;
+    private FrameHeaderDescriptor frameHeaderDescriptor;
+    private WindowDescriptor windowDescriptor;
+
+    private int windowSize;
+    private long contentSize;
+    private long dictionaryId;
+    private boolean hasChecksum;
+
+    public FrameHeader(int windowSize, long contentSize, long dictionaryId, boolean hasChecksum) {
+        this.windowSize = windowSize;
+        this.contentSize = contentSize;
+        this.dictionaryId = dictionaryId;
+        this.hasChecksum = hasChecksum;
+    }
 
     public static FrameHeader decode(In in) {
-        FrameHeaderDescriptor frameHeaderDescriptor = FrameHeaderDescriptor.decode(in);
-        long windowSize = readWindowDescriptorAndGetWindowSize(in, frameHeaderDescriptor);
-        long dictionaryId = readDictionaryId(in, frameHeaderDescriptor);
-        long frameContentSize = readFrameContentSize(in, frameHeaderDescriptor);
+        FrameHeader fh = new FrameHeader();
+        fh.frameHeaderDescriptor = FrameHeaderDescriptor.decode(in);
+
+        if (!fh.frameHeaderDescriptor.isSingleSegmentFlag())
+            fh.windowDescriptor = WindowDescriptor.decode(in);
+
+        long windowSize = readWindowDescriptorAndGetWindowSize(fh);
+        long dictionaryId = readDictionaryId(in, fh.frameHeaderDescriptor);
+        long frameContentSize = readFrameContentSize(in, fh.frameHeaderDescriptor);
 
         // if Single_Segment_flag == true => windowSize = frameContentSize
-        if (windowSize == FrameHeader.UNKNOWN_SIZE)
+        if (windowSize == UNKNOWN_SIZE)
             windowSize = frameContentSize;
 
-        verify(windowSize != FrameHeader.UNKNOWN_SIZE, "Frame content size is unknown");
-        verify(windowSize <= FrameHeader.MAX_WINDOW_SIZE, "Frame requires too much memory");
+        verify(windowSize != UNKNOWN_SIZE, "Frame content size is unknown");
+        verify(windowSize <= MAX_WINDOW_SIZE, "Frame requires too much memory");
 
-        boolean hasChecksum = frameHeaderDescriptor.isContentChecksumFlag();
+        boolean hasChecksum = fh.frameHeaderDescriptor.isContentChecksumFlag();
         return new FrameHeader((int) windowSize, frameContentSize, dictionaryId, hasChecksum);
     }
 
-    private static long readWindowDescriptorAndGetWindowSize(In in, FrameHeaderDescriptor frameHeaderDescriptor) {
-        if (frameHeaderDescriptor.isSingleSegmentFlag())
+    private static long readWindowDescriptorAndGetWindowSize(FrameHeader frameHeader) {
+        if (frameHeader.frameHeaderDescriptor.isSingleSegmentFlag())
             return UNKNOWN_SIZE;
 
-        int windowDescriptor = in.readByte();
+        WindowDescriptor wd = frameHeader.windowDescriptor;
+        int b = wd.b;
         // bit7_3 - Exponent
-        int exponent = (windowDescriptor >> 3) & 0b11111;
+        int exponent = (b >> 3) & 0b11111;
         // bit2-0 - Mantissa
-        int mantissa = windowDescriptor & 0b111;
+        int mantissa = b & 0b111;
 
         long base = 1L << (MIN_WINDOW_LOG + exponent);
         return base + (base / 8) * mantissa;
