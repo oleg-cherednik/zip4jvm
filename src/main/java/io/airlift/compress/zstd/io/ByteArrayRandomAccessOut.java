@@ -20,7 +20,7 @@ public class ByteArrayRandomAccessOut implements RandomAccessOut {
 
     private static final int OFFS_ZERO = 0;
 
-    @Getter //(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     private final byte[] buf;
     private int offs;

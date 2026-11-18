@@ -10,9 +10,6 @@ import java.io.IOException;
  */
 public interface RandomAccessOut extends Out {
 
-    @Deprecated
-    byte[] getBuf();
-
     RandomAccessOut slice(int offs, int len);
 
     void setOffs(int offs);
