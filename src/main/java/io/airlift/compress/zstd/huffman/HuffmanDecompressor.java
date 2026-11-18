@@ -31,25 +31,23 @@ import static io.airlift.compress.zstd.model.Util.verify;
 @RequiredArgsConstructor
 public class HuffmanDecompressor {
 
-    public static final int MAX_FSE_TABLE_LOG = 6;
+    private static final int TABLE_NOT_LOADED = -1;
 
     // table
-    private int tableLog = -1;
+    private int tableLog = TABLE_NOT_LOADED;
     private final byte[] symbols = new byte[1 << HuffmanConst.MAX_TABLE_LOG];
     private final byte[] numbersOfBits = new byte[1 << HuffmanConst.MAX_TABLE_LOG];
 
-    private final In in;
-
     public boolean isLoaded() {
-        return tableLog != -1;
+        return tableLog != TABLE_NOT_LOADED;
     }
 
     public void reset() {
-        tableLog = -1;
+        tableLog = TABLE_NOT_LOADED;
     }
 
     // see 4.2.1.1
-    public int readTable() throws IOException {
+    public int readTable(In in) throws IOException {
         byte[] weights = new byte[HuffmanConst.MAX_SYMBOL + 1];
         int[] ranks = new int[HuffmanConst.MAX_TABLE_LOG + 1];
 
@@ -137,7 +135,7 @@ public class HuffmanDecompressor {
         fse.decompress(new BackwardDecorator(in, totalBytes), weights);
     }
 
-    public void decodeSingleStream(long inputLimit, ByteArrayRandomAccessOut out) throws IOException {
+    public void decodeSingleStream(In in, long inputLimit, ByteArrayRandomAccessOut out) throws IOException {
         // inputLimit is an absolute position in 'in', the stream is the rest of the literals section
         BackwardDecorator bwd = new BackwardDecorator(in, (int) (inputLimit - in.getPos()));
         BackwardBitInputStream bitStream = new BackwardBitInputStream(bwd, tableLog, symbols, numbersOfBits);
@@ -158,17 +156,17 @@ public class HuffmanDecompressor {
         bitStream.decodeTail(out);
     }
 
-    public void decode4Streams(long inputLimit, RandomAccessOut rao) throws IOException {
+    public void decode4Streams(In in, long inputLimit, RandomAccessOut rao) throws IOException {
         verify(inputLimit - in.getPos() >= 10, "Input is corrupted"); // jump table + 1 byte per stream
 
         int size1 = in.readWord();
         int size2 = in.readWord();
         int size3 = in.readWord();
 
-        BackwardBitInputStream bbis1 = createStream(size1);
-        BackwardBitInputStream bbis2 = createStream(size2);
-        BackwardBitInputStream bbis3 = createStream(size3);
-        BackwardBitInputStream bbis4 = createStream((int) (inputLimit - in.getPos()));
+        BackwardBitInputStream bbis1 = createStream(in, size1);
+        BackwardBitInputStream bbis2 = createStream(in, size2);
+        BackwardBitInputStream bbis3 = createStream(in, size3);
+        BackwardBitInputStream bbis4 = createStream(in, (int) (inputLimit - in.getPos()));
 
         int segmentSize = (rao.available() + 3) / 4;
         long fastOutputLimit = rao.available() - 7;
@@ -210,7 +208,7 @@ public class HuffmanDecompressor {
         bbis4.decodeTail(out4);
     }
 
-    private BackwardBitInputStream createStream(int totalBytes) throws IOException {
+    private BackwardBitInputStream createStream(In in, int totalBytes) throws IOException {
         BackwardDecorator bd = new BackwardDecorator(in, totalBytes);
         return new BackwardBitInputStream(bd, tableLog, symbols, numbersOfBits);
     }
