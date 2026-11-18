@@ -13,17 +13,16 @@
  */
 package io.airlift.compress.zstd.huffman;
 
+import io.airlift.compress.zstd.DecompressIn;
+import io.airlift.compress.zstd.fse.decompress.FiniteStateEntropyForDecompress;
+import io.airlift.compress.zstd.io.BackwardBitInputStream;
 import io.airlift.compress.zstd.io.BackwardDecorator;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
-import io.airlift.compress.zstd.DecompressIn;
 import io.airlift.compress.zstd.model.Util;
-import io.airlift.compress.zstd.io.BackwardBitInputStream;
-import io.airlift.compress.zstd.fse.decompress.FiniteStateEntropyForDecompress;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
-import static io.airlift.compress.zstd.model.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.model.Util.isPowerOf2;
 import static io.airlift.compress.zstd.model.Util.verify;
 
@@ -128,7 +127,8 @@ public class HuffmanDecompressor {
         return outputSize;
     }
 
-    private static void readWeightsAsFse(DecompressIn in, int totalBytes, ByteArrayWithOffs weights) throws IOException {
+    private static void readWeightsAsFse(DecompressIn in, int totalBytes, ByteArrayWithOffs weights)
+            throws IOException {
         long lo = in.getPos();
         FiniteStateEntropyForDecompress fse = new FiniteStateEntropyForDecompress().readFseTable(in, totalBytes);
         totalBytes -= (int) (in.getPos() - lo);
@@ -174,38 +174,20 @@ public class HuffmanDecompressor {
         int outputStart3 = segmentSize + segmentSize;
         int outputStart4 = outputStart3 + segmentSize;
 
-        int output1 = 0;
-        int output2 = outputStart2;
-        int output3 = outputStart3;
-        int output4 = outputStart4;
+        ByteArrayWithOffs out1 = new ByteArrayWithOffs(out.buf, 0, outputStart2);
+        ByteArrayWithOffs out2 = new ByteArrayWithOffs(out.buf, outputStart2, outputStart3);
+        ByteArrayWithOffs out3 = new ByteArrayWithOffs(out.buf, outputStart3, outputStart4);
+        ByteArrayWithOffs out4 = new ByteArrayWithOffs(out.buf, outputStart4, out.getLimit());
 
         long fastOutputLimit = out.getLimit() - 7;
 
-        while (output4 < fastOutputLimit) {
-            bbis1.decodeSymbol(out, output1);
-            bbis2.decodeSymbol(out, output2);
-            bbis3.decodeSymbol(out, output3);
-            bbis4.decodeSymbol(out, output4);
-
-            bbis1.decodeSymbol(out, output1 + 1);
-            bbis2.decodeSymbol(out, output2 + 1);
-            bbis3.decodeSymbol(out, output3 + 1);
-            bbis4.decodeSymbol(out, output4 + 1);
-
-            bbis1.decodeSymbol(out, output1 + 2);
-            bbis2.decodeSymbol(out, output2 + 2);
-            bbis3.decodeSymbol(out, output3 + 2);
-            bbis4.decodeSymbol(out, output4 + 2);
-
-            bbis1.decodeSymbol(out, output1 + 3);
-            bbis2.decodeSymbol(out, output2 + 3);
-            bbis3.decodeSymbol(out, output3 + 3);
-            bbis4.decodeSymbol(out, output4 + 3);
-
-            output1 += SIZE_OF_INT;
-            output2 += SIZE_OF_INT;
-            output3 += SIZE_OF_INT;
-            output4 += SIZE_OF_INT;
+        while (out4.getOffs() < fastOutputLimit) {
+            for (int i = 0; i < 4; i++) {
+                bbis1.decodeSymbol(out1);
+                bbis2.decodeSymbol(out2);
+                bbis3.decodeSymbol(out3);
+                bbis4.decodeSymbol(out4);
+            }
 
             if (bbis1.load())
                 break;
@@ -217,13 +199,14 @@ public class HuffmanDecompressor {
                 break;
         }
 
-        verify(output1 <= outputStart2 && output2 <= outputStart3 && output3 <= outputStart4, "Input is corrupted");
+        verify(out1.getOffs() <= outputStart2, "Input is corrupted");
+        verify(out2.getOffs() <= outputStart3, "Input is corrupted");
+        verify(out3.getOffs() <= outputStart4, "Input is corrupted");
 
-        // finish streams one by one
-        bbis1.decodeTail(out, output1, outputStart2);
-        bbis2.decodeTail(out, output2, outputStart3);
-        bbis3.decodeTail(out, output3, outputStart4);
-        bbis4.decodeTail(out, output4, out.getLimit());
+        bbis1.decodeTail(out1);
+        bbis2.decodeTail(out2);
+        bbis3.decodeTail(out3);
+        bbis4.decodeTail(out4);
     }
 
     private BackwardBitInputStream createStream(int totalBytes) throws IOException {

@@ -1,7 +1,6 @@
 package io.airlift.compress.zstd.io;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_BYTE;
@@ -11,16 +10,20 @@ import static io.airlift.compress.zstd.model.Constants.SIZE_OF_LONG;
  * @author Oleg Cherednik
  * @since 03.09.2026
  */
-@RequiredArgsConstructor
 public final class ByteArrayWithOffs {
 
     public final byte[] buf;
+    private final int startOffs;
     @Getter
     @Setter
     private int offs;
     @Setter
     @Getter
     private int limit;
+
+    public ByteArrayWithOffs(byte[] buf) {
+        this(buf, 0);
+    }
 
     public ByteArrayWithOffs(byte[] buf, int offs) {
         this(buf, offs, buf.length);
@@ -30,10 +33,11 @@ public final class ByteArrayWithOffs {
         this.buf = buf;
         this.offs = offs;
         this.limit = limit;
+        startOffs = offs;
     }
 
     public int available() {
-        return buf.length - offs;
+        return limit - offs;
     }
 
     public int getByte() {
@@ -69,13 +73,8 @@ public final class ByteArrayWithOffs {
         return maxLen;
     }
 
-    public int putByte(int offs, byte x) {
-        buf[offs] = x;
-        return SIZE_OF_BYTE;
-    }
-
     public void putByte(byte x) {
-        putByte(offs, x);
+        buf[offs] = x;
         offs += SIZE_OF_BYTE;
     }
 
@@ -86,7 +85,7 @@ public final class ByteArrayWithOffs {
 
     @Override
     public String toString() {
-        return String.format("size: %s, offs: %s", buf.length, offs);
+        return String.format("size: %s, offs: %s (startOffs: %s)", buf.length, offs, startOffs);
     }
 
 }
