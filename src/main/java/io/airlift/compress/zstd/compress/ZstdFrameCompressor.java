@@ -15,12 +15,12 @@ package io.airlift.compress.zstd.compress;
 
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
-import io.airlift.compress.zstd.model.BlockHeader;
 import io.airlift.compress.zstd.CompressIn;
 import io.airlift.compress.zstd.Out;
-import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
+import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
 import io.airlift.compress.zstd.io.RandomAccessOut;
+import io.airlift.compress.zstd.model.BlockHeader;
 import io.airlift.compress.zstd.seq.SequenceEncoder;
 import lombok.RequiredArgsConstructor;
 
