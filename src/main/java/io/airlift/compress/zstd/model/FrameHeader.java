@@ -16,7 +16,6 @@ package io.airlift.compress.zstd.model;
 import io.airlift.compress.zstd.In;
 import lombok.Getter;
 
-import static io.airlift.compress.zstd.model.Constants.MIN_WINDOW_LOG;
 import static io.airlift.compress.zstd.model.Util.verify;
 
 /**
@@ -44,15 +43,18 @@ public class FrameHeader {
     private int windowSize;
 
     public static FrameHeader decode(In in) {
+        long windowSize = UNKNOWN_SIZE;
+
         FrameHeader frameHeader = new FrameHeader();
         frameHeader.frameHeaderDescriptor = FrameHeaderDescriptor.decode(in);
 
-        if (!frameHeader.frameHeaderDescriptor.isSingleSegmentFlag())
+        if (!frameHeader.frameHeaderDescriptor.isSingleSegmentFlag()) {
             frameHeader.windowDescriptor = WindowDescriptor.decode(in);
+            windowSize = frameHeader.windowDescriptor.getWindowSize();
+        }
 
-        long windowSize = getWindowSize(frameHeader);
-        frameHeader.dictionaryId = readDictionaryId(in, frameHeader.frameHeaderDescriptor);
-        frameHeader.frameContentSize = readFrameContentSize(in, frameHeader.frameHeaderDescriptor);
+        frameHeader.dictionaryId = frameHeader.frameHeaderDescriptor.readDictionaryId(in);
+        frameHeader.frameContentSize = frameHeader.frameHeaderDescriptor.readFrameContentSize(in);
 
         // if Single_Segment_flag == true => windowSize = frameContentSize
         if (windowSize == UNKNOWN_SIZE)
@@ -64,40 +66,6 @@ public class FrameHeader {
         frameHeader.windowSize = (int) windowSize;
 
         return frameHeader;
-    }
-
-    private static long getWindowSize(FrameHeader frameHeader) {
-        if (frameHeader.frameHeaderDescriptor.isSingleSegmentFlag())
-            return UNKNOWN_SIZE;
-
-        long base = 1L << (MIN_WINDOW_LOG + frameHeader.windowDescriptor.getExponent());
-        return base + (base / 8) * frameHeader.windowDescriptor.getMantissa();
-    }
-
-    private static long readDictionaryId(In in, FrameHeaderDescriptor frameHeaderDescriptor) {
-        int dictionaryIdFlag = frameHeaderDescriptor.getDictionaryIdFlag();
-
-        if (dictionaryIdFlag == 0)
-            return 0;
-        if (dictionaryIdFlag == 1)
-            return in.readByte();
-        if (dictionaryIdFlag == 2)
-            return in.readWord() & 0xFFFF;
-        // dictionaryIdFlag == 3
-        return in.readDword() & 0xFFFF_FFFFL;
-    }
-
-    private static long readFrameContentSize(In in, FrameHeaderDescriptor frameHeaderDescriptor) {
-        int frameContentSizeFlag = frameHeaderDescriptor.getFrameContentSizeFlag();
-
-        if (frameContentSizeFlag == 0)
-            return frameHeaderDescriptor.isSingleSegmentFlag() ? in.readByte() : UNKNOWN_SIZE;
-        if (frameContentSizeFlag == 1)
-            return (in.readWord() & 0xFFFF) + 256;
-        if (frameContentSizeFlag == 2)
-            return in.readDword() & 0xFFFF_FFFFL;
-        // frameContentSizeFlag == e
-        return in.readQword();
     }
 
     public boolean isHasChecksum() {

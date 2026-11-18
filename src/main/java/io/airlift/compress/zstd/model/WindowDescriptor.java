@@ -3,6 +3,7 @@ package io.airlift.compress.zstd.model;
 import io.airlift.compress.zstd.In;
 import lombok.Getter;
 
+import static io.airlift.compress.zstd.model.Constants.MIN_WINDOW_LOG;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT1;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT2;
@@ -33,6 +34,11 @@ public class WindowDescriptor {
         wd.exponent = getValue(b, BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
 
         return wd;
+    }
+
+    public long getWindowSize() {
+        long base = 1L << (MIN_WINDOW_LOG + exponent);
+        return base + (base / 8) * mantissa;
     }
 
 }

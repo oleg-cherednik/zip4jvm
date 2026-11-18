@@ -1,7 +1,9 @@
 package io.airlift.compress.zstd.model;
 
 import io.airlift.compress.zstd.In;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT1;
@@ -19,11 +21,13 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.isBitSet;
  * @since 18.11.2026
  */
 @Getter
+@Setter
 public class FrameHeaderDescriptor {
 
     private int dictionaryIdFlag;
     private boolean contentChecksumFlag;
     private boolean singleSegmentFlag;
+    @Setter(AccessLevel.NONE)
     private int frameContentSizeFlag;
 
     public static FrameHeaderDescriptor decode(In in) {
@@ -36,6 +40,32 @@ public class FrameHeaderDescriptor {
         descriptor.frameContentSizeFlag = getValue(b, BIT6 | BIT7);
 
         return descriptor;
+    }
+
+    public long readDictionaryId(In in) {
+        if (dictionaryIdFlag == 0)
+            return 0;
+        if (dictionaryIdFlag == 1)
+            return in.readByte();
+        if (dictionaryIdFlag == 2)
+            return in.readWord() & 0xFFFF;
+        // dictionaryIdFlag == 3
+        return in.readDword() & 0xFFFF_FFFFL;
+    }
+
+    public long readFrameContentSize(In in) {
+        if (frameContentSizeFlag == 0)
+            return singleSegmentFlag ? in.readByte() : FrameHeader.UNKNOWN_SIZE;
+        if (frameContentSizeFlag == 1)
+            return (in.readWord() & 0xFFFF) + 256;
+        if (frameContentSizeFlag == 2)
+            return in.readDword() & 0xFFFF_FFFFL;
+        // frameContentSizeFlag == e
+        return in.readQword();
+    }
+
+    public void calcFrameContentSizeFlag(int contentSize) {
+        frameContentSizeFlag = (contentSize > 0xFF ? 1 : 0) + (contentSize >= 65536 + 256 ? 1 : 0);
     }
 
 }
