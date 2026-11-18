@@ -22,7 +22,6 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.getValue;
 @Getter
 public class WindowDescriptor {
 
-    public int b;
     private int mantissa;
     private int exponent;
 
@@ -30,7 +29,6 @@ public class WindowDescriptor {
         int b = in.readByte();
 
         WindowDescriptor wd = new WindowDescriptor();
-        wd.b = b;
         wd.mantissa = getValue(b, BIT0 | BIT1 | BIT2);
         wd.exponent = getValue(b, BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
 

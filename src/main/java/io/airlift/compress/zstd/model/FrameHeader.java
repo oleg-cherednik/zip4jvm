@@ -50,7 +50,7 @@ public class FrameHeader {
         if (!frameHeader.frameHeaderDescriptor.isSingleSegmentFlag())
             frameHeader.windowDescriptor = WindowDescriptor.decode(in);
 
-        long windowSize = readWindowDescriptorAndGetWindowSize(frameHeader);
+        long windowSize = getWindowSize(frameHeader);
         frameHeader.dictionaryId = readDictionaryId(in, frameHeader.frameHeaderDescriptor);
         frameHeader.frameContentSize = readFrameContentSize(in, frameHeader.frameHeaderDescriptor);
 
@@ -66,19 +66,12 @@ public class FrameHeader {
         return frameHeader;
     }
 
-    private static long readWindowDescriptorAndGetWindowSize(FrameHeader frameHeader) {
+    private static long getWindowSize(FrameHeader frameHeader) {
         if (frameHeader.frameHeaderDescriptor.isSingleSegmentFlag())
             return UNKNOWN_SIZE;
 
-        WindowDescriptor wd = frameHeader.windowDescriptor;
-        int b = wd.b;
-        // bit7_3 - Exponent
-        int exponent = (b >> 3) & 0b11111;
-        // bit2-0 - Mantissa
-        int mantissa = b & 0b111;
-
-        long base = 1L << (MIN_WINDOW_LOG + exponent);
-        return base + (base / 8) * mantissa;
+        long base = 1L << (MIN_WINDOW_LOG + frameHeader.windowDescriptor.getExponent());
+        return base + (base / 8) * frameHeader.windowDescriptor.getMantissa();
     }
 
     private static long readDictionaryId(In in, FrameHeaderDescriptor frameHeaderDescriptor) {
