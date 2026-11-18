@@ -160,23 +160,22 @@ public class HuffmanDecompressor {
         int size4 = in.available() - size1 - size2 - size3;
 
         int segmentSize = (rao.available() + 3) / 4;
-        long fastOutputLimit = rao.available() - 7;
-
-        int outputStart2 = segmentSize;
-        int outputStart3 = outputStart2 + segmentSize;
-        int outputStart4 = outputStart3 + segmentSize;
+        int offsSegment2 = segmentSize;
+        int offsSegment3 = offsSegment2 + segmentSize;
+        int offsSegment4 = offsSegment3 + segmentSize;
 
         BackwardBitInputStream bbis1 = createStream(in, size1);
         BackwardBitInputStream bbis2 = createStream(in, size2);
         BackwardBitInputStream bbis3 = createStream(in, size3);
         BackwardBitInputStream bbis4 = createStream(in, size4);
 
-        RandomAccessOut out1 = rao.slice(0, outputStart2);
-        RandomAccessOut out2 = rao.slice(outputStart2, outputStart3);
-        RandomAccessOut out3 = rao.slice(outputStart3, outputStart4);
-        RandomAccessOut out4 = rao.slice(outputStart4, rao.available());
+        RandomAccessOut out1 = rao.slice(0, offsSegment2);
+        RandomAccessOut out2 = rao.slice(offsSegment2, offsSegment3);
+        RandomAccessOut out3 = rao.slice(offsSegment3, offsSegment4);
+        RandomAccessOut out4 = rao.slice(offsSegment4, rao.available());
 
-        while (out4.getOffs() < fastOutputLimit) {
+        while (rao.available() >= 8) {
+            // 4 * 4 per loop
             for (int i = 0; i < 4; i++) {
                 bbis1.decodeSymbol(out1);
                 bbis2.decodeSymbol(out2);
@@ -194,9 +193,9 @@ public class HuffmanDecompressor {
                 break;
         }
 
-        verify(out1.getOffs() <= outputStart2, "Input is corrupted");
-        verify(out2.getOffs() <= outputStart3, "Input is corrupted");
-        verify(out3.getOffs() <= outputStart4, "Input is corrupted");
+        verify(out1.getOffs() <= offsSegment2, "Input is corrupted");
+        verify(out2.getOffs() <= offsSegment3, "Input is corrupted");
+        verify(out3.getOffs() <= offsSegment4, "Input is corrupted");
 
         bbis1.decodeTail(out1);
         bbis2.decodeTail(out2);
