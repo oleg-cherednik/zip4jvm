@@ -14,10 +14,10 @@
 package io.airlift.compress.zstd.huffman;
 
 import io.airlift.compress.zstd.In;
+import io.airlift.compress.zstd.Out;
 import io.airlift.compress.zstd.fse.decompress.FiniteStateEntropyForDecompress;
 import io.airlift.compress.zstd.io.BackwardBitInputStream;
 import io.airlift.compress.zstd.io.BackwardDecorator;
-import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.io.RandomAccessOut;
 import io.airlift.compress.zstd.model.Util;
@@ -134,14 +134,11 @@ public class HuffmanDecompressor {
         fse.decompress(new BackwardDecorator(in, totalBytes), weights);
     }
 
-    public void decodeSingleStream(In in, ByteArrayRandomAccessOut out) throws IOException {
+    public void decodeSingleStream(In in, Out out) throws IOException {
         BackwardDecorator bwd = new BackwardDecorator(in, in.available());
         BackwardBitInputStream bitStream = new BackwardBitInputStream(bwd, tableLog, symbols, numbersOfBits);
 
-        // 4 symbols at a time
-        long fastOutputLimit = out.getLimit() - 4;
-
-        while (out.getOffs() < fastOutputLimit) {
+        while (out.available() >= 4) {
             if (bitStream.load())
                 break;
 
@@ -162,17 +159,17 @@ public class HuffmanDecompressor {
         int size3 = in.readWord();
         int size4 = in.available() - size1 - size2 - size3;
 
-        BackwardBitInputStream bbis1 = createStream(in, size1);
-        BackwardBitInputStream bbis2 = createStream(in, size2);
-        BackwardBitInputStream bbis3 = createStream(in, size3);
-        BackwardBitInputStream bbis4 = createStream(in, size4);
-
         int segmentSize = (rao.available() + 3) / 4;
         long fastOutputLimit = rao.available() - 7;
 
         int outputStart2 = segmentSize;
-        int outputStart3 = segmentSize + segmentSize;
+        int outputStart3 = outputStart2 + segmentSize;
         int outputStart4 = outputStart3 + segmentSize;
+
+        BackwardBitInputStream bbis1 = createStream(in, size1);
+        BackwardBitInputStream bbis2 = createStream(in, size2);
+        BackwardBitInputStream bbis3 = createStream(in, size3);
+        BackwardBitInputStream bbis4 = createStream(in, size4);
 
         RandomAccessOut out1 = rao.slice(0, outputStart2);
         RandomAccessOut out2 = rao.slice(outputStart2, outputStart3);
