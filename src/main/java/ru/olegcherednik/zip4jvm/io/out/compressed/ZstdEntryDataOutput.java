@@ -18,12 +18,14 @@ package ru.olegcherednik.zip4jvm.io.out.compressed;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
+import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import io.airlift.compress.zstd.ZstdCompressor;
-import io.airlift.compress.zstd.io.InByteArrayWithOffs;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
+import io.airlift.compress.zstd.io.InByteArrayWithOffs;
 import io.airlift.compress.zstd.io.RandomAccessOut;
+import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 
@@ -62,7 +64,19 @@ final class ZstdEntryDataOutput extends CompressedEntryDataOutput {
         RandomAccessOut rao = new ByteArrayRandomAccessOut(compressor.maxCompressedLength(input.length));
         Quietly.doRuntime(() -> compressor.compress(new InByteArrayWithOffs(input), rao));
 
-        out.write(rao.getBuf(), 0, rao.getOffs());
+        int len = rao.getOffs();
+        rao.setOffs(0);
+
+        while (rao.getOffs() < len) {
+            byte[] buf = ThreadLocalBuffer.getOne();
+            int readNow = rao.read(buf, 0, buf.length);
+
+            if (readNow == IOUtils.EOF)
+                break;
+
+            out.write(buf, 0, readNow);
+        }
+
 //        Quietly.doRuntime(zstd::close);
         super.close();
     }
