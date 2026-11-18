@@ -15,7 +15,6 @@ package io.airlift.compress.zstd.model;
 
 import io.airlift.compress.zstd.In;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import static io.airlift.compress.zstd.model.Constants.MIN_WINDOW_LOG;
 import static io.airlift.compress.zstd.model.Util.verify;
@@ -29,7 +28,6 @@ import static io.airlift.compress.zstd.model.Util.verify;
  * </ul>
  */
 @Getter
-@NoArgsConstructor
 public class FrameHeader {
 
     public static final long UNKNOWN_SIZE = -1;
@@ -44,11 +42,6 @@ public class FrameHeader {
     private long frameContentSize;
 
     private int windowSize;
-
-    public FrameHeader(int windowSize, long dictionaryId) {
-        this.windowSize = windowSize;
-        this.dictionaryId = dictionaryId;
-    }
 
     public static FrameHeader decode(In in) {
         FrameHeader frameHeader = new FrameHeader();
