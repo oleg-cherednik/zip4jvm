@@ -48,20 +48,29 @@ public class ZstdFrameCompressor {
     private final int compressionLevel;
 
     private void writeFrameHeader(Out out, CompressionParameters parameters, int contentSize) {
-        FrameHeaderDescriptor frameHeaderDescriptor = createFrameHeaderDescriptor(parameters, contentSize);
-        WindowDescriptor windowDescriptor =
-                frameHeaderDescriptor.isSingleSegmentFlag() ? null : new WindowDescriptor(parameters.getWindowSize());
+        FrameHeader frameHeader1 = FrameHeader.createWith(parameters.getWindowSize(), contentSize);
 
-        FrameHeader frameHeader = new FrameHeader();
-        frameHeader.setFrameHeaderDescriptor(frameHeaderDescriptor);
-        frameHeader.setWindowDescriptor(windowDescriptor);
-
-        frameHeader.encode(out);
+        frameHeader1.encode(out);
 
         writeFrameContentSize(out,
-                              frameHeader.getFrameHeaderDescriptor().isSingleSegmentFlag(),
-                              frameHeader.getFrameHeaderDescriptor().getFrameContentSizeFlag(),
+                              frameHeader1.getFrameHeaderDescriptor().isSingleSegmentFlag(),
+                              frameHeader1.getFrameHeaderDescriptor().getFrameContentSizeFlag(),
                               contentSize);
+
+//        FrameHeaderDescriptor frameHeaderDescriptor = createFrameHeaderDescriptor(parameters, contentSize);
+//        WindowDescriptor windowDescriptor =
+//                frameHeaderDescriptor.isSingleSegmentFlag() ? null : new WindowDescriptor(parameters.getWindowSize());
+//
+//        FrameHeader frameHeader = new FrameHeader();
+//        frameHeader.setFrameHeaderDescriptor(frameHeaderDescriptor);
+//        frameHeader.setWindowDescriptor(windowDescriptor);
+//
+//        frameHeader.encode(out);
+//
+//        writeFrameContentSize(out,
+//                              frameHeader.getFrameHeaderDescriptor().isSingleSegmentFlag(),
+//                              frameHeader.getFrameHeaderDescriptor().getFrameContentSizeFlag(),
+//                              contentSize);
 
         byte[] buf = ((ByteArrayRandomAccessOut) out).buf;
         byte[] buf1 = Arrays.copyOfRange(buf, 4, buf.length);

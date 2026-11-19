@@ -15,6 +15,7 @@ package io.airlift.compress.zstd.model;
 
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.Out;
+import io.airlift.compress.zstd.compress.CompressionParameters;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -56,6 +57,10 @@ public class FrameHeader {
 
     public static FrameHeader decode(In in) {
         return new Builder().decode(in);
+    }
+
+    public static FrameHeader createWith(int windowSize, int contentSize) {
+        return new Builder().createWith(windowSize, contentSize);
     }
 
     public void encode(Out out) {
@@ -117,6 +122,35 @@ public class FrameHeader {
                 return in.readDword() & 0xFFFF_FFFFL;
             // frameContentSizeFlag == 3
             return in.readQword();
+        }
+
+        public FrameHeader createWith(int windowSize, int contentSize) {
+            FrameHeaderDescriptor frameHeaderDescriptor = createFrameHeaderDescriptor(windowSize, contentSize);
+            WindowDescriptor windowDescriptor =
+                    frameHeaderDescriptor.isSingleSegmentFlag() ? null :
+                    new WindowDescriptor(windowSize);
+
+            FrameHeader frameHeader = new FrameHeader();
+            frameHeader.setFrameHeaderDescriptor(frameHeaderDescriptor);
+            frameHeader.setWindowDescriptor(windowDescriptor);
+
+//            frameHeader.encode(out);
+//
+//            writeFrameContentSize(out,
+//                                  frameHeader.getFrameHeaderDescriptor().isSingleSegmentFlag(),
+//                                  frameHeader.getFrameHeaderDescriptor().getFrameContentSizeFlag(),
+//                                  contentSize);
+
+            return frameHeader;
+        }
+
+        private static FrameHeaderDescriptor createFrameHeaderDescriptor(int windowSize, int contentSize) {
+            FrameHeaderDescriptor fhd = new FrameHeaderDescriptor();
+            fhd.setDictionaryIdFlag(0);
+            fhd.setContentChecksumFlag(true);
+            fhd.setSingleSegmentFlag(windowSize >= contentSize);
+            fhd.withContentSize(contentSize);
+            return fhd;
         }
 
     }
