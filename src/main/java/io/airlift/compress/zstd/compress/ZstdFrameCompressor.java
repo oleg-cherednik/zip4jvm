@@ -46,12 +46,11 @@ public class ZstdFrameCompressor {
         FrameHeader frameHeader = new FrameHeader();
         frameHeader.setFrameHeaderDescriptor(createFrameHeaderDescriptor(parameters, contentSize));
 
-        frameHeader.encode(out);
-
         if (!frameHeader.getFrameHeaderDescriptor().isSingleSegmentFlag()) {
             frameHeader.setWindowDescriptor(new WindowDescriptor(parameters.getWindowSize()));
-            frameHeader.getWindowDescriptor().encode(out);
         }
+
+        frameHeader.encode(out);
 
         writeFrameContentSize(out,
                               frameHeader.getFrameHeaderDescriptor().isSingleSegmentFlag(),

@@ -73,6 +73,9 @@ public class FrameHeader {
 
     public void encode(Out out) {
         frameHeaderDescriptor.encode(out);
+
+        if (windowDescriptor != null)
+            windowDescriptor.encode(out);
     }
 
     public boolean isHasChecksum() {
