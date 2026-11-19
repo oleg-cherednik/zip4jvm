@@ -22,7 +22,7 @@ public class ByteArrayRandomAccessOut implements RandomAccessOut {
 
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
-    private final byte[] buf;
+    public final byte[] buf;
     private int offs;
     private int limit;
 

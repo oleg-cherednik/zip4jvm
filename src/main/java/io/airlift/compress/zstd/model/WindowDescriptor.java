@@ -1,5 +1,7 @@
 package io.airlift.compress.zstd.model;
 
+import ru.olegcherednik.zip4jvm.utils.BitUtils;
+
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.Out;
 import lombok.Getter;
@@ -15,7 +17,6 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT4;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT5;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT6;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT7;
-import static ru.olegcherednik.zip4jvm.utils.BitUtils.getValue;
 
 /**
  * see: 3.1.1.1.2.
@@ -53,8 +54,8 @@ public class WindowDescriptor {
         int b = in.readByte();
 
         WindowDescriptor wd = new WindowDescriptor();
-        wd.mantissa = getValue(b, BIT0 | BIT1 | BIT2);
-        wd.exponent = getValue(b, BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
+        wd.mantissa = BitUtils.getValue(b, BIT0 | BIT1 | BIT2);
+        wd.exponent = BitUtils.getValue(b, BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
 
         return wd;
     }

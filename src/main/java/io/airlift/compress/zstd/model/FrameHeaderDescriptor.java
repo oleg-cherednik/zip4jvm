@@ -1,5 +1,7 @@
 package io.airlift.compress.zstd.model;
 
+import ru.olegcherednik.zip4jvm.utils.BitUtils;
+
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.Out;
 import lombok.AccessLevel;
@@ -12,8 +14,6 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT2;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT5;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT6;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT7;
-import static ru.olegcherednik.zip4jvm.utils.BitUtils.getValue;
-import static ru.olegcherednik.zip4jvm.utils.BitUtils.isBitSet;
 
 /**
  * see: 3.1.1.1.1
@@ -28,17 +28,17 @@ public class FrameHeaderDescriptor {
     private int dictionaryIdFlag;
     private boolean contentChecksumFlag;
     private boolean singleSegmentFlag;
-    @Setter(AccessLevel.NONE)
+    //    @Setter(AccessLevel.NONE)
     private int frameContentSizeFlag;
 
     public static FrameHeaderDescriptor decode(In in) {
         int b = in.readByte();
 
         FrameHeaderDescriptor descriptor = new FrameHeaderDescriptor();
-        descriptor.dictionaryIdFlag = getValue(b, BIT0 | BIT1);
-        descriptor.contentChecksumFlag = isBitSet(b, BIT2);
-        descriptor.singleSegmentFlag = isBitSet(b, BIT5);
-        descriptor.frameContentSizeFlag = getValue(b, BIT6 | BIT7);
+        descriptor.dictionaryIdFlag = BitUtils.getValue(b, BIT0 | BIT1);
+        descriptor.contentChecksumFlag = BitUtils.isBitSet(b, BIT2);
+        descriptor.singleSegmentFlag = BitUtils.isBitSet(b, BIT5);
+        descriptor.frameContentSizeFlag = BitUtils.getValue(b, BIT6 | BIT7);
 
         return descriptor;
     }

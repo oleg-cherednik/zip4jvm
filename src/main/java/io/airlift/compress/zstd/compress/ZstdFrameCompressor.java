@@ -14,6 +14,8 @@
 package io.airlift.compress.zstd.compress;
 
 import io.airlift.compress.zstd.CompressIn;
+import io.airlift.compress.zstd.In;
+import io.airlift.compress.zstd.InputStreamToInAdapter;
 import io.airlift.compress.zstd.Out;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
@@ -23,9 +25,13 @@ import io.airlift.compress.zstd.model.FrameHeader;
 import io.airlift.compress.zstd.model.FrameHeaderDescriptor;
 import io.airlift.compress.zstd.model.WindowDescriptor;
 import io.airlift.compress.zstd.seq.SequenceEncoder;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 import static io.airlift.compress.zstd.model.Constants.MAGIC_NUMBER;
 import static io.airlift.compress.zstd.model.Constants.MAX_BLOCK_SIZE;
@@ -54,10 +60,20 @@ public class ZstdFrameCompressor {
                               frameHeader.getFrameHeaderDescriptor().isSingleSegmentFlag(),
                               frameHeader.getFrameHeaderDescriptor().getFrameContentSizeFlag(),
                               contentSize);
+
+        byte[] buf = ((ByteArrayRandomAccessOut) out).buf;
+        byte[] buf1 = Arrays.copyOfRange(buf, 4, buf.length);
+
+        In in = new InputStreamToInAdapter(new ByteArrayInputStream(buf1));
+        FrameHeader hh = FrameHeader.decode(in);
+
+        int a = 0;
+
     }
 
-    private static FrameHeaderDescriptor createFrameHeaderDescriptor(CompressionParameters parameters,
-                                                                     int contentSize) {
+    private static FrameHeaderDescriptor createFrameHeaderDescriptor(
+            CompressionParameters parameters,
+            int contentSize) {
         FrameHeaderDescriptor fhd = new FrameHeaderDescriptor();
         fhd.setDictionaryIdFlag(0);
         fhd.setContentChecksumFlag(true);
