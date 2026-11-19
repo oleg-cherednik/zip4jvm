@@ -46,28 +46,23 @@ public class FrameHeader {
     private int windowSize;
 
     public static FrameHeader decode(In in) {
-        long windowSize = UNKNOWN_SIZE;
+        FrameHeaderDescriptor frameHeaderDescriptor = FrameHeaderDescriptor.decode(in);
+        WindowDescriptor windowDescriptor =
+                frameHeaderDescriptor.isSingleSegmentFlag() ? null : WindowDescriptor.decode(in);
 
-        FrameHeader frameHeader = new FrameHeader();
-        frameHeader.frameHeaderDescriptor = FrameHeaderDescriptor.decode(in);
-
-        if (!frameHeader.frameHeaderDescriptor.isSingleSegmentFlag()) {
-            frameHeader.windowDescriptor = WindowDescriptor.decode(in);
-            windowSize = frameHeader.windowDescriptor.getWindowSize();
-        }
-
-        frameHeader.dictionaryId = readDictionaryId(in, frameHeader.frameHeaderDescriptor);
-        frameHeader.frameContentSize = frameHeader.frameHeaderDescriptor.readFrameContentSize(in);
-
-        // if Single_Segment_flag == true => windowSize = frameContentSize
-        if (windowSize == UNKNOWN_SIZE)
-            windowSize = frameHeader.frameContentSize;
+        long dictionaryId = readDictionaryId(in, frameHeaderDescriptor);
+        long frameContentSize = readFrameContentSize(in, frameHeaderDescriptor);
+        long windowSize = windowDescriptor == null ? frameContentSize : windowDescriptor.getWindowSize();
 
         verify(windowSize != UNKNOWN_SIZE, "Frame content size is unknown");
         verify(windowSize <= MAX_WINDOW_SIZE, "Frame requires too much memory");
 
+        FrameHeader frameHeader = new FrameHeader();
+        frameHeader.frameHeaderDescriptor = frameHeaderDescriptor;
+        frameHeader.windowDescriptor = windowDescriptor;
+        frameHeader.dictionaryId = dictionaryId;
+        frameHeader.frameContentSize = frameContentSize;
         frameHeader.windowSize = (int) windowSize;
-
         return frameHeader;
     }
 
@@ -82,6 +77,20 @@ public class FrameHeader {
             return in.readWord() & 0xFFFF;
         // dictionaryIdFlag == 3
         return in.readDword() & 0xFFFF_FFFFL;
+    }
+
+    private static long readFrameContentSize(In in, FrameHeaderDescriptor frameHeaderDescriptor) {
+        boolean singleSegmentFlag = frameHeaderDescriptor.isSingleSegmentFlag();
+        int frameContentSizeFlag = frameHeaderDescriptor.getFrameContentSizeFlag();
+
+        if (frameContentSizeFlag == 0)
+            return singleSegmentFlag ? in.readByte() : UNKNOWN_SIZE;
+        if (frameContentSizeFlag == 1)
+            return (in.readWord() & 0xFFFF) + 256;
+        if (frameContentSizeFlag == 2)
+            return in.readDword() & 0xFFFF_FFFFL;
+        // frameContentSizeFlag == e
+        return in.readQword();
     }
 
     public void encode(Out out) {
