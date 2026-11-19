@@ -4,11 +4,8 @@ import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.Out;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 
 import static io.airlift.compress.zstd.model.Constants.MIN_WINDOW_LOG;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
@@ -27,13 +24,11 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT7;
  * @since 18.11.2026
  */
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class WindowDescriptor {
 
-    private int mantissa;
-    private int exponent;
+    private final int mantissa;
+    private final int exponent;
 
     public WindowDescriptor(int windowSize) {
         int base = Integer.highestOneBit(windowSize);

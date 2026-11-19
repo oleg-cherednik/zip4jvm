@@ -4,11 +4,8 @@ import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.Out;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT1;
@@ -24,16 +21,13 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT7;
  * @since 18.11.2026
  */
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class FrameHeaderDescriptor {
 
-    private int dictionaryIdFlag;
-    private boolean contentChecksumFlag;
-    private boolean singleSegmentFlag;
-    //    @Setter(AccessLevel.NONE)
-    private int frameContentSizeFlag;
+    private final int dictionaryIdFlag;
+    private final boolean contentChecksumFlag;
+    private final boolean singleSegmentFlag;
+    private final int frameContentSizeFlag;
 
     public static FrameHeaderDescriptor decode(In in) {
         int b = in.readByte();
@@ -54,11 +48,6 @@ public class FrameHeaderDescriptor {
                 | (dictionaryIdFlag & 0b11);
 
         out.putByte((byte) (data & 0xFF));
-    }
-
-    public void withContentSize(int contentSize) {
-        frameContentSizeFlag = (contentSize > 0xFF ? 1 : 0)
-                + (contentSize >= 65536 + 256 ? 1 : 0);
     }
 
 }

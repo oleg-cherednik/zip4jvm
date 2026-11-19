@@ -162,12 +162,13 @@ public class FrameHeader {
         }
 
         private static FrameHeaderDescriptor createFrameHeaderDescriptor(int windowSize, int contentSize) {
-            FrameHeaderDescriptor fhd = new FrameHeaderDescriptor();
-            fhd.setDictionaryIdFlag(0);
-            fhd.setContentChecksumFlag(true);
-            fhd.setSingleSegmentFlag(windowSize >= contentSize);
-            fhd.withContentSize(contentSize);
-            return fhd;
+            int dictionaryIdFlag = 0;
+            boolean contentChecksumFlag = true;
+            boolean singleSegmentFlag = windowSize >= contentSize;
+            int frameContentSizeFlag = (contentSize > 0xFF ? 1 : 0) + (contentSize >= 65536 + 256 ? 1 : 0);
+
+            return new FrameHeaderDescriptor(dictionaryIdFlag, contentChecksumFlag,
+                                             singleSegmentFlag, frameContentSizeFlag);
         }
 
     }
