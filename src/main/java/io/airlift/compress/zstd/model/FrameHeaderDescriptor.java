@@ -52,17 +52,6 @@ public class FrameHeaderDescriptor {
         out.putByte((byte) (data & 0xFF));
     }
 
-    public long readDictionaryId(In in) {
-        if (dictionaryIdFlag == 0)
-            return 0;
-        if (dictionaryIdFlag == 1)
-            return in.readByte();
-        if (dictionaryIdFlag == 2)
-            return in.readWord() & 0xFFFF;
-        // dictionaryIdFlag == 3
-        return in.readDword() & 0xFFFF_FFFFL;
-    }
-
     public long readFrameContentSize(In in) {
         if (frameContentSizeFlag == 0)
             return singleSegmentFlag ? in.readByte() : FrameHeader.UNKNOWN_SIZE;

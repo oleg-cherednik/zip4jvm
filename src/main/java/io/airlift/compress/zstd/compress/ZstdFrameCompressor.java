@@ -30,7 +30,6 @@ import java.io.IOException;
 import static io.airlift.compress.zstd.model.Constants.MAGIC_NUMBER;
 import static io.airlift.compress.zstd.model.Constants.MAX_BLOCK_SIZE;
 import static io.airlift.compress.zstd.model.Constants.MIN_BLOCK_SIZE;
-import static io.airlift.compress.zstd.model.Constants.MIN_WINDOW_LOG;
 
 @RequiredArgsConstructor
 public class ZstdFrameCompressor {
@@ -46,9 +45,8 @@ public class ZstdFrameCompressor {
         FrameHeader frameHeader = new FrameHeader();
         frameHeader.setFrameHeaderDescriptor(createFrameHeaderDescriptor(parameters, contentSize));
 
-        if (!frameHeader.getFrameHeaderDescriptor().isSingleSegmentFlag()) {
+        if (!frameHeader.isSingleSegment())
             frameHeader.setWindowDescriptor(new WindowDescriptor(parameters.getWindowSize()));
-        }
 
         frameHeader.encode(out);
 
@@ -66,27 +64,6 @@ public class ZstdFrameCompressor {
         fhd.setSingleSegmentFlag(parameters.getWindowSize() >= contentSize);
         fhd.withContentSize(contentSize);
         return fhd;
-    }
-
-    private static void writeWindowDescriptor(Out out, int windowSize) {
-        int base = Integer.highestOneBit(windowSize);
-
-        int exponent = 32 - Integer.numberOfLeadingZeros(base) - 1;
-        if (exponent < MIN_WINDOW_LOG) {
-            throw new IllegalArgumentException("Minimum window size is " + (1 << MIN_WINDOW_LOG));
-        }
-
-        int remainder = windowSize - base;
-        if (remainder % (base / 8) != 0) {
-            throw new IllegalArgumentException(
-                    "Window size of magnitude 2^" + exponent + " must be multiple of " + (base / 8));
-        }
-
-        // mantissa is guaranteed to be between 0-7
-        int mantissa = remainder / (base / 8);
-        int encoded = ((exponent - MIN_WINDOW_LOG) << 3) | mantissa;
-
-        out.putByte((byte) encoded);
     }
 
     private static void writeFrameContentSize(Out out, boolean singleSegment, int frameContentSizeFlag,

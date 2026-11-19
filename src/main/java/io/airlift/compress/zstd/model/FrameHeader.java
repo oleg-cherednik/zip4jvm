@@ -56,7 +56,7 @@ public class FrameHeader {
             windowSize = frameHeader.windowDescriptor.getWindowSize();
         }
 
-        frameHeader.dictionaryId = frameHeader.frameHeaderDescriptor.readDictionaryId(in);
+        frameHeader.dictionaryId = readDictionaryId(in, frameHeader.frameHeaderDescriptor);
         frameHeader.frameContentSize = frameHeader.frameHeaderDescriptor.readFrameContentSize(in);
 
         // if Single_Segment_flag == true => windowSize = frameContentSize
@@ -69,6 +69,19 @@ public class FrameHeader {
         frameHeader.windowSize = (int) windowSize;
 
         return frameHeader;
+    }
+
+    private static long readDictionaryId(In in, FrameHeaderDescriptor frameHeaderDescriptor) {
+        int dictionaryIdFlag = frameHeaderDescriptor.getDictionaryIdFlag();
+
+        if (dictionaryIdFlag == 0)
+            return 0;
+        if (dictionaryIdFlag == 1)
+            return in.readByte();
+        if (dictionaryIdFlag == 2)
+            return in.readWord() & 0xFFFF;
+        // dictionaryIdFlag == 3
+        return in.readDword() & 0xFFFF_FFFFL;
     }
 
     public void encode(Out out) {
