@@ -14,6 +14,7 @@
 package io.airlift.compress.zstd.model;
 
 import io.airlift.compress.zstd.In;
+import io.airlift.compress.zstd.Out;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -70,8 +71,16 @@ public class FrameHeader {
         return frameHeader;
     }
 
+    public void encode(Out out) {
+        frameHeaderDescriptor.encode(out);
+    }
+
     public boolean isHasChecksum() {
         return frameHeaderDescriptor.isContentChecksumFlag();
+    }
+
+    public boolean isSingleSegment() {
+        return frameHeaderDescriptor.isSingleSegmentFlag();
     }
 
 }
