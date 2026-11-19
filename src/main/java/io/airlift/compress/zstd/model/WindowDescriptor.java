@@ -4,6 +4,8 @@ import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.Out;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,6 +29,7 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT7;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class WindowDescriptor {
 
     private int mantissa;
@@ -52,12 +55,9 @@ public class WindowDescriptor {
 
     public static WindowDescriptor decode(In in) {
         int b = in.readByte();
-
-        WindowDescriptor wd = new WindowDescriptor();
-        wd.mantissa = BitUtils.getValue(b, BIT0 | BIT1 | BIT2);
-        wd.exponent = BitUtils.getValue(b, BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
-
-        return wd;
+        int mantissa = BitUtils.getValue(b, BIT0 | BIT1 | BIT2);
+        int exponent = BitUtils.getValue(b, BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
+        return new WindowDescriptor(mantissa, exponent);
     }
 
     public void encode(Out out) {

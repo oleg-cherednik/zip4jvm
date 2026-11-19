@@ -5,7 +5,9 @@ import ru.olegcherednik.zip4jvm.utils.BitUtils;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.Out;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
@@ -23,6 +25,8 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT7;
  */
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class FrameHeaderDescriptor {
 
     private int dictionaryIdFlag;
@@ -34,13 +38,13 @@ public class FrameHeaderDescriptor {
     public static FrameHeaderDescriptor decode(In in) {
         int b = in.readByte();
 
-        FrameHeaderDescriptor descriptor = new FrameHeaderDescriptor();
-        descriptor.dictionaryIdFlag = BitUtils.getValue(b, BIT0 | BIT1);
-        descriptor.contentChecksumFlag = BitUtils.isBitSet(b, BIT2);
-        descriptor.singleSegmentFlag = BitUtils.isBitSet(b, BIT5);
-        descriptor.frameContentSizeFlag = BitUtils.getValue(b, BIT6 | BIT7);
+        int dictionaryIdFlag = BitUtils.getValue(b, BIT0 | BIT1);
+        boolean contentChecksumFlag = BitUtils.isBitSet(b, BIT2);
+        boolean singleSegmentFlag = BitUtils.isBitSet(b, BIT5);
+        int frameContentSizeFlag = BitUtils.getValue(b, BIT6 | BIT7);
 
-        return descriptor;
+        return new FrameHeaderDescriptor(dictionaryIdFlag, contentChecksumFlag,
+                                         singleSegmentFlag, frameContentSizeFlag);
     }
 
     public void encode(Out out) {
@@ -50,17 +54,6 @@ public class FrameHeaderDescriptor {
                 | (dictionaryIdFlag & 0b11);
 
         out.putByte((byte) (data & 0xFF));
-    }
-
-    public long readFrameContentSize(In in) {
-        if (frameContentSizeFlag == 0)
-            return singleSegmentFlag ? in.readByte() : FrameHeader.UNKNOWN_SIZE;
-        if (frameContentSizeFlag == 1)
-            return (in.readWord() & 0xFFFF) + 256;
-        if (frameContentSizeFlag == 2)
-            return in.readDword() & 0xFFFF_FFFFL;
-        // frameContentSizeFlag == e
-        return in.readQword();
     }
 
     public void withContentSize(int contentSize) {

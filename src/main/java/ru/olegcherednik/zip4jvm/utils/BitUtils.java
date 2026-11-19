@@ -100,12 +100,8 @@ public final class BitUtils {
         if (bits == 0)
             return 0;
 
-        while (isBitClear(bits, BIT0)) {
-            val >>>= 1;
-            bits >>>= 1;
-        }
-
-        return val & bits;
+        int n = Integer.numberOfTrailingZeros(bits);
+        return (val >>> n) & (bits >>> n);
     }
 
     public static int toBytes(int numberOfBits) {

@@ -182,7 +182,7 @@ public class ZstdFrameDecompressor implements AutoCloseable {
          * [Content_Checksum]
          */
         verifyMagic();
-        frameHeader = FrameHeader.decode(in);
+        frameHeader = FrameHeader.builder().decode(in).build();
         slideWindow.init(frameHeader.getWindowSize(), frameHeader.getFrameContentSize());
         doInitFrame = false;
     }
