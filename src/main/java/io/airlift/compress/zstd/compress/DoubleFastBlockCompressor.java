@@ -17,7 +17,7 @@ import io.airlift.compress.zstd.model.Constants;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
 
-import static io.airlift.compress.zstd.model.Constants.SIZE_OF_INT;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_DWORD;
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_LONG;
 
 class DoubleFastBlockCompressor implements BlockCompressor {
@@ -87,8 +87,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
 
             if (offs0 > 0 && isIntEqual(in, inOffs + 1 - offs0, inOffs + 1)) {
                 // found a repeated sequence of at least 4 bytes, separated by offs0
-                matchLength = count(in, inOffs + 1 + SIZE_OF_INT, inputEnd, inOffs + 1 + SIZE_OF_INT - offs0) +
-                        SIZE_OF_INT;
+                matchLength = count(in, inOffs + 1 + SIZE_OF_DWORD, inputEnd, inOffs + 1 + SIZE_OF_DWORD - offs0) +
+                        SIZE_OF_DWORD;
                 inOffs++;
                 // NOTE: in offs is moved (literals are copied long-at-a-time, so it can be moved beyond inOffs + literalLength)
                 in.setOffs(anchor);
@@ -123,9 +123,9 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                             matchLength += extra;
                         } else {
                             // if no long +1 match, explore the short match we found
-                            matchLength = count(in, inOffs + SIZE_OF_INT,
+                            matchLength = count(in, inOffs + SIZE_OF_DWORD,
                                                 inputEnd,
-                                                shortMatchAddress + SIZE_OF_INT) + SIZE_OF_INT;
+                                                shortMatchAddress + SIZE_OF_DWORD) + SIZE_OF_DWORD;
                             offset = inOffs - shortMatchAddress;
                             int extra = countBackward(in, inOffs, anchor, shortMatchAddress, windowBaseAddress);
                             inOffs -= extra;
@@ -162,9 +162,9 @@ class DoubleFastBlockCompressor implements BlockCompressor {
 
                 while (inOffs <= inputLimit && offs1 > 0 && isIntEqual(in, inOffs, inOffs - offs1)) {
                     int repetitionLength = count(in,
-                                                 inOffs + SIZE_OF_INT,
+                                                 inOffs + SIZE_OF_DWORD,
                                                  inputEnd,
-                                                 inOffs + SIZE_OF_INT - offs1) + SIZE_OF_INT;
+                                                 inOffs + SIZE_OF_DWORD - offs1) + SIZE_OF_DWORD;
 
                     // swap offs1 <=> offs0
                     int temp = offs1;

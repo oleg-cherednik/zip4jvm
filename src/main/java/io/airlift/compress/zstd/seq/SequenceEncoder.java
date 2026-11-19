@@ -137,7 +137,7 @@ public class SequenceEncoder {
 
         switch (sequenceHeader.getLiteralsLengthCompressionMode()) {
             case RLE:
-                out.putByte(context.sequenceStore.literalLengthCodes[0]);
+                out.writeByte(context.sequenceStore.literalLengthCodes[0]);
                 context.sequenceEncodingContext.literalLengthTable.initializeRleTable(maxSymbol);
                 literalLengthTable = context.sequenceEncodingContext.literalLengthTable;
                 break;
@@ -184,7 +184,7 @@ public class SequenceEncoder {
 
         switch (sequenceHeader.getOffsetCompressionMode()) {
             case RLE:
-                out.putByte(context.sequenceStore.offsetCodes[0]);
+                out.writeByte(context.sequenceStore.offsetCodes[0]);
                 context.sequenceEncodingContext.offsetCodeTable.initializeRleTable(maxSymbol);
                 offsetCodeTable = context.sequenceEncodingContext.offsetCodeTable;
                 break;
@@ -228,7 +228,7 @@ public class SequenceEncoder {
 
         switch (sequenceHeader.getMatchLengthCompressionMode()) {
             case RLE:
-                out.putByte(context.sequenceStore.matchLengthCodes[0]);
+                out.writeByte(context.sequenceStore.matchLengthCodes[0]);
                 context.sequenceEncodingContext.matchLengthTable.initializeRleTable(maxSymbol);
                 matchLengthTable = context.sequenceEncodingContext.matchLengthTable;
                 break;

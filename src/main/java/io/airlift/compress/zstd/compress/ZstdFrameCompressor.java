@@ -33,7 +33,7 @@ import static io.airlift.compress.zstd.model.Constants.MIN_BLOCK_SIZE;
 public class ZstdFrameCompressor {
 
     private static void writeMagic(Out out) {
-        out.putInt(MAGIC_NUMBER);
+        out.writeDword(MAGIC_NUMBER);
     }
 
     private final CompressIn in;
@@ -47,7 +47,7 @@ public class ZstdFrameCompressor {
 
     private static void writeChecksum(Out out, XXHash64 checksum, FrameHeader frameHeader) {
         if (frameHeader.isHasChecksum())
-            out.putInt((int) checksum.getValue());
+            out.writeDword((int) checksum.getValue());
     }
 
     public void compress(Out out) throws IOException {

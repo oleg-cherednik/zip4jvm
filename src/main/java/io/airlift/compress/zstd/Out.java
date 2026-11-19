@@ -16,11 +16,11 @@ public interface Out extends Closeable {
 
     int getOffs();
 
-    void putByte(byte x);
+    void writeByte(int x);
 
-    void putShort(short x);
+    void writeWord(int x);
 
-    void putInt(int x);
+    void writeDword(long x);
 
     void copyMemory(ByteArrayWithOffs in);
 

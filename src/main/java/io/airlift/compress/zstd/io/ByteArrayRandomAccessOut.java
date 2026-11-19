@@ -7,8 +7,8 @@ import lombok.Setter;
 import java.util.Arrays;
 
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_BYTE;
-import static io.airlift.compress.zstd.model.Constants.SIZE_OF_INT;
-import static io.airlift.compress.zstd.model.Constants.SIZE_OF_SHORT;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_DWORD;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_WORD;
 
 /**
  * @author Oleg Cherednik
@@ -56,25 +56,25 @@ public class ByteArrayRandomAccessOut implements RandomAccessOut {
     }
 
     @Override
-    public void putByte(byte x) {
-        buf[offs] = x;
+    public void writeByte(int x) {
+        buf[offs] = (byte) x;
         offs += SIZE_OF_BYTE;
     }
 
     @Override
-    public void putShort(short x) {
+    public void writeWord(int x) {
         buf[offs] = (byte) (x & 0xFF);
         buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
-        offs += SIZE_OF_SHORT;
+        offs += SIZE_OF_WORD;
     }
 
     @Override
-    public void putInt(int x) {
+    public void writeDword(long x) {
         buf[offs] = (byte) (x & 0xFF);
         buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
         buf[offs + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
-        buf[offs + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
-        offs += SIZE_OF_INT;
+        buf[offs + 3] = (byte) ((x & 0xFF000000L) >> 8 * 3);
+        offs += SIZE_OF_DWORD;
     }
 
     @Override

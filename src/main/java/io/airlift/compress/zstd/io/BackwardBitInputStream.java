@@ -93,7 +93,7 @@ public class BackwardBitInputStream {
 
     public void decodeSymbol(Out out) {
         int value = (int) BackwardBitInputDecorator.peekBitsFast(bitsConsumed, bits, tableLog);
-        out.putByte(symbols[value]);
+        out.writeByte(symbols[value]);
         bitsConsumed += numbersOfBits[value];
     }
 

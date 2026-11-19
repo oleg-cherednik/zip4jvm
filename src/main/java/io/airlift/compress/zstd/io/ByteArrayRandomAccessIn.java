@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_BYTE;
-import static io.airlift.compress.zstd.model.Constants.SIZE_OF_INT;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_DWORD;
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_LONG;
 
 /**
@@ -100,10 +100,10 @@ public final class ByteArrayRandomAccessIn {
     public int getInt() {
         long val = 0;
 
-        for (int i = 0; i < SIZE_OF_INT; i++)
+        for (int i = 0; i < SIZE_OF_DWORD; i++)
             val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
 
-        offs += SIZE_OF_INT;
+        offs += SIZE_OF_DWORD;
         return (int) val;
     }
 

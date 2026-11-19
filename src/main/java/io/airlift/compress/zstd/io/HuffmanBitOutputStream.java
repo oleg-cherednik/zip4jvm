@@ -36,7 +36,7 @@ public class HuffmanBitOutputStream implements AutoCloseable {
         int bytes = BitUtils.toBytes(bitCount);
 
         for (int i = 0; i < bytes; i++) {
-            out.putByte((byte) container);
+            out.writeByte((byte) container);
             container >>>= 8;
         }
 
@@ -48,7 +48,7 @@ public class HuffmanBitOutputStream implements AutoCloseable {
         addBits(1, 1); // end mark
 
         if (bitCount > 0)
-            out.putByte((byte) container);
+            out.writeByte((byte) container);
     }
 
 }

@@ -48,7 +48,7 @@ public final class BlockHeader {
                 | (lastBlock ? 1 : 0);
 
         for (int i = 0; i < HEADER_SIZE; i++) {
-            out.putByte((byte) (data & 0xFF));
+            out.writeByte((byte) (data & 0xFF));
             data >>>= 8;
         }
     }

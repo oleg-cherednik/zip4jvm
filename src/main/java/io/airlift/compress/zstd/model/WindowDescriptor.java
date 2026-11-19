@@ -57,7 +57,7 @@ public class WindowDescriptor {
 
     public void encode(Out out) {
         int encoded = ((exponent - MIN_WINDOW_LOG) << 3) | mantissa;
-        out.putByte((byte) encoded);
+        out.writeByte((byte) encoded);
     }
 
     public long getWindowSize() {

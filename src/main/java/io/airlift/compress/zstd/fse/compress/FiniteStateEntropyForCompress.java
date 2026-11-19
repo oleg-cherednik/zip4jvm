@@ -276,7 +276,7 @@ public class FiniteStateEntropyForCompress {
                     start += 24;
                     bitStream |= 0b11_11_11_11_11_11_11_11 << bitCount;
 
-                    out.putShort((short) bitStream);
+                    out.writeWord((short) bitStream);
 
                     // flush now, so no need to increase bitCount by 16
                     bitStream >>>= Short.SIZE;
@@ -295,7 +295,7 @@ public class FiniteStateEntropyForCompress {
 
                 // flush bitstream if necessary
                 if (bitCount > 16) {
-                    out.putShort((short) bitStream);
+                    out.writeWord((short) bitStream);
                     bitStream >>>= Short.SIZE;
                     bitCount -= Short.SIZE;
                 }
@@ -324,7 +324,7 @@ public class FiniteStateEntropyForCompress {
 
             // flush bitstream if necessary
             if (bitCount > 16) {
-                out.putShort((short) bitStream);
+                out.writeWord((short) bitStream);
 
                 bitStream >>>= Short.SIZE;
                 bitCount -= Short.SIZE;
@@ -336,7 +336,7 @@ public class FiniteStateEntropyForCompress {
         int tmp = bitStream;
 
         for (int i = 0; i < tailBytes; i++) {
-            out.putByte((byte) (tmp & 0xFF));
+            out.writeByte((byte) (tmp & 0xFF));
             tmp >>>= 8;
         }
 

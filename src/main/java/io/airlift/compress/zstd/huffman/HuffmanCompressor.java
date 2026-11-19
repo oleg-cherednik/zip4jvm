@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 import java.io.IOException;
 
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_BYTE;
-import static io.airlift.compress.zstd.model.Constants.SIZE_OF_SHORT;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_WORD;
 
 @RequiredArgsConstructor
 public class HuffmanCompressor {
@@ -33,11 +33,11 @@ public class HuffmanCompressor {
     private final HuffmanCompressionTable table;
 
     public void compressFourStreams(RandomAccessOut rao, final int totalBytes) throws IOException {
-        if (totalBytes <= 3 * SIZE_OF_SHORT + 3 * SIZE_OF_BYTE) // jump table + one byte per stream
+        if (totalBytes <= 3 * SIZE_OF_WORD + 3 * SIZE_OF_BYTE) // jump table + one byte per stream
             return;  // no saving possible: input too small
 
         HeaderDataOutDecorator hdod = new HeaderDataOutDecorator(rao);
-        hdod.setHeaderSize(3 * SIZE_OF_SHORT);
+        hdod.setHeaderSize(3 * SIZE_OF_WORD);
 
         int segmentSize = (totalBytes + 3) / 4;
 
@@ -50,9 +50,9 @@ public class HuffmanCompressor {
         hdod.saveDataSize();
 
         Out headerOut = hdod.getOutForHeader();
-        headerOut.putShort((short) size1);
-        headerOut.putShort((short) size2);
-        headerOut.putShort((short) size3);
+        headerOut.writeWord((short) size1);
+        headerOut.writeWord((short) size2);
+        headerOut.writeWord((short) size3);
 
         hdod.close();
     }

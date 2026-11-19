@@ -193,7 +193,7 @@ public abstract class LiteralsSectionHeader {
                         | (blockType.id & MASK_BLOCK_TYPE);
 
             for (int i = 0; i < headerSize; i++) {
-                out.putByte((byte) (data & 0xFF));
+                out.writeByte((byte) (data & 0xFF));
                 data >>>= 8;
             }
         }
@@ -316,7 +316,7 @@ public abstract class LiteralsSectionHeader {
                 throw new RuntimeException("headerSize = " + headerSize + " is not supported");
 
             for (int i = 0; i < headerSize; i++) {
-                out.putByte((byte) (data & 0xFF));
+                out.writeByte((byte) (data & 0xFF));
                 data >>>= 8;
             }
         }

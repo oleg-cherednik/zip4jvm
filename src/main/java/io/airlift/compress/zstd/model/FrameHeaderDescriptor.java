@@ -47,7 +47,7 @@ public class FrameHeaderDescriptor {
                 | (contentChecksumFlag ? 1 : 0) << 2
                 | (dictionaryIdFlag & 0b11);
 
-        out.putByte((byte) (data & 0xFF));
+        out.writeByte((byte) (data & 0xFF));
     }
 
 }

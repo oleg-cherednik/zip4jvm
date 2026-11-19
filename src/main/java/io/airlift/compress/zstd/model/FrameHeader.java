@@ -50,10 +50,6 @@ public class FrameHeader {
 
     private int windowSize;
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
     public static FrameHeader decode(In in) {
         return new Builder().decode(in);
     }
@@ -79,11 +75,11 @@ public class FrameHeader {
 
         if (frameContentSizeFlag == 0) {
             if (singleSegment)
-                out.putByte((byte) frameContentSize);
+                out.writeByte((byte) frameContentSize);
         } else if (frameContentSizeFlag == 1)
-            out.putShort((short) (frameContentSize - 256));
+            out.writeWord((short) (frameContentSize - 256));
         else if (frameContentSizeFlag == 2)
-            out.putInt((int) frameContentSize);
+            out.writeDword((int) frameContentSize);
         else
             throw new AssertionError();
     }

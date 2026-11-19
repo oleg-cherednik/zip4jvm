@@ -228,7 +228,7 @@ public final class HuffmanCompressionTable {
             //   - the compressed size is better than what we'd get with the raw encoding below
             //   - the compressed size is <= 127 bytes, which is the most that the encoding can hold for FSE-compressed weights (see RFC 8478 section 4.2.1.1). This is implied
             //     by the maxSymbol / 2 check, since maxSymbol must be <= 255
-            hdod.getOutForHeader().putByte((byte) size);
+            hdod.getOutForHeader().writeByte((byte) size);
             hdod.close();
         } else {
             // Use raw encoding (4 bits per entry)
@@ -239,11 +239,11 @@ public final class HuffmanCompressionTable {
             // encode number of symbols
             // header = #entries + 127 per RFC
             hdod.reset();
-            rao.putByte((byte) (127 + entryCount));
+            rao.writeByte((byte) (127 + entryCount));
 
             workspace.weights[maxSymbol] = 0; // last weight is implicit, so set to 0 so that it doesn't get encoded below
             for (int i = 0; i < entryCount; i += 2)
-                rao.putByte((byte) ((workspace.weights[i] << 4) + workspace.weights[i + 1]));
+                rao.writeByte((byte) ((workspace.weights[i] << 4) + workspace.weights[i + 1]));
         }
     }
 
@@ -393,7 +393,7 @@ public final class HuffmanCompressionTable {
         if (maxCount == weightsLength)
             // only a single symbol in source
             // TODO initially just retrieve size 1
-            out.putByte((byte) 0);
+            out.writeByte((byte) 0);
         if (maxCount == 1)
             // each symbol present maximum once => not compressible
             return;

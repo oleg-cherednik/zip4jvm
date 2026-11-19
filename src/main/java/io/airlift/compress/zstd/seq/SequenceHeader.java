@@ -54,13 +54,13 @@ public class SequenceHeader {
 
     private void encodeSequenceCount(Out out) {
         if (sequenceCount <= SEQ_1_BYTE)
-            out.putByte((byte) sequenceCount);
+            out.writeByte((byte) sequenceCount);
         else if (sequenceCount <= LONG_NUMBER_OF_SEQUENCES) {
-            out.putByte((byte) (sequenceCount >>> 8 | 0x80));
-            out.putByte((byte) sequenceCount);
+            out.writeByte((byte) (sequenceCount >>> 8 | 0x80));
+            out.writeByte((byte) sequenceCount);
         } else {
-            out.putByte((byte) 0xFF);
-            out.putShort((short) (sequenceCount - LONG_NUMBER_OF_SEQUENCES));
+            out.writeByte((byte) 0xFF);
+            out.writeWord((short) (sequenceCount - LONG_NUMBER_OF_SEQUENCES));
         }
     }
 
@@ -68,7 +68,7 @@ public class SequenceHeader {
         if (literalsLengthCompressionMode != null
                 && offsetCompressionMode != null
                 && matchLengthCompressionMode != null) {
-            out.putByte((byte) ((literalsLengthCompressionMode.id << 6)
+            out.writeByte((byte) ((literalsLengthCompressionMode.id << 6)
                     | (offsetCompressionMode.id << 4)
                     | (matchLengthCompressionMode.id << 2)));
         }

@@ -16,7 +16,7 @@ public class RleLiteralsEncode {
 
         if (header.getHeaderSize() + 1 <= out.available()) {
             header.encode(out);
-            out.putByte(in.buf[0]);
+            out.writeByte(in.buf[0]);
         }
     }
 
