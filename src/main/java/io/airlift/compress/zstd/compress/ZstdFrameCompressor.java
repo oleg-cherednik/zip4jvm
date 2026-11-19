@@ -14,24 +14,16 @@
 package io.airlift.compress.zstd.compress;
 
 import io.airlift.compress.zstd.CompressIn;
-import io.airlift.compress.zstd.In;
-import io.airlift.compress.zstd.InputStreamToInAdapter;
 import io.airlift.compress.zstd.Out;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
 import io.airlift.compress.zstd.io.RandomAccessOut;
 import io.airlift.compress.zstd.model.BlockHeader;
 import io.airlift.compress.zstd.model.FrameHeader;
-import io.airlift.compress.zstd.model.FrameHeaderDescriptor;
-import io.airlift.compress.zstd.model.WindowDescriptor;
 import io.airlift.compress.zstd.seq.SequenceEncoder;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Arrays;
 
 import static io.airlift.compress.zstd.model.Constants.MAGIC_NUMBER;
 import static io.airlift.compress.zstd.model.Constants.MAX_BLOCK_SIZE;
@@ -47,68 +39,15 @@ public class ZstdFrameCompressor {
     private final CompressIn in;
     private final int compressionLevel;
 
-    private void writeFrameHeader(Out out, CompressionParameters parameters, int contentSize) {
-        FrameHeader frameHeader1 = FrameHeader.createWith(parameters.getWindowSize(), contentSize);
-
-        frameHeader1.encode(out);
-
-        writeFrameContentSize(out,
-                              frameHeader1.getFrameHeaderDescriptor().isSingleSegmentFlag(),
-                              frameHeader1.getFrameHeaderDescriptor().getFrameContentSizeFlag(),
-                              contentSize);
-
-//        FrameHeaderDescriptor frameHeaderDescriptor = createFrameHeaderDescriptor(parameters, contentSize);
-//        WindowDescriptor windowDescriptor =
-//                frameHeaderDescriptor.isSingleSegmentFlag() ? null : new WindowDescriptor(parameters.getWindowSize());
-//
-//        FrameHeader frameHeader = new FrameHeader();
-//        frameHeader.setFrameHeaderDescriptor(frameHeaderDescriptor);
-//        frameHeader.setWindowDescriptor(windowDescriptor);
-//
-//        frameHeader.encode(out);
-//
-//        writeFrameContentSize(out,
-//                              frameHeader.getFrameHeaderDescriptor().isSingleSegmentFlag(),
-//                              frameHeader.getFrameHeaderDescriptor().getFrameContentSizeFlag(),
-//                              contentSize);
-
-        byte[] buf = ((ByteArrayRandomAccessOut) out).buf;
-        byte[] buf1 = Arrays.copyOfRange(buf, 4, buf.length);
-
-        In in = new InputStreamToInAdapter(new ByteArrayInputStream(buf1));
-        FrameHeader hh = FrameHeader.decode(in);
-
-        int a = 0;
-
+    private static FrameHeader writeFrameHeader(Out out, CompressionParameters parameters, int contentSize) {
+        FrameHeader frameHeader = FrameHeader.createWith(parameters.getWindowSize(), contentSize);
+        frameHeader.encode(out);
+        return frameHeader;
     }
 
-    private static FrameHeaderDescriptor createFrameHeaderDescriptor(
-            CompressionParameters parameters,
-            int contentSize) {
-        FrameHeaderDescriptor fhd = new FrameHeaderDescriptor();
-        fhd.setDictionaryIdFlag(0);
-        fhd.setContentChecksumFlag(true);
-        fhd.setSingleSegmentFlag(parameters.getWindowSize() >= contentSize);
-        fhd.withContentSize(contentSize);
-        return fhd;
-    }
-
-    private static void writeFrameContentSize(Out out, boolean singleSegment, int frameContentSizeFlag,
-                                              int contentSize) {
-        if (frameContentSizeFlag == 0) {
-            if (singleSegment)
-                out.putByte((byte) contentSize);
-        } else if (frameContentSizeFlag == 1)
-            out.putShort((short) (contentSize - 256));
-        else if (frameContentSizeFlag == 2)
-            out.putInt(contentSize);
-        else
-            throw new AssertionError();
-    }
-
-    private static void writeChecksum(Out out, XXHash64 checksum) {
-        // TODO check the flag
-        out.putInt((int) checksum.getValue());
+    private static void writeChecksum(Out out, XXHash64 checksum, FrameHeader frameHeader) {
+        if (frameHeader.isHasChecksum())
+            out.putInt((int) checksum.getValue());
     }
 
     public void compress(Out out) throws IOException {
@@ -116,9 +55,9 @@ public class ZstdFrameCompressor {
         CompressionParameters parameters = CompressionParameters.compute(compressionLevel, contentSize);
 
         writeMagic(out);
-        writeFrameHeader(out, parameters, contentSize);
+        FrameHeader frameHeader = writeFrameHeader(out, parameters, contentSize);
         XXHash64 checksum = compressFrame(out, parameters, contentSize);
-        writeChecksum(out, checksum);
+        writeChecksum(out, checksum, frameHeader);
     }
 
     private XXHash64 compressFrame(Out out, CompressionParameters parameters, int contentSize) throws IOException {

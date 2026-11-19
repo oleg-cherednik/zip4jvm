@@ -15,7 +15,6 @@ package io.airlift.compress.zstd.model;
 
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.Out;
-import io.airlift.compress.zstd.compress.CompressionParameters;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -65,18 +64,35 @@ public class FrameHeader {
 
     public void encode(Out out) {
         frameHeaderDescriptor.encode(out);
+        encodeWindowDescriptor(out);
+        encodeFrameContentSize(out);
+    }
 
+    private void encodeWindowDescriptor(Out out) {
         if (windowDescriptor != null)
             windowDescriptor.encode(out);
+    }
+
+    private void encodeFrameContentSize(Out out) {
+        boolean singleSegment = frameHeaderDescriptor.isSingleSegmentFlag();
+        int frameContentSizeFlag = frameHeaderDescriptor.getFrameContentSizeFlag();
+
+        if (frameContentSizeFlag == 0) {
+            if (singleSegment)
+                out.putByte((byte) frameContentSize);
+        } else if (frameContentSizeFlag == 1)
+            out.putShort((short) (frameContentSize - 256));
+        else if (frameContentSizeFlag == 2)
+            out.putInt((int) frameContentSize);
+        else
+            throw new AssertionError();
     }
 
     public boolean isHasChecksum() {
         return frameHeaderDescriptor.isContentChecksumFlag();
     }
 
-    public boolean isSingleSegment() {
-        return frameHeaderDescriptor.isSingleSegmentFlag();
-    }
+    // ---------- Builder ----------
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class Builder {
@@ -133,6 +149,7 @@ public class FrameHeader {
             FrameHeader frameHeader = new FrameHeader();
             frameHeader.setFrameHeaderDescriptor(frameHeaderDescriptor);
             frameHeader.setWindowDescriptor(windowDescriptor);
+            frameHeader.setFrameContentSize(contentSize);
 
 //            frameHeader.encode(out);
 //
