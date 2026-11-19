@@ -21,6 +21,7 @@ import io.airlift.compress.zstd.io.RandomAccessOut;
 import io.airlift.compress.zstd.model.BlockHeader;
 import io.airlift.compress.zstd.model.FrameHeader;
 import io.airlift.compress.zstd.model.FrameHeaderDescriptor;
+import io.airlift.compress.zstd.model.WindowDescriptor;
 import io.airlift.compress.zstd.seq.SequenceEncoder;
 import lombok.RequiredArgsConstructor;
 
@@ -47,8 +48,10 @@ public class ZstdFrameCompressor {
 
         frameHeader.encode(out);
 
-        if (!frameHeader.getFrameHeaderDescriptor().isSingleSegmentFlag())
-            writeWindowDescriptor(out, parameters.getWindowSize());
+        if (!frameHeader.getFrameHeaderDescriptor().isSingleSegmentFlag()) {
+            frameHeader.setWindowDescriptor(new WindowDescriptor(parameters.getWindowSize()));
+            frameHeader.getWindowDescriptor().encode(out);
+        }
 
         writeFrameContentSize(out,
                               frameHeader.getFrameHeaderDescriptor().isSingleSegmentFlag(),
@@ -65,7 +68,6 @@ public class ZstdFrameCompressor {
         fhd.withContentSize(contentSize);
         return fhd;
     }
-
 
     private static void writeWindowDescriptor(Out out, int windowSize) {
         int base = Integer.highestOneBit(windowSize);

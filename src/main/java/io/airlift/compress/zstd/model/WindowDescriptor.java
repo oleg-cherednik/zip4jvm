@@ -1,7 +1,10 @@
 package io.airlift.compress.zstd.model;
 
 import io.airlift.compress.zstd.In;
+import io.airlift.compress.zstd.Out;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import static io.airlift.compress.zstd.model.Constants.MIN_WINDOW_LOG;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
@@ -21,27 +24,14 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.getValue;
  * @since 18.11.2026
  */
 @Getter
+@Setter
+@NoArgsConstructor
 public class WindowDescriptor {
 
     private int mantissa;
     private int exponent;
 
-    public static WindowDescriptor decode(In in) {
-        int b = in.readByte();
-
-        WindowDescriptor wd = new WindowDescriptor();
-        wd.mantissa = getValue(b, BIT0 | BIT1 | BIT2);
-        wd.exponent = getValue(b, BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
-
-        return wd;
-    }
-
-    public long getWindowSize() {
-        long base = 1L << (MIN_WINDOW_LOG + exponent);
-        return base + (base / 8) * mantissa;
-    }
-
-    public void withWindowSize(int windowSize) {
+    public WindowDescriptor(int windowSize) {
         int base = Integer.highestOneBit(windowSize);
 
         exponent = 32 - Integer.numberOfLeadingZeros(base) - 1;
@@ -57,6 +47,26 @@ public class WindowDescriptor {
 
         // mantissa is guaranteed to be between 0-7
         mantissa = remainder / (base / 8);
+    }
+
+    public static WindowDescriptor decode(In in) {
+        int b = in.readByte();
+
+        WindowDescriptor wd = new WindowDescriptor();
+        wd.mantissa = getValue(b, BIT0 | BIT1 | BIT2);
+        wd.exponent = getValue(b, BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
+
+        return wd;
+    }
+
+    public void encode(Out out) {
+        int encoded = ((exponent - MIN_WINDOW_LOG) << 3) | mantissa;
+        out.putByte((byte) encoded);
+    }
+
+    public long getWindowSize() {
+        long base = 1L << (MIN_WINDOW_LOG + exponent);
+        return base + (base / 8) * mantissa;
     }
 
 }
