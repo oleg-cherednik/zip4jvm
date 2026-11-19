@@ -55,68 +55,8 @@ public class FrameHeader {
     }
 
     public static FrameHeader decode(In in) {
-        FrameHeaderDescriptor frameHeaderDescriptor = FrameHeaderDescriptor.decode(in);
-        WindowDescriptor windowDescriptor =
-                frameHeaderDescriptor.isSingleSegmentFlag() ? null : WindowDescriptor.decode(in);
-
-        long dictionaryId = readDictionaryId(in, frameHeaderDescriptor);
-        long frameContentSize = readFrameContentSize(in, frameHeaderDescriptor);
-        long windowSize = windowDescriptor == null ? frameContentSize : windowDescriptor.getWindowSize();
-
-        verify(windowSize != UNKNOWN_SIZE, "Frame content size is unknown");
-        verify(windowSize <= MAX_WINDOW_SIZE, "Frame requires too much memory");
-
-        FrameHeader frameHeader = new FrameHeader();
-        frameHeader.frameHeaderDescriptor = frameHeaderDescriptor;
-        frameHeader.windowDescriptor = windowDescriptor;
-        frameHeader.dictionaryId = dictionaryId;
-        frameHeader.frameContentSize = frameContentSize;
-        frameHeader.windowSize = (int) windowSize;
-        return frameHeader;
+        return new Builder().decode(in);
     }
-
-    private static long readDictionaryId(In in, FrameHeaderDescriptor frameHeaderDescriptor) {
-        int dictionaryIdFlag = frameHeaderDescriptor.getDictionaryIdFlag();
-
-        if (dictionaryIdFlag == 0)
-            return 0;
-        if (dictionaryIdFlag == 1)
-            return in.readByte();
-        if (dictionaryIdFlag == 2)
-            return in.readWord() & 0xFFFF;
-        // dictionaryIdFlag == 3
-        return in.readDword() & 0xFFFF_FFFFL;
-    }
-
-    private static long readFrameContentSize(In in, FrameHeaderDescriptor frameHeaderDescriptor) {
-        boolean singleSegmentFlag = frameHeaderDescriptor.isSingleSegmentFlag();
-        int frameContentSizeFlag = frameHeaderDescriptor.getFrameContentSizeFlag();
-
-        if (frameContentSizeFlag == 0)
-            return singleSegmentFlag ? in.readByte() : UNKNOWN_SIZE;
-        if (frameContentSizeFlag == 1)
-            return (in.readWord() & 0xFFFF) + 256;
-        if (frameContentSizeFlag == 2)
-            return in.readDword() & 0xFFFF_FFFFL;
-        // frameContentSizeFlag == 3
-        return in.readQword();
-    }
-
-//    private static void writeFrameContentSize(FrameHeaderDescriptor frameHeaderDescriptor,
-//                                              int contentSize) {
-//        boolean singleSegmentFlag = frameHeaderDescriptor.isSingleSegmentFlag();
-//        int frameContentSizeFlag = frameHeaderDescriptor.getFrameContentSizeFlag();
-//
-//        if (frameContentSizeFlag == 0) {
-//            if (singleSegment)
-//                out.putByte((byte) contentSize);
-//        } else if (frameContentSizeFlag == 1)
-//            out.putShort((short) (contentSize - 256));
-//        else if (frameContentSizeFlag == 2)
-//            out.putInt(contentSize);
-//        else
-//            throw new AssertionError();
-//    }
 
     public void encode(Out out) {
         frameHeaderDescriptor.encode(out);
@@ -136,39 +76,23 @@ public class FrameHeader {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class Builder {
 
-        private FrameHeaderDescriptor frameHeaderDescriptor;
-        private WindowDescriptor windowDescriptor;
-        private long dictionaryId;
-        private long frameContentSize;
-        private long windowSize;
+        public FrameHeader decode(In in) {
+            FrameHeaderDescriptor frameHeaderDescriptor = FrameHeaderDescriptor.decode(in);
+            WindowDescriptor windowDescriptor =
+                    frameHeaderDescriptor.isSingleSegmentFlag() ? null : WindowDescriptor.decode(in);
 
-        public FrameHeader build() {
-            return new FrameHeader(frameHeaderDescriptor, windowDescriptor, dictionaryId,
-                                   frameContentSize, (int) windowSize);
-        }
-
-        public Builder decode(In in) {
-            frameHeaderDescriptor = FrameHeaderDescriptor.decode(in);
-
-            if (!frameHeaderDescriptor.isSingleSegmentFlag())
-                windowDescriptor = WindowDescriptor.decode(in);
-            dictionaryId = readDictionaryId(in);
-            frameContentSize = readFrameContentSize(in);
-            windowSize = windowDescriptor == null ? frameContentSize : windowDescriptor.getWindowSize();
+            long dictionaryId = readDictionaryId(in, frameHeaderDescriptor);
+            long frameContentSize = readFrameContentSize(in, frameHeaderDescriptor);
+            long windowSize = windowDescriptor == null ? frameContentSize : windowDescriptor.getWindowSize();
 
             verify(windowSize != UNKNOWN_SIZE, "Frame content size is unknown");
             verify(windowSize <= MAX_WINDOW_SIZE, "Frame requires too much memory");
 
-            FrameHeader frameHeader = new FrameHeader();
-            frameHeader.frameHeaderDescriptor = frameHeaderDescriptor;
-            frameHeader.windowDescriptor = windowDescriptor;
-            frameHeader.dictionaryId = dictionaryId;
-            frameHeader.frameContentSize = frameContentSize;
-            frameHeader.windowSize = (int) windowSize;
-            return this;
+            return new FrameHeader(frameHeaderDescriptor, windowDescriptor, dictionaryId,
+                                   frameContentSize, (int) windowSize);
         }
 
-        private long readDictionaryId(In in) {
+        private static long readDictionaryId(In in, FrameHeaderDescriptor frameHeaderDescriptor) {
             int dictionaryIdFlag = frameHeaderDescriptor.getDictionaryIdFlag();
 
             if (dictionaryIdFlag == 0)
@@ -181,7 +105,7 @@ public class FrameHeader {
             return in.readDword() & 0xFFFF_FFFFL;
         }
 
-        private long readFrameContentSize(In in) {
+        private static long readFrameContentSize(In in, FrameHeaderDescriptor frameHeaderDescriptor) {
             boolean singleSegmentFlag = frameHeaderDescriptor.isSingleSegmentFlag();
             int frameContentSizeFlag = frameHeaderDescriptor.getFrameContentSizeFlag();
 
