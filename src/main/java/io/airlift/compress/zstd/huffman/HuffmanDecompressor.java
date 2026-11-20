@@ -18,7 +18,7 @@ import io.airlift.compress.zstd.Out;
 import io.airlift.compress.zstd.fse.decompress.FiniteStateEntropyForDecompress;
 import io.airlift.compress.zstd.io.BackwardBitInputStream;
 import io.airlift.compress.zstd.io.BackwardDecorator;
-import io.airlift.compress.zstd.io.ByteArrayWithOffs;
+import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
 import io.airlift.compress.zstd.io.RandomAccessOut;
 import io.airlift.compress.zstd.model.Util;
 import lombok.RequiredArgsConstructor;
@@ -52,23 +52,21 @@ public class HuffmanDecompressor {
         int[] ranks = new int[HuffmanConst.MAX_TABLE_LOG + 1];
 
         int headerByte = in.readByte();
-        int outputSize;
-        ByteArrayWithOffs weights1 = new ByteArrayWithOffs(weights);
+
+        ByteArrayRandomAccessOut weights1 = new ByteArrayRandomAccessOut(weights);
 
         if (headerByte >= 128) {
             readWeightsAsDirect(in, headerByte, weights1);
-            outputSize = weights1.getOffs();
-            headerByte = outputSize / 2;
-        } else {
+            headerByte = weights1.getOffs() / 2;
+        } else
             readWeightsAsFse(in, headerByte, weights1);
-            outputSize = weights1.getOffs();
-        }
 
+        int outputSize = weights1.getOffs();
         int totalWeight = 0;
 
         for (int i = 0; i < outputSize; i++) {
             ranks[weights[i]]++;
-            totalWeight += (1 << weights[i]) >> 1;   // TODO same as 1 << (weights[n] - 1)?
+            totalWeight += (1 << weights[i]) >> 1;
         }
 
         verify(totalWeight != 0, "Input is corrupted");
@@ -97,7 +95,7 @@ public class HuffmanDecompressor {
 
         for (int n = 0; n < numberOfSymbols; n++) {
             int weight = weights[n];
-            int length = (1 << weight) >> 1;  // TODO: 1 << (weight - 1) ??
+            int length = (1 << weight) >> 1;
 
             byte symbol = (byte) n;
             byte numberOfBits = (byte) (tableLog + 1 - weight);
@@ -113,21 +111,21 @@ public class HuffmanDecompressor {
         return headerByte + 1;
     }
 
-    private static int readWeightsAsDirect(In in, int headerByte, ByteArrayWithOffs weights) {
-        int outputSize = headerByte - 127;
+    private static int readWeightsAsDirect(In in, int headerByte, Out weights) {
+        int numberOfSymbols = headerByte - 127;
 
-        for (int i = 0; i < outputSize; i += 2) {
+        for (int i = 0; i < numberOfSymbols; i += 2) {
             int b = in.readByte();
-            weights.putByte((byte) (b >> 4));
+            weights.writeByte((byte) (b >> 4));
 
-            if (i + 1 < outputSize)
-                weights.putByte((byte) (b & 0b1111));
+            if (i + 1 < numberOfSymbols)
+                weights.writeByte((byte) (b & 0xF));
         }
 
-        return outputSize;
+        return numberOfSymbols;
     }
 
-    private static void readWeightsAsFse(In in, int totalBytes, ByteArrayWithOffs weights) throws IOException {
+    private static void readWeightsAsFse(In in, int totalBytes, Out weights) throws IOException {
         long lo = in.getPos();
         FiniteStateEntropyForDecompress fse = new FiniteStateEntropyForDecompress().readFseTable(in, totalBytes);
         totalBytes -= (int) (in.getPos() - lo);

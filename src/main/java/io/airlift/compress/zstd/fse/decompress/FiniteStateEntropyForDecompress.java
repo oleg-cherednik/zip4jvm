@@ -13,15 +13,15 @@
  */
 package io.airlift.compress.zstd.fse.decompress;
 
-import io.airlift.compress.zstd.io.BackwardDecorator;
-import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.In;
-import io.airlift.compress.zstd.io.BackwardBitInputDecorator;
+import io.airlift.compress.zstd.Out;
 import io.airlift.compress.zstd.huffman.HuffmanConst;
+import io.airlift.compress.zstd.io.BackwardBitInputDecorator;
+import io.airlift.compress.zstd.io.BackwardDecorator;
 
+import static io.airlift.compress.zstd.io.BackwardBitInputDecorator.peekBits;
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.model.Util.verify;
-import static io.airlift.compress.zstd.io.BackwardBitInputDecorator.peekBits;
 
 public class FiniteStateEntropyForDecompress {
 
@@ -34,7 +34,7 @@ public class FiniteStateEntropyForDecompress {
         return this;
     }
 
-    public void decompress(BackwardDecorator bbis, ByteArrayWithOffs weights) {
+    public void decompress(BackwardDecorator bbis, Out weights) {
         verify(bbis.getTotalBytes() >= 1, "Bitstream is empty");
 
         // a stream shorter than SIZE_OF_LONG is read as is; getBitsConsumed() counts the missing bytes as consumed
@@ -61,22 +61,22 @@ public class FiniteStateEntropyForDecompress {
         while (true) {
             int numberOfBits;
 
-            weights.putByte(table.symbol[state1]);
+            weights.writeByte(table.symbol[state1]);
             numberOfBits = table.numberOfBits[state1];
             state1 = (int) (table.newState[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            weights.putByte(table.symbol[state2]);
+            weights.writeByte(table.symbol[state2]);
             numberOfBits = table.numberOfBits[state2];
             state2 = (int) (table.newState[state2] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            weights.putByte(table.symbol[state1]);
+            weights.writeByte(table.symbol[state1]);
             numberOfBits = table.numberOfBits[state1];
             state1 = (int) (table.newState[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            weights.putByte(table.symbol[state2]);
+            weights.writeByte(table.symbol[state2]);
             numberOfBits = table.numberOfBits[state2];
             state2 = (int) (table.newState[state2] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
@@ -91,7 +91,7 @@ public class FiniteStateEntropyForDecompress {
         }
 
         while (true) {
-            weights.putByte(table.symbol[state1]);
+            weights.writeByte(table.symbol[state1]);
             int numberOfBits = table.numberOfBits[state1];
             state1 = (int) (table.newState[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
@@ -101,11 +101,11 @@ public class FiniteStateEntropyForDecompress {
             bits = bbid4.getBits();
 
             if (bbid4.isOverflow()) {
-                weights.putByte(table.symbol[state2]);
+                weights.writeByte(table.symbol[state2]);
                 break;
             }
 
-            weights.putByte(table.symbol[state2]);
+            weights.writeByte(table.symbol[state2]);
             int numberOfBits1 = table.numberOfBits[state2];
             state2 = (int) (table.newState[state2] + peekBits(bitsConsumed, bits, numberOfBits1));
             bitsConsumed += numberOfBits1;
@@ -115,7 +115,7 @@ public class FiniteStateEntropyForDecompress {
             bits = bbid5.getBits();
 
             if (bbid5.isOverflow()) {
-                weights.putByte(table.symbol[state1]);
+                weights.writeByte(table.symbol[state1]);
                 break;
             }
         }
