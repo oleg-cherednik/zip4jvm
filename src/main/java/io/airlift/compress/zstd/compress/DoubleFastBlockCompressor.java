@@ -14,7 +14,6 @@
 package io.airlift.compress.zstd.compress;
 
 import io.airlift.compress.zstd.In;
-import io.airlift.compress.zstd.io.ByteArrayRandomAccess;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.io.RandomAccess;
@@ -29,9 +28,10 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     private static final int SEARCH_STRENGTH = 8;
     private static final int REP_MOVE = Constants.REPEATED_OFFSET_COUNT - 1;
 
+    // ---------- BlockCompressor ----------
+
     @Override
-    public int compressBlock(ByteArrayRandomAccessIn in1, CompressionContext context) {
-        RandomAccess in = new ByteArrayRandomAccess(in1.getBuf(), in1.getOffs(), in1.getLimit());
+    public int compressBlock(RandomAccess in, CompressionContext context) {
         int matchSearchLength = Math.max(context.parameters.getSearchLength(), 4);
 
         // Offsets in hash tables are relative to baseAddress. Hash tables can be reused across calls to compressBlock as long as

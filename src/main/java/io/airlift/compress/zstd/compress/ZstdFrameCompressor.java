@@ -122,7 +122,8 @@ public class ZstdFrameCompressor {
         context.blockCompressionState.enforceMaxDistance(raIn.getLimit(), context.parameters.getWindowSize());
         context.sequenceStore.reset();
 
-        int lastLiteralsSize = context.parameters.getStrategy().getCompressor().compressBlock(raIn, context);
+        RandomAccess in1 = new ByteArrayRandomAccess(raIn.getBuf(), raIn.getOffs(), raIn.getLimit());
+        int lastLiteralsSize = context.parameters.getStrategy().getCompressor().compressBlock(in1, context);
         int lastLiteralsAddress = raIn.getLimit() - lastLiteralsSize;
 
         // append [lastLiteralsAddress .. lastLiteralsSize] to sequenceStore literals buffer

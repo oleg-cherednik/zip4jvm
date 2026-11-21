@@ -13,13 +13,14 @@
  */
 package io.airlift.compress.zstd.compress;
 
-import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
+import io.airlift.compress.zstd.io.RandomAccess;
 
 interface BlockCompressor {
 
-    BlockCompressor UNSUPPORTED = (inputBase, context) -> {
+    BlockCompressor UNSUPPORTED = (in, context) -> {
         throw new UnsupportedOperationException();
     };
 
-    int compressBlock(ByteArrayRandomAccessIn in, CompressionContext context);
+    int compressBlock(RandomAccess in, CompressionContext context);
+
 }
