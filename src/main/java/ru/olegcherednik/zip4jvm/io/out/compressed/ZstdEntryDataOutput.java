@@ -23,7 +23,6 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import io.airlift.compress.zstd.ZstdCompressor;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccess;
-import io.airlift.compress.zstd.io.InByteArrayWithOffs;
 import io.airlift.compress.zstd.io.RandomAccess;
 import org.apache.commons.io.IOUtils;
 
@@ -62,7 +61,7 @@ final class ZstdEntryDataOutput extends CompressedEntryDataOutput {
         ZstdCompressor compressor = new ZstdCompressor();
         byte[] input = baos.toByteArray();
         RandomAccess rao = new ByteArrayRandomAccess(compressor.maxCompressedLength(input.length));
-        Quietly.doRuntime(() -> compressor.compress(new InByteArrayWithOffs(input), rao));
+        Quietly.doRuntime(() -> compressor.compress(new ByteArrayRandomAccess(input, 0, input.length), rao));
 
         int len = rao.getOffs();
         rao.setOffs(0);
