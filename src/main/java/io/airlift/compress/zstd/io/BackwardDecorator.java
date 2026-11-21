@@ -19,7 +19,7 @@ import lombok.Getter;
 import java.io.IOException;
 
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_BYTE;
-import static io.airlift.compress.zstd.model.Constants.SIZE_OF_LONG;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_QWORD;
 import static io.airlift.compress.zstd.model.Util.highestBit;
 import static io.airlift.compress.zstd.model.Util.verify;
 
@@ -59,7 +59,7 @@ public class BackwardDecorator {
     public long getLong() {
         long val = 0;
 
-        for (int i = 0; i < SIZE_OF_LONG; i++)
+        for (int i = 0; i < SIZE_OF_QWORD; i++)
             val = (val << 8) | getByte();
 
         return val;
@@ -72,8 +72,8 @@ public class BackwardDecorator {
         verify(lastByte != 0, "Bitstream end mark not present");
 
         // padding bits of a stream shorter than SIZE_OF_LONG are consumed up front
-        int padding = Math.max(0, SIZE_OF_LONG - buf.length);
-        return SIZE_OF_LONG - highestBit(lastByte) + padding * 8;
+        int padding = Math.max(0, SIZE_OF_QWORD - buf.length);
+        return SIZE_OF_QWORD - highestBit(lastByte) + padding * 8;
     }
 
     @Override

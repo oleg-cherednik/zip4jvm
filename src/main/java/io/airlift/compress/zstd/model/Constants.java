@@ -18,7 +18,7 @@ public class Constants {
     public static final int SIZE_OF_BYTE = 1;
     public static final int SIZE_OF_WORD = 2;
     public static final int SIZE_OF_DWORD = 4;
-    public static final int SIZE_OF_LONG = 8;
+    public static final int SIZE_OF_QWORD = 8;
 
     public static final int MAGIC_NUMBER = 0xFD2FB528;
 

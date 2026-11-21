@@ -2,7 +2,7 @@ package io.airlift.compress.zstd.io;
 
 import lombok.Getter;
 
-import static io.airlift.compress.zstd.model.Constants.SIZE_OF_LONG;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_QWORD;
 import static io.airlift.compress.zstd.model.Util.highestBit;
 import static io.airlift.compress.zstd.model.Util.verify;
 
@@ -27,14 +27,14 @@ public class SequencesInitializer {
         int lastByte = bbis.getLastByte() & 0xFF;
         verify(lastByte != 0, "Bitstream end mark not present");
 
-        bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
+        bitsConsumed = SIZE_OF_QWORD - highestBit(lastByte);
         int totalBytes = bbis.getTotalBytes();
 
-        if (totalBytes >= SIZE_OF_LONG) {  /* normal case */
+        if (totalBytes >= SIZE_OF_QWORD) {  /* normal case */
             bits = bbis.getLong();
         } else {
             bits = readTail(totalBytes);
-            bitsConsumed += (SIZE_OF_LONG - totalBytes) * 8;
+            bitsConsumed += (SIZE_OF_QWORD - totalBytes) * 8;
         }
     }
 

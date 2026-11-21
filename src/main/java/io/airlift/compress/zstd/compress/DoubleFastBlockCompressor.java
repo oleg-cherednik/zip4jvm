@@ -18,7 +18,7 @@ import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
 
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_DWORD;
-import static io.airlift.compress.zstd.model.Constants.SIZE_OF_LONG;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_QWORD;
 
 class DoubleFastBlockCompressor implements BlockCompressor {
 
@@ -43,7 +43,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         int shortHashBits = context.parameters.getChainLog();
 
         final int inputEnd = in.getOffs() + in.getSize();
-        final long inputLimit = inputEnd - SIZE_OF_LONG; // We read a long at a time for computing the hashes
+        final long inputLimit = inputEnd - SIZE_OF_QWORD; // We read a long at a time for computing the hashes
 
         int inOffs = in.getOffs();
         int anchor = in.getOffs();
@@ -96,8 +96,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
             } else {
                 // check prefix long match
                 if (longMatchAddress > windowBaseAddress && isLongEqual(in, longMatchAddress, inOffs)) {
-                    matchLength = count(in, inOffs + SIZE_OF_LONG, inputEnd, longMatchAddress + SIZE_OF_LONG) +
-                            SIZE_OF_LONG;
+                    matchLength = count(in, inOffs + SIZE_OF_QWORD, inputEnd, longMatchAddress + SIZE_OF_QWORD) +
+                            SIZE_OF_QWORD;
                     offset = inOffs - longMatchAddress;
                     int extra = countBackward(in, inOffs, anchor, longMatchAddress, windowBaseAddress);
                     inOffs -= extra;
@@ -113,9 +113,9 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                         if (nextOffsetMatchAddress > windowBaseAddress &&
                                 isLongEqual(in, nextOffsetMatchAddress, inOffs + 1)) {
                             matchLength = count(in,
-                                                inOffs + 1 + SIZE_OF_LONG,
+                                                inOffs + 1 + SIZE_OF_QWORD,
                                                 inputEnd,
-                                                nextOffsetMatchAddress + SIZE_OF_LONG) + SIZE_OF_LONG;
+                                                nextOffsetMatchAddress + SIZE_OF_QWORD) + SIZE_OF_QWORD;
                             inOffs++;
                             offset = inOffs - nextOffsetMatchAddress;
                             int extra = countBackward(in, inOffs, anchor, nextOffsetMatchAddress, windowBaseAddress);
@@ -209,13 +209,13 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         // first, compare long at a time
         int count = 0;
 
-        while (count < remaining - (SIZE_OF_LONG - 1)) {
+        while (count < remaining - (SIZE_OF_QWORD - 1)) {
             long diff = match.getLong() ^ input.getLong();
 
             if (diff != 0)
                 return count + (Long.numberOfTrailingZeros(diff) >> 3);
 
-            count += SIZE_OF_LONG;
+            count += SIZE_OF_QWORD;
         }
 
         while (count < remaining && match.getByte() == input.getByte())

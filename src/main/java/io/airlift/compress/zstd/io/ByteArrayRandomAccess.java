@@ -9,6 +9,7 @@ import java.util.Arrays;
 
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_BYTE;
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_DWORD;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_QWORD;
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_WORD;
 
 /**
@@ -60,22 +61,37 @@ public class ByteArrayRandomAccess implements RandomAccess {
 
     @Override
     public int readWord() {
-        return 0;
+        int val = 0;
+
+        for (int i = 0; i < SIZE_OF_WORD; i++)
+            val = (readByte() << 8 * i) | val;
+
+        return (short) val;
     }
 
     @Override
     public long readDword() {
-        return 0;
+        long val = 0;
+
+        for (int i = 0; i < SIZE_OF_DWORD; i++)
+            val = ((long) readByte() << 8 * i) | val;
+
+        return val;
     }
 
     @Override
     public long readQword() {
-        return 0;
+        long val = 0;
+
+        for (int i = 0; i < SIZE_OF_QWORD; i++)
+            val = ((long) readByte() << 8 * i) | val;
+
+        return val;
     }
 
     @Override
     public long getPos() {
-        return 0;
+        return offs;
     }
 
     // ---------- Out ----------

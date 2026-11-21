@@ -6,7 +6,7 @@ import lombok.Setter;
 
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_BYTE;
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_DWORD;
-import static io.airlift.compress.zstd.model.Constants.SIZE_OF_LONG;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_QWORD;
 
 /**
  * Sliding input window for block compression: history ({@code <= windowSize}) followed by the current block
@@ -110,10 +110,10 @@ public final class ByteArrayRandomAccessIn {
     public long getLong() {
         long val = 0;
 
-        for (int i = 0; i < SIZE_OF_LONG; i++)
+        for (int i = 0; i < SIZE_OF_QWORD; i++)
             val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
 
-        offs += SIZE_OF_LONG;
+        offs += SIZE_OF_QWORD;
         return val;
     }
 

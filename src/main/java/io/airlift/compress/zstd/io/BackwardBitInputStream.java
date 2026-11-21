@@ -3,7 +3,7 @@ package io.airlift.compress.zstd.io;
 import io.airlift.compress.zstd.Out;
 import lombok.Getter;
 
-import static io.airlift.compress.zstd.model.Constants.SIZE_OF_LONG;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_QWORD;
 import static io.airlift.compress.zstd.model.Util.highestBit;
 import static io.airlift.compress.zstd.model.Util.verify;
 
@@ -36,9 +36,9 @@ public class BackwardBitInputStream {
         int lastByte = in.getLastByte();
         verify(lastByte != 0, "Bitstream end mark not present");
 
-        int size = Math.min(in.getTotalBytes(), SIZE_OF_LONG);
+        int size = Math.min(in.getTotalBytes(), SIZE_OF_QWORD);
         bits = readTail(size);
-        bitsConsumed = SIZE_OF_LONG - highestBit(lastByte) + (SIZE_OF_LONG - size) * 8;
+        bitsConsumed = SIZE_OF_QWORD - highestBit(lastByte) + (SIZE_OF_QWORD - size) * 8;
     }
 
     public boolean load() {

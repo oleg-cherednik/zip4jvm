@@ -20,7 +20,7 @@ import io.airlift.compress.zstd.io.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.io.BackwardDecorator;
 
 import static io.airlift.compress.zstd.io.BackwardBitInputDecorator.peekBits;
-import static io.airlift.compress.zstd.model.Constants.SIZE_OF_LONG;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_QWORD;
 import static io.airlift.compress.zstd.model.Util.verify;
 
 public class FiniteStateEntropyForDecompress {
@@ -38,7 +38,7 @@ public class FiniteStateEntropyForDecompress {
         verify(bbis.getTotalBytes() >= 1, "Bitstream is empty");
 
         // a stream shorter than SIZE_OF_LONG is read as is; getBitsConsumed() counts the missing bytes as consumed
-        long bits = readHead(bbis, Math.min(bbis.getTotalBytes(), SIZE_OF_LONG));
+        long bits = readHead(bbis, Math.min(bbis.getTotalBytes(), SIZE_OF_QWORD));
         int bitsConsumed = bbis.getBitsConsumed();
 
         // initialize first FSE stream

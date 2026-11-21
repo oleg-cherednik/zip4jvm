@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_BYTE;
-import static io.airlift.compress.zstd.model.Constants.SIZE_OF_LONG;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_QWORD;
 
 /**
  * @author Oleg Cherednik
@@ -55,10 +55,10 @@ public final class ByteArrayWithOffs {
     public long getLong() {
         long val = 0;
 
-        for (int i = 0; i < SIZE_OF_LONG; i++)
+        for (int i = 0; i < SIZE_OF_QWORD; i++)
             val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
 
-        offs += SIZE_OF_LONG;
+        offs += SIZE_OF_QWORD;
         return val;
     }
 

@@ -44,7 +44,7 @@ import static io.airlift.compress.zstd.model.Constants.MAX_BLOCK_SIZE;
 import static io.airlift.compress.zstd.model.Constants.MAX_LITERALS_LENGTH_SYMBOL;
 import static io.airlift.compress.zstd.model.Constants.MAX_MATCH_LENGTH_SYMBOL;
 import static io.airlift.compress.zstd.model.Constants.OFFSET_TABLE_LOG;
-import static io.airlift.compress.zstd.model.Constants.SIZE_OF_LONG;
+import static io.airlift.compress.zstd.model.Constants.SIZE_OF_QWORD;
 import static io.airlift.compress.zstd.model.Util.verify;
 
 @RequiredArgsConstructor
@@ -109,7 +109,7 @@ public class ZstdFrameDecompressor implements AutoCloseable {
                     6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 });
 
     // extra space to allow for long-at-a-time copy
-    private final byte[] literals = new byte[MAX_BLOCK_SIZE + SIZE_OF_LONG];
+    private final byte[] literals = new byte[MAX_BLOCK_SIZE + SIZE_OF_QWORD];
 
     // current buffer containing literals
     private byte[] literalsBase;
