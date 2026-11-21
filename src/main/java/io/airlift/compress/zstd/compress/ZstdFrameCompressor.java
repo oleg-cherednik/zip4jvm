@@ -86,7 +86,8 @@ public class ZstdFrameCompressor {
             barao.reset();
             barao.setLimit(read);
 
-            boolean success = compressBlock(barao, context, barai);
+            RandomAccess in1 = new ByteArrayRandomAccess(barai.getBuf(), barai.getOffs(), barai.getLimit());
+            boolean success = compressBlock(barao, context, in1);
 
             if (success) {
                 blockHeader.setBlockType(BlockHeader.BlockType.COMPRESSED_BLOCK);
@@ -111,42 +112,40 @@ public class ZstdFrameCompressor {
         return checksum;
     }
 
-    private static boolean compressBlock(RandomAccess rao, CompressionContext context, ByteArrayRandomAccessIn raIn)
+    private static boolean compressBlock(RandomAccess out, CompressionContext context, RandomAccess in)
             throws IOException {
-        RandomAccess in1 = new ByteArrayRandomAccess(raIn.getBuf(), raIn.getOffs(), raIn.getLimit());
-
-        if (raIn.getSize() < MIN_BLOCK_SIZE + BlockHeader.HEADER_SIZE + 1)
+        if (in.getOffs() < MIN_BLOCK_SIZE + BlockHeader.HEADER_SIZE + 1)
             //  don't even attempt compression below a certain input size
             return false;
 
-        final int offs = rao.getOffs();
+        final int offs = out.getOffs();
 
-        context.blockCompressionState.enforceMaxDistance(raIn.getLimit(), context.parameters.getWindowSize());
+        context.blockCompressionState.enforceMaxDistance(in.getLimit(), context.parameters.getWindowSize());
         context.sequenceStore.reset();
 
-        int lastLiteralsSize = context.parameters.getStrategy().getCompressor().compressBlock(in1, context);
-        int lastLiteralsAddress = raIn.getLimit() - lastLiteralsSize;
+        int lastLiteralsSize = context.parameters.getStrategy().getCompressor().compressBlock(in, context);
+        int lastLiteralsAddress = in.getLimit() - lastLiteralsSize;
 
         // append [lastLiteralsAddress .. lastLiteralsSize] to sequenceStore literals buffer
-        context.sequenceStore.appendLiterals(in1, lastLiteralsAddress, lastLiteralsSize);
+        context.sequenceStore.appendLiterals(in, lastLiteralsAddress, lastLiteralsSize);
 
         // convert length/offsets into codes
         context.sequenceStore.generateCodes();
 
-        boolean success = EncodeLiterals.encodeLiterals(rao, context);
+        boolean success = EncodeLiterals.encodeLiterals(out, context);
 
         if (!success)
             return false;
 
-        success = SequenceEncoder.compressSequences(rao, context);
+        success = SequenceEncoder.compressSequences(out, context);
 
         if (!success)
             return false; // sequences section does not fit into the output
 
         // Check compressibility
-        int maxCompressedSize = in1.getOffs() - context.calculateMinimumGain(in1.getOffs());
+        int maxCompressedSize = in.getOffs() - context.calculateMinimumGain(in.getOffs());
 
-        if (rao.getOffs() - offs > maxCompressedSize)
+        if (out.getOffs() - offs > maxCompressedSize)
             return false; // not compressed
 
         // confirm repeated offsets and entropy tables
