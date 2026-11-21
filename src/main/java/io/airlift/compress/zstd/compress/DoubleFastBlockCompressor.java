@@ -190,7 +190,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                     // NOTE: in offs is moved (literals are copied long-at-a-time, so it can be moved beyond inOffs + literalLength)
                     in.setOffs(anchor);
                     raIn.setOffs(anchor);
-                    context.sequenceStore.storeSequence(in, 0, 0, repetitionLength - MIN_MATCH);
+                    context.sequenceStore.storeSequence(raIn, 0, 0, repetitionLength - MIN_MATCH);
 
                     inOffs += repetitionLength;
                     anchor = inOffs;
