@@ -117,6 +117,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                         int nextOffsetMatchAddress = longHashTable[nextOffsetHash];
                         longHashTable[nextOffsetHash] = current + 1;
 
+                        raIn.setOffs(in.getOffs());
+
                         // check prefix long +1 match
                         if (nextOffsetMatchAddress > windowBaseAddress &&
                                 isQwordEqual(raIn, nextOffsetMatchAddress, inOffs + 1)) {
@@ -150,8 +152,9 @@ class DoubleFastBlockCompressor implements BlockCompressor {
 
                 // NOTE: in offs is moved (literals are copied long-at-a-time, so it can be moved beyond inOffs + literalLength)
                 in.setOffs(anchor);
+                raIn.setOffs(anchor);
 
-                context.sequenceStore.storeSequence(in, inOffs - anchor, offset + REP_MOVE,
+                context.sequenceStore.storeSequence(raIn, inOffs - anchor, offset + REP_MOVE,
                                                     matchLength - MIN_MATCH);
             }
 
@@ -160,7 +163,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
 
             if (inOffs <= inputLimit) {
                 // Fill Table
-                longHashTable[hash8(in, current + 2, longHashBits)] = current + 2;
+                longHashTable[hash8(raIn, current + 2, longHashBits)] = current + 2;
                 in.setOffs(current + 2);
                 shortHashTable[hash(in, shortHashBits, matchSearchLength)] = current + 2;
 
@@ -299,6 +302,16 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     private static int hash8(ByteArrayRandomAccessIn in, int offs, int bits) {
         in.setOffs(offs);
         return hash8(in.getLong(), bits);
+    }
+
+    private static int hash8(RandomAccess in, int offs, int bits) {
+        int tmpOffs = in.getOffs();
+
+        in.setOffs(offs);
+        int res = hash8(in, bits);
+        in.setOffs(tmpOffs);
+
+        return res;
     }
 
     private static int hash8(In in, int bits) {
