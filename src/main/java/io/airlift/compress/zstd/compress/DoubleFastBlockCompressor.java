@@ -212,6 +212,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
 
     /**
      * matchAddress must be < inOffs
+     * TODO здесь явно ошибка с оффсетами (но тесты не падают)
      */
     private static int count(RandomAccess in, final int inOffs, final int inputLimit, final int matchAddress) {
         // two forward cursors over the same buffer; in offs is not changed
