@@ -28,11 +28,11 @@ public final class RawLiteralsEncode {
 
     public static void encode(Out out, RandomAccess in) throws IOException {
         LiteralsSectionHeader.RawRle header = LiteralsSectionHeader.createForRaw();
-        header.withRegeneratedSize(in.getOffs());
+        header.withRegeneratedSize(in.available());
 
         if (header.getHeaderSize() + header.getRegeneratedSize() <= out.available()) {
             header.encode(out);
-            out.copyMemory(in.slice(0, in.getOffs()));
+            out.copyMemory(in);
         }
     }
 

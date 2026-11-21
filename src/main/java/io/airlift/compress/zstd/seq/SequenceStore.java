@@ -15,15 +15,13 @@ package io.airlift.compress.zstd.seq;
 
 import io.airlift.compress.zstd.io.ByteArrayRandomAccess;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
-import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.io.RandomAccess;
 import io.airlift.compress.zstd.model.Constants;
 import io.airlift.compress.zstd.model.Util;
 
 public class SequenceStore {
 
-    private final ByteArrayWithOffs literalsBuf;
-    private final ByteArrayRandomAccess literalsBuf1;
+    private final ByteArrayRandomAccess literals;
 
     public final int[] offsets;
     public final int[] literalLengths;
@@ -65,25 +63,22 @@ public class SequenceStore {
         literalLengthCodes = new byte[maxSequences];
         matchLengthCodes = new byte[maxSequences];
         offsetCodes = new byte[maxSequences];
-        literalsBuf = new ByteArrayWithOffs(new byte[blockSize]);
-        literalsBuf1 = new ByteArrayRandomAccess(literalsBuf.buf, literalsBuf.getOffs(), literalsBuf.getLimit());
+        literals = new ByteArrayRandomAccess(blockSize);
     }
 
     public RandomAccess getLiteralsBufSlice() {
-        return new ByteArrayRandomAccess(literalsBuf.buf,
-                                         literalsBuf.getOffs(),
-                                         literalsBuf.getOffs());
+        RandomAccess b = literals;
+        RandomAccess c = literals.slice(0, getLiteralsSize());
+        return b;
     }
 
     public int getLiteralsSize() {
-        return literalsBuf.getOffs();
+        return literals.getOffs();
     }
 
     public void appendLiterals(byte[] in, int offs, int inputSize) {
         for (int i = 0; i < inputSize; i++)
-            literalsBuf1.writeByte(in[offs + i]);
-
-        literalsBuf.setOffs(literalsBuf1.getOffs());
+            literals.writeByte(in[offs + i]);
     }
 
     public void storeSequence(ByteArrayRandomAccessIn in,
@@ -91,9 +86,7 @@ public class SequenceStore {
                               int offsetCode,
                               int matchLengthBase) {
         for (int i = 0; i < literalLength; i++)
-            literalsBuf1.writeByte((byte) in.getByte());
-
-        literalsBuf.setOffs(literalsBuf1.getOffs());
+            literals.writeByte((byte) in.getByte());
 
 //        literalsBuf.copyMemory(in, literalLength);
 
@@ -115,8 +108,7 @@ public class SequenceStore {
     }
 
     public void reset() {
-        literalsBuf.setOffs(0);
-        literalsBuf1.reset();
+        literals.reset();
         sequenceCount = 0;
         longLengthField = null;
     }
