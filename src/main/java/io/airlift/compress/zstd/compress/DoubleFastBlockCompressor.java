@@ -113,7 +113,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 } else {
                     // check prefix short match
                     if (shortMatchAddress > windowBaseAddress && isDwordEqual(raIn, shortMatchAddress, inOffs)) {
-                        int nextOffsetHash = hash8(in, inOffs + 1, longHashBits);
+                        int nextOffsetHash = hash8(raIn, inOffs + 1, longHashBits);
                         int nextOffsetMatchAddress = longHashTable[nextOffsetHash];
                         longHashTable[nextOffsetHash] = current + 1;
 
