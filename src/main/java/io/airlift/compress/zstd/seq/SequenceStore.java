@@ -66,10 +66,8 @@ public class SequenceStore {
         literals = new ByteArrayRandomAccess(blockSize);
     }
 
-    public RandomAccess getLiteralsBufSlice() {
-        RandomAccess b = literals;
-        RandomAccess c = literals.slice(0, getLiteralsSize());
-        return c;
+    public RandomAccess getLiterals() {
+        return literals.slice(0, getLiteralsSize());
     }
 
     public int getLiteralsSize() {

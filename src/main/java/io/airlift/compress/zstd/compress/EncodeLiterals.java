@@ -32,7 +32,7 @@ public final class EncodeLiterals {
     public static boolean encodeLiterals(RandomAccess rao, CompressionContext context) throws IOException {
         final int offs = rao.getOffs();
 
-        RandomAccess literals = context.sequenceStore.getLiteralsBufSlice();
+        RandomAccess literals = context.sequenceStore.getLiterals();
         int literalsSize = context.sequenceStore.getLiteralsSize();
 
         if (context.parameters.isBypassCompression() || literalsSize <= MINIMUM_LITERALS_SIZE)
@@ -68,7 +68,7 @@ public final class EncodeLiterals {
                                            Histogram histogram, int maxSymbol) throws IOException {
         HuffmanCompressionTable prevTable = context.huffmanCompressionContext.getPrevTable();
         int literalsSize = context.sequenceStore.getLiteralsSize();
-        RandomAccess literals = context.sequenceStore.getLiteralsBufSlice();
+        RandomAccess literals = context.sequenceStore.getLiterals();
 
         HuffmanCompressionTable table;
         int serializedTableSize;
