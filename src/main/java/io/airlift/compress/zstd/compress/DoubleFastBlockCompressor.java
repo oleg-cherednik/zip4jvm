@@ -13,9 +13,11 @@
  */
 package io.airlift.compress.zstd.compress;
 
-import io.airlift.compress.zstd.model.Constants;
-import io.airlift.compress.zstd.io.ByteArrayWithOffs;
+import io.airlift.compress.zstd.io.ByteArrayRandomAccess;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
+import io.airlift.compress.zstd.io.ByteArrayWithOffs;
+import io.airlift.compress.zstd.io.RandomAccess;
+import io.airlift.compress.zstd.model.Constants;
 
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_DWORD;
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_QWORD;
@@ -87,7 +89,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
 
             if (offs0 > 0 && isIntEqual(in, inOffs + 1 - offs0, inOffs + 1)) {
                 // found a repeated sequence of at least 4 bytes, separated by offs0
-                matchLength = count(in, inOffs + 1 + SIZE_OF_DWORD, inputEnd, inOffs + 1 + SIZE_OF_DWORD - offs0) +
+                RandomAccess ra = new ByteArrayRandomAccess(in.getBuf(), in.getOffs(), in.getLimit());
+                matchLength = count(ra, inOffs + 1 + SIZE_OF_DWORD, inputEnd, inOffs + 1 + SIZE_OF_DWORD - offs0) +
                         SIZE_OF_DWORD;
                 inOffs++;
                 // NOTE: in offs is moved (literals are copied long-at-a-time, so it can be moved beyond inOffs + literalLength)
@@ -96,7 +99,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
             } else {
                 // check prefix long match
                 if (longMatchAddress > windowBaseAddress && isLongEqual(in, longMatchAddress, inOffs)) {
-                    matchLength = count(in, inOffs + SIZE_OF_QWORD, inputEnd, longMatchAddress + SIZE_OF_QWORD) +
+                    RandomAccess ra = new ByteArrayRandomAccess(in.getBuf(), in.getOffs(), in.getLimit());
+                    matchLength = count(ra, inOffs + SIZE_OF_QWORD, inputEnd, longMatchAddress + SIZE_OF_QWORD) +
                             SIZE_OF_QWORD;
                     offset = inOffs - longMatchAddress;
                     int extra = countBackward(in, inOffs, anchor, longMatchAddress, windowBaseAddress);
@@ -112,7 +116,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                         // check prefix long +1 match
                         if (nextOffsetMatchAddress > windowBaseAddress &&
                                 isLongEqual(in, nextOffsetMatchAddress, inOffs + 1)) {
-                            matchLength = count(in,
+                            RandomAccess ra = new ByteArrayRandomAccess(in.getBuf(), in.getOffs(), in.getLimit());
+                            matchLength = count(ra,
                                                 inOffs + 1 + SIZE_OF_QWORD,
                                                 inputEnd,
                                                 nextOffsetMatchAddress + SIZE_OF_QWORD) + SIZE_OF_QWORD;
@@ -123,7 +128,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                             matchLength += extra;
                         } else {
                             // if no long +1 match, explore the short match we found
-                            matchLength = count(in, inOffs + SIZE_OF_DWORD,
+                            RandomAccess ra = new ByteArrayRandomAccess(in.getBuf(), in.getOffs(), in.getLimit());
+                            matchLength = count(ra, inOffs + SIZE_OF_DWORD,
                                                 inputEnd,
                                                 shortMatchAddress + SIZE_OF_DWORD) + SIZE_OF_DWORD;
                             offset = inOffs - shortMatchAddress;
@@ -161,7 +167,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 shortHashTable[hash(in, shortHashBits, matchSearchLength)] = inOffs - 2;
 
                 while (inOffs <= inputLimit && offs1 > 0 && isIntEqual(in, inOffs, inOffs - offs1)) {
-                    int repetitionLength = count(in,
+                    RandomAccess ra = new ByteArrayRandomAccess(in.getBuf(), in.getOffs(), in.getLimit());
+                    int repetitionLength = count(ra,
                                                  inOffs + SIZE_OF_DWORD,
                                                  inputEnd,
                                                  inOffs + SIZE_OF_DWORD - offs1) + SIZE_OF_DWORD;
@@ -198,11 +205,10 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     /**
      * matchAddress must be < inOffs
      */
-    public static int count(ByteArrayRandomAccessIn in, final int inOffs, final int inputLimit,
-                            final int matchAddress) {
+    private static int count(RandomAccess in, final int inOffs, final int inputLimit, final int matchAddress) {
         // two forward cursors over the same buffer; in offs is not changed
-        ByteArrayWithOffs input = new ByteArrayWithOffs(in.getBuf(), inOffs);
-        ByteArrayWithOffs match = new ByteArrayWithOffs(in.getBuf(), matchAddress);
+        RandomAccess input1 = in.slice(inOffs, in.getOffs() - inOffs);
+        RandomAccess match1 = in.slice(matchAddress, in.getOffs() - matchAddress);
 
         int remaining = inputLimit - inOffs;
 
@@ -210,7 +216,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         int count = 0;
 
         while (count < remaining - (SIZE_OF_QWORD - 1)) {
-            long diff = match.getLong() ^ input.getLong();
+            long diff = match1.readQword() ^ input1.readQword();
 
             if (diff != 0)
                 return count + (Long.numberOfTrailingZeros(diff) >> 3);
@@ -218,7 +224,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
             count += SIZE_OF_QWORD;
         }
 
-        while (count < remaining && match.getByte() == input.getByte())
+        while (count < remaining && match1.readByte() == input1.readByte())
             count++;
 
         return count;
