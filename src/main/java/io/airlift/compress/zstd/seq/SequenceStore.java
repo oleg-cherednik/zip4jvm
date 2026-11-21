@@ -22,7 +22,7 @@ import io.airlift.compress.zstd.model.Util;
 
 public class SequenceStore {
 
-    public final ByteArrayWithOffs literalsBuf;
+    private final ByteArrayWithOffs literalsBuf;
 
     public final int[] offsets;
     public final int[] literalLengths;
