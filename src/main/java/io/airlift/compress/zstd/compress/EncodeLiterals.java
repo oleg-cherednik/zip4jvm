@@ -72,6 +72,7 @@ public final class EncodeLiterals {
                                            Histogram histogram, int maxSymbol) throws IOException {
         HuffmanCompressionTable prevTable = context.huffmanCompressionContext.getPrevTable();
         ByteArrayWithOffs literalsBuf = context.sequenceStore.literalsBuf;
+        RandomAccessOut literalsBuf1 = context.sequenceStore.getLiteralsBufSlice();
 
         HuffmanCompressionTable table;
         int serializedTableSize;
@@ -81,7 +82,7 @@ public final class EncodeLiterals {
         boolean preferReuse = context.isPreferReuse();
 
         HeaderDataOutDecorator hdod = new HeaderDataOutDecorator(rao);
-        hdod.setHeaderSize(LiteralsSectionHeader.CompressedTreeless.calcHeaderSize(literalsBuf.getOffs()));
+        hdod.setHeaderSize(LiteralsSectionHeader.CompressedTreeless.calcHeaderSize(literalsBuf1.getOffs()));
 
         RandomAccessOut dataOut = hdod.getOutForData();
 
@@ -96,7 +97,7 @@ public final class EncodeLiterals {
                     histogram.getCounts(),
                     maxSymbol,
                     HuffmanCompressionTable.optimalNumberOfBits(MAX_HUFFMAN_TABLE_LOG,
-                                                                literalsBuf.getOffs(),
+                                                                literalsBuf1.getOffs(),
                                                                 maxSymbol),
                     context.huffmanCompressionContext.getCompressionTableWorkspace());
 
@@ -122,7 +123,7 @@ public final class EncodeLiterals {
         if (hdod.getHeaderSize() + serializedTableSize + maxStreamsSize > rao.available()) {
             context.huffmanCompressionContext.discardTemporaryTable();
             hdod.reset();
-            RawLiteralsEncode.encode(rao, literalsBuf);
+            RawLiteralsEncode.encode(rao, literalsBuf1);
         } else {
             In in = new InputStreamToInAdapter(new ByteArrayInputStream(literalsBuf.buf));
             HuffmanCompressor huffmanCompressor = new HuffmanCompressor(in, table);
