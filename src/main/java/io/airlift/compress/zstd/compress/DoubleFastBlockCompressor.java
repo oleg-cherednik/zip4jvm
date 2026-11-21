@@ -165,10 +165,12 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 // Fill Table
                 longHashTable[hash8(raIn, current + 2, longHashBits)] = current + 2;
                 in.setOffs(current + 2);
+                raIn.setOffs(current + 2);
                 shortHashTable[hash(raIn, shortHashBits, matchSearchLength)] = current + 2;
 
                 longHashTable[hash8(raIn, inOffs - 2, longHashBits)] = inOffs - 2;
                 in.setOffs(inOffs - 2);
+                raIn.setOffs(inOffs - 2);
                 shortHashTable[hash(raIn, shortHashBits, matchSearchLength)] = inOffs - 2;
 
                 while (inOffs <= inputLimit && offs1 > 0 && isDwordEqual(raIn, inOffs, inOffs - offs1)) {
