@@ -1,12 +1,13 @@
 package io.airlift.compress.zstd;
 
+import java.io.Closeable;
 import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
  * @since 27.10.2026
  */
-public interface In extends CompressIn {
+public interface In extends Closeable {
 
     int readByte();
 
@@ -18,6 +19,10 @@ public interface In extends CompressIn {
 
     long getPos();
 
+    int available();
+
     int read(byte[] buf) throws IOException;
+
+    int read(byte[] buf, int offs, int len) throws IOException;
 
 }

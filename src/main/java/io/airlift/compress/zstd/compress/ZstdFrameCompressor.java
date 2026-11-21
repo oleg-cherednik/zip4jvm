@@ -13,7 +13,7 @@
  */
 package io.airlift.compress.zstd.compress;
 
-import io.airlift.compress.zstd.CompressIn;
+import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.Out;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccess;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
@@ -36,7 +36,7 @@ public class ZstdFrameCompressor {
         out.writeDword(MAGIC_NUMBER);
     }
 
-    private final CompressIn in;
+    private final In in;
     private final int compressionLevel;
 
     private static FrameHeader writeFrameHeader(Out out, CompressionParameters parameters, int contentSize) {

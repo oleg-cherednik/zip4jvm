@@ -29,6 +29,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import com.github.luben.zstd.Zstd;
 import com.github.luben.zstd.ZstdCompressCtx;
+import io.airlift.compress.zstd.InputStreamToInAdapter;
 import io.airlift.compress.zstd.ZstdCompressor;
 import io.airlift.compress.zstd.ZstdInputStream;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccess;
@@ -164,7 +165,7 @@ public class CompressionZstdTest extends BaseTest {
 
         ZstdCompressor compressor = new ZstdCompressor();
         RandomAccess rao = new ByteArrayRandomAccess(compressor.maxCompressedLength(expected.length));
-        compressor.compress(new ByteArrayRandomAccess(expected, 0, expected.length), rao);
+        compressor.compress(new InputStreamToInAdapter(new ByteArrayInputStream(expected)), rao);
         assertThat(Zstd.decompress(readBuf(rao), expected.length)).isEqualTo(expected);
     }
 
@@ -187,7 +188,7 @@ public class CompressionZstdTest extends BaseTest {
 
         ZstdCompressor compressor = new ZstdCompressor();
         RandomAccess rao = new ByteArrayRandomAccess(compressor.maxCompressedLength(expected.length));
-        compressor.compress(new ByteArrayRandomAccess(expected, 0, expected.length), rao);
+        compressor.compress(new InputStreamToInAdapter(new ByteArrayInputStream(expected)), rao);
         assertThat(Zstd.decompress(readBuf(rao), expected.length)).isEqualTo(expected);
     }
 
@@ -198,7 +199,7 @@ public class CompressionZstdTest extends BaseTest {
 
         ZstdCompressor compressor = new ZstdCompressor();
         RandomAccess rao = new ByteArrayRandomAccess(compressor.maxCompressedLength(expected.length));
-        compressor.compress(new ByteArrayRandomAccess(expected, 0, expected.length), rao);
+        compressor.compress(new InputStreamToInAdapter(new ByteArrayInputStream(expected)), rao);
         assertThat(Zstd.decompress(readBuf(rao), expected.length)).isEqualTo(expected);
     }
 
@@ -215,7 +216,7 @@ public class CompressionZstdTest extends BaseTest {
 
                 ZstdCompressor compressor = new ZstdCompressor();
                 RandomAccess rao = new ByteArrayRandomAccess(compressor.maxCompressedLength(expected.length));
-                compressor.compress(new ByteArrayRandomAccess(expected, 0, expected.length), rao);
+                compressor.compress(new InputStreamToInAdapter(new ByteArrayInputStream(expected)), rao);
 
                 assertThat(Zstd.decompress(readBuf(rao), expected.length))
                         .as("size=" + size + " distinct=" + distinct)
