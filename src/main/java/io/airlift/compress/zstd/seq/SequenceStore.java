@@ -15,7 +15,6 @@ package io.airlift.compress.zstd.seq;
 
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccess;
-import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
 import io.airlift.compress.zstd.io.RandomAccess;
 import io.airlift.compress.zstd.model.Constants;
 import io.airlift.compress.zstd.model.Util;
@@ -80,30 +79,16 @@ public class SequenceStore {
             literals.writeByte(in[offs + i]);
     }
 
-    public void storeSequence(ByteArrayRandomAccessIn in,
-                              int literalLength,
-                              int offsetCode,
-                              int matchLengthBase) {
-        for (int i = 0; i < literalLength; i++)
-            literals.writeByte((byte) in.getByte());
+    // TODO заменить на slice
+    public void appendLiterals(RandomAccess in, int offs, int inputSize) {
+        int tmpOffs = in.getOffs();
 
-//        literalsBuf.copyMemory(in, literalLength);
+        in.setOffs(offs);
 
-        if (literalLength > 65535) {
-            longLengthField = LongField.LITERAL;
-            longLengthPosition = sequenceCount;
-        }
+        for (int i = 0; i < inputSize; i++)
+            literals.writeByte(in.readByte());
 
-        literalLengths[sequenceCount] = literalLength;
-        offsets[sequenceCount] = offsetCode + 1;
-
-        if (matchLengthBase > 65535) {
-            longLengthField = LongField.MATCH;
-            longLengthPosition = sequenceCount;
-        }
-
-        matchLengths[sequenceCount] = matchLengthBase;
-        sequenceCount++;
+        in.setOffs(tmpOffs);
     }
 
     public void storeSequence(In in,

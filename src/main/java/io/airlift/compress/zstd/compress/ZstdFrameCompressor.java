@@ -128,7 +128,7 @@ public class ZstdFrameCompressor {
         int lastLiteralsAddress = raIn.getLimit() - lastLiteralsSize;
 
         // append [lastLiteralsAddress .. lastLiteralsSize] to sequenceStore literals buffer
-        context.sequenceStore.appendLiterals(raIn.getBuf(), lastLiteralsAddress, lastLiteralsSize);
+        context.sequenceStore.appendLiterals(in1, lastLiteralsAddress, lastLiteralsSize);
 
         // convert length/offsets into codes
         context.sequenceStore.generateCodes();
