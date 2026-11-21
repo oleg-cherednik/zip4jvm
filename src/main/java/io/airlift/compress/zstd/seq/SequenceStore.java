@@ -69,7 +69,7 @@ public class SequenceStore {
     public RandomAccess getLiteralsBufSlice() {
         RandomAccess b = literals;
         RandomAccess c = literals.slice(0, getLiteralsSize());
-        return b;
+        return c;
     }
 
     public int getLiteralsSize() {
