@@ -30,8 +30,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     private static final int REP_MOVE = Constants.REPEATED_OFFSET_COUNT - 1;
 
     @Override
-    public int compressBlock(ByteArrayRandomAccessIn in, CompressionContext context) {
-        RandomAccess raIn = new ByteArrayRandomAccess(in.getBuf(), in.getOffs(), in.getLimit());
+    public int compressBlock(ByteArrayRandomAccessIn in1, CompressionContext context) {
+        RandomAccess in = new ByteArrayRandomAccess(in1.getBuf(), in1.getOffs(), in1.getLimit());
         int matchSearchLength = Math.max(context.parameters.getSearchLength(), 4);
 
         // Offsets in hash tables are relative to baseAddress. Hash tables can be reused across calls to compressBlock as long as
@@ -46,11 +46,11 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         int[] shortHashTable = context.blockCompressionState.chainTable;
         int shortHashBits = context.parameters.getChainLog();
 
-        final int inputEnd = raIn.getLimit();
+        final int inputEnd = in.getLimit();
         final long inputLimit = inputEnd - SIZE_OF_QWORD; // We read a long at a time for computing the hashes
 
-        int inOffs = raIn.getOffs();
-        int anchor = raIn.getOffs();
+        int inOffs = in.getOffs();
+        int anchor = in.getOffs();
 
         int offs0 = context.getOffs0();
         int offs1 = context.getOffs1();
@@ -74,12 +74,12 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         }
 
         while (inOffs < inputLimit) {   // < instead of <=, because repcode check at (inOffs+1)
-            raIn.setOffs(inOffs);
-            int shortHash = hash(raIn, shortHashBits, matchSearchLength);
+            in.setOffs(inOffs);
+            int shortHash = hash(in, shortHashBits, matchSearchLength);
             int shortMatchAddress = shortHashTable[shortHash];
 
-            raIn.setOffs(inOffs);
-            int longHash = hash8(raIn, longHashBits);
+            in.setOffs(inOffs);
+            int longHash = hash8(in, longHashBits);
             int longMatchAddress = longHashTable[longHash];
 
             // update hash tables
@@ -90,49 +90,49 @@ class DoubleFastBlockCompressor implements BlockCompressor {
             int matchLength;
             int offset;
 
-            if (offs0 > 0 && isDwordEqual(raIn, inOffs + 1 - offs0, inOffs + 1)) {
+            if (offs0 > 0 && isDwordEqual(in, inOffs + 1 - offs0, inOffs + 1)) {
                 // found a repeated sequence of at least 4 bytes, separated by offs0
-                matchLength = count(raIn, inOffs + 1 + SIZE_OF_DWORD, inputEnd, inOffs + 1 + SIZE_OF_DWORD - offs0) +
+                matchLength = count(in, inOffs + 1 + SIZE_OF_DWORD, inputEnd, inOffs + 1 + SIZE_OF_DWORD - offs0) +
                         SIZE_OF_DWORD;
                 inOffs++;
                 // NOTE: in offs is moved (literals are copied long-at-a-time, so it can be moved beyond inOffs + literalLength)
-                raIn.setOffs(anchor);
-                context.sequenceStore.storeSequence(raIn, inOffs - anchor, 0, matchLength - MIN_MATCH);
+                in.setOffs(anchor);
+                context.sequenceStore.storeSequence(in, inOffs - anchor, 0, matchLength - MIN_MATCH);
             } else {
                 // check prefix long match
-                if (longMatchAddress > windowBaseAddress && isQwordEqual(raIn, longMatchAddress, inOffs)) {
-                    matchLength = count(raIn, inOffs + SIZE_OF_QWORD, inputEnd, longMatchAddress + SIZE_OF_QWORD) +
+                if (longMatchAddress > windowBaseAddress && isQwordEqual(in, longMatchAddress, inOffs)) {
+                    matchLength = count(in, inOffs + SIZE_OF_QWORD, inputEnd, longMatchAddress + SIZE_OF_QWORD) +
                             SIZE_OF_QWORD;
                     offset = inOffs - longMatchAddress;
-                    int extra = countBackward(raIn, inOffs, anchor, longMatchAddress, windowBaseAddress);
+                    int extra = countBackward(in, inOffs, anchor, longMatchAddress, windowBaseAddress);
                     inOffs -= extra;
                     matchLength += extra;
                 } else {
                     // check prefix short match
-                    if (shortMatchAddress > windowBaseAddress && isDwordEqual(raIn, shortMatchAddress, inOffs)) {
-                        int nextOffsetHash = hash8(raIn, inOffs + 1, longHashBits);
+                    if (shortMatchAddress > windowBaseAddress && isDwordEqual(in, shortMatchAddress, inOffs)) {
+                        int nextOffsetHash = hash8(in, inOffs + 1, longHashBits);
                         int nextOffsetMatchAddress = longHashTable[nextOffsetHash];
                         longHashTable[nextOffsetHash] = current + 1;
 
                         // check prefix long +1 match
                         if (nextOffsetMatchAddress > windowBaseAddress &&
-                                isQwordEqual(raIn, nextOffsetMatchAddress, inOffs + 1)) {
-                            matchLength = count(raIn,
+                                isQwordEqual(in, nextOffsetMatchAddress, inOffs + 1)) {
+                            matchLength = count(in,
                                                 inOffs + 1 + SIZE_OF_QWORD,
                                                 inputEnd,
                                                 nextOffsetMatchAddress + SIZE_OF_QWORD) + SIZE_OF_QWORD;
                             inOffs++;
                             offset = inOffs - nextOffsetMatchAddress;
-                            int extra = countBackward(raIn, inOffs, anchor, nextOffsetMatchAddress, windowBaseAddress);
+                            int extra = countBackward(in, inOffs, anchor, nextOffsetMatchAddress, windowBaseAddress);
                             inOffs -= extra;
                             matchLength += extra;
                         } else {
                             // if no long +1 match, explore the short match we found
-                            matchLength = count(raIn, inOffs + SIZE_OF_DWORD,
+                            matchLength = count(in, inOffs + SIZE_OF_DWORD,
                                                 inputEnd,
                                                 shortMatchAddress + SIZE_OF_DWORD) + SIZE_OF_DWORD;
                             offset = inOffs - shortMatchAddress;
-                            int extra = countBackward(raIn, inOffs, anchor, shortMatchAddress, windowBaseAddress);
+                            int extra = countBackward(in, inOffs, anchor, shortMatchAddress, windowBaseAddress);
                             inOffs -= extra;
                             matchLength += extra;
                         }
@@ -146,9 +146,9 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 offs0 = offset;
 
                 // NOTE: in offs is moved (literals are copied long-at-a-time, so it can be moved beyond inOffs + literalLength)
-                raIn.setOffs(anchor);
+                in.setOffs(anchor);
 
-                context.sequenceStore.storeSequence(raIn, inOffs - anchor, offset + REP_MOVE,
+                context.sequenceStore.storeSequence(in, inOffs - anchor, offset + REP_MOVE,
                                                     matchLength - MIN_MATCH);
             }
 
@@ -157,16 +157,16 @@ class DoubleFastBlockCompressor implements BlockCompressor {
 
             if (inOffs <= inputLimit) {
                 // Fill Table
-                longHashTable[hash8(raIn, current + 2, longHashBits)] = current + 2;
-                raIn.setOffs(current + 2);
-                shortHashTable[hash(raIn, shortHashBits, matchSearchLength)] = current + 2;
+                longHashTable[hash8(in, current + 2, longHashBits)] = current + 2;
+                in.setOffs(current + 2);
+                shortHashTable[hash(in, shortHashBits, matchSearchLength)] = current + 2;
 
-                longHashTable[hash8(raIn, inOffs - 2, longHashBits)] = inOffs - 2;
-                raIn.setOffs(inOffs - 2);
-                shortHashTable[hash(raIn, shortHashBits, matchSearchLength)] = inOffs - 2;
+                longHashTable[hash8(in, inOffs - 2, longHashBits)] = inOffs - 2;
+                in.setOffs(inOffs - 2);
+                shortHashTable[hash(in, shortHashBits, matchSearchLength)] = inOffs - 2;
 
-                while (inOffs <= inputLimit && offs1 > 0 && isDwordEqual(raIn, inOffs, inOffs - offs1)) {
-                    int repetitionLength = count(raIn,
+                while (inOffs <= inputLimit && offs1 > 0 && isDwordEqual(in, inOffs, inOffs - offs1)) {
+                    int repetitionLength = count(in,
                                                  inOffs + SIZE_OF_DWORD,
                                                  inputEnd,
                                                  inOffs + SIZE_OF_DWORD - offs1) + SIZE_OF_DWORD;
@@ -176,13 +176,13 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                     offs1 = offs0;
                     offs0 = temp;
 
-                    raIn.setOffs(inOffs);
-                    shortHashTable[hash(raIn, shortHashBits, matchSearchLength)] = inOffs;
-                    longHashTable[hash8(raIn, inOffs, longHashBits)] = inOffs;
+                    in.setOffs(inOffs);
+                    shortHashTable[hash(in, shortHashBits, matchSearchLength)] = inOffs;
+                    longHashTable[hash8(in, inOffs, longHashBits)] = inOffs;
 
                     // NOTE: in offs is moved (literals are copied long-at-a-time, so it can be moved beyond inOffs + literalLength)
-                    raIn.setOffs(anchor);
-                    context.sequenceStore.storeSequence(raIn, 0, 0, repetitionLength - MIN_MATCH);
+                    in.setOffs(anchor);
+                    context.sequenceStore.storeSequence(in, 0, 0, repetitionLength - MIN_MATCH);
 
                     inOffs += repetitionLength;
                     anchor = inOffs;
