@@ -48,8 +48,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         final int inputEnd = in.getOffs() + in.getSize();
         final long inputLimit = inputEnd - SIZE_OF_QWORD; // We read a long at a time for computing the hashes
 
-        int inOffs = in.getOffs();
-        int anchor = in.getOffs();
+        int inOffs = ra.getOffs();
+        int anchor = ra.getOffs();
 
         int offs0 = context.getOffs0();
         int offs1 = context.getOffs1();
