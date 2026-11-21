@@ -81,9 +81,9 @@ public class SequenceStore {
 
     public void appendLiterals(byte[] in, int offs, int inputSize) {
         for (int i = 0; i < inputSize; i++)
-            literalsBuf.putByte(in[offs + i]);
+            literalsBuf1.writeByte(in[offs + i]);
 
-        literalsBuf1.setOffs(literalsBuf.getOffs());
+        literalsBuf.setOffs(literalsBuf1.getOffs());
     }
 
     public void storeSequence(ByteArrayRandomAccessIn in,
@@ -91,9 +91,9 @@ public class SequenceStore {
                               int offsetCode,
                               int matchLengthBase) {
         for (int i = 0; i < literalLength; i++)
-            literalsBuf.putByte((byte) in.getByte());
+            literalsBuf1.writeByte((byte) in.getByte());
 
-        literalsBuf1.setOffs(literalsBuf.getOffs());
+        literalsBuf.setOffs(literalsBuf1.getOffs());
 
 //        literalsBuf.copyMemory(in, literalLength);
 
