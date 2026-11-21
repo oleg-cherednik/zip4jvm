@@ -15,8 +15,8 @@ package io.airlift.compress.zstd.compress;
 
 import io.airlift.compress.zstd.CompressIn;
 import io.airlift.compress.zstd.Out;
-import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccess;
+import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
 import io.airlift.compress.zstd.io.RandomAccess;
 import io.airlift.compress.zstd.model.BlockHeader;
 import io.airlift.compress.zstd.model.FrameHeader;
@@ -113,6 +113,8 @@ public class ZstdFrameCompressor {
 
     private static boolean compressBlock(RandomAccess rao, CompressionContext context, ByteArrayRandomAccessIn raIn)
             throws IOException {
+        RandomAccess in1 = new ByteArrayRandomAccess(raIn.getBuf(), raIn.getOffs(), raIn.getLimit());
+
         if (raIn.getSize() < MIN_BLOCK_SIZE + BlockHeader.HEADER_SIZE + 1)
             //  don't even attempt compression below a certain input size
             return false;
@@ -122,7 +124,6 @@ public class ZstdFrameCompressor {
         context.blockCompressionState.enforceMaxDistance(raIn.getLimit(), context.parameters.getWindowSize());
         context.sequenceStore.reset();
 
-        RandomAccess in1 = new ByteArrayRandomAccess(raIn.getBuf(), raIn.getOffs(), raIn.getLimit());
         int lastLiteralsSize = context.parameters.getStrategy().getCompressor().compressBlock(in1, context);
         int lastLiteralsAddress = raIn.getLimit() - lastLiteralsSize;
 
@@ -143,7 +144,7 @@ public class ZstdFrameCompressor {
             return false; // sequences section does not fit into the output
 
         // Check compressibility
-        int maxCompressedSize = raIn.getSize() - context.calculateMinimumGain(raIn.getSize());
+        int maxCompressedSize = in1.getOffs() - context.calculateMinimumGain(in1.getOffs());
 
         if (rao.getOffs() - offs > maxCompressedSize)
             return false; // not compressed
