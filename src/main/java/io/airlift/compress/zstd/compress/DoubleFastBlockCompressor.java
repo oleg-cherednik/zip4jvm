@@ -119,14 +119,14 @@ class DoubleFastBlockCompressor implements BlockCompressor {
 
                         // check prefix long +1 match
                         if (nextOffsetMatchAddress > windowBaseAddress &&
-                                isLongEqual(in, nextOffsetMatchAddress, inOffs + 1)) {
+                                isQwordEqual(raIn, nextOffsetMatchAddress, inOffs + 1)) {
                             matchLength = count(raIn,
                                                 inOffs + 1 + SIZE_OF_QWORD,
                                                 inputEnd,
                                                 nextOffsetMatchAddress + SIZE_OF_QWORD) + SIZE_OF_QWORD;
                             inOffs++;
                             offset = inOffs - nextOffsetMatchAddress;
-                            int extra = countBackward(in, inOffs, anchor, nextOffsetMatchAddress, windowBaseAddress);
+                            int extra = countBackward(raIn, inOffs, anchor, nextOffsetMatchAddress, windowBaseAddress);
                             inOffs -= extra;
                             matchLength += extra;
                         } else {
@@ -135,7 +135,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                                                 inputEnd,
                                                 shortMatchAddress + SIZE_OF_DWORD) + SIZE_OF_DWORD;
                             offset = inOffs - shortMatchAddress;
-                            int extra = countBackward(in, inOffs, anchor, shortMatchAddress, windowBaseAddress);
+                            int extra = countBackward(raIn, inOffs, anchor, shortMatchAddress, windowBaseAddress);
                             inOffs -= extra;
                             matchLength += extra;
                         }
