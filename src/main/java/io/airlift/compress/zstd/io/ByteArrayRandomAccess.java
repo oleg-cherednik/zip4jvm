@@ -24,7 +24,7 @@ public class ByteArrayRandomAccess implements RandomAccess {
 
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
-    public final byte[] buf;
+    private final byte[] buf;
     private int offs;
     private int limit;
 
