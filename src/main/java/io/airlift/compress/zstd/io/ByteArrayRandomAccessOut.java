@@ -26,13 +26,6 @@ public class ByteArrayRandomAccessOut implements RandomAccessOut, RandomAccessHu
     private int offs;
     private int limit;
 
-    @Deprecated
-    public ByteArrayRandomAccessOut(byte[] buf) {
-        this.buf = buf;
-        offs = 0;
-        limit = buf.length;
-    }
-
     public ByteArrayRandomAccessOut(int limit) {
         this(new byte[limit], 0, limit);
     }
