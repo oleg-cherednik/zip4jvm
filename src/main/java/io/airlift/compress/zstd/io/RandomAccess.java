@@ -11,6 +11,7 @@ import java.io.IOException;
  */
 public interface RandomAccess extends In, Out {
 
+    // TODO limit выставляется не верно
     RandomAccess slice(int offs, int len);
 
     void setOffs(int offs);
