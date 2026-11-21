@@ -169,7 +169,7 @@ public class CompressionZstdTest extends BaseTest {
         assertThat(Zstd.decompress(readBuf(rao), expected.length)).isEqualTo(expected);
     }
 
-    private static byte[] readBuf(RandomAccess rao) {
+    private static byte[] readBuf(RandomAccess rao) throws IOException {
         RandomAccess slice = rao.slice(0, rao.getOffs());
         byte[] buf = new byte[slice.available()];
         slice.read(buf, 0, buf.length);

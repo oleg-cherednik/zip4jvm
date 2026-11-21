@@ -67,7 +67,7 @@ public class HuffmanDecompressor {
         weights.setOffs(0);
 
         for (int i = 0; i < totalBytes; i++) {
-            int w = weights.getByte();
+            int w = weights.readByte();
             ranks[w]++;
             totalWeight += (1 << w) >> 1;
         }
@@ -96,7 +96,7 @@ public class HuffmanDecompressor {
         weights.setOffs(0);
 
         for (int i = 0; i < numberOfSymbols; i++) {
-            int weight = weights.getByte();
+            int weight = weights.readByte();
             int length = (1 << weight) >> 1;
 
             byte symbol = (byte) i;

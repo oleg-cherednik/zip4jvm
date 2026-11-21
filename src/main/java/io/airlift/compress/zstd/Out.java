@@ -5,6 +5,7 @@ import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
 import io.airlift.compress.zstd.io.RandomAccess;
 
 import java.io.Closeable;
+import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
@@ -13,8 +14,6 @@ import java.io.Closeable;
 public interface Out extends Closeable {
 
     int available();
-
-//    int getLimit();
 
     int getOffs();
 
@@ -26,7 +25,7 @@ public interface Out extends Closeable {
 
     void copyMemory(ByteArrayWithOffs in);
 
-    void copyMemory(RandomAccess rao);
+    void copyMemory(RandomAccess rao) throws IOException;
 
     void copyMemory(ByteArrayRandomAccessIn in, int size);
 

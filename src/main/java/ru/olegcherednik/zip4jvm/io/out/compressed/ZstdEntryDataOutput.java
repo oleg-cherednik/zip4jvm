@@ -69,7 +69,7 @@ final class ZstdEntryDataOutput extends CompressedEntryDataOutput {
 
         while (rao.getOffs() < len) {
             byte[] buf = ThreadLocalBuffer.getOne();
-            int readNow = rao.read(buf, 0, buf.length);
+            int readNow = Quietly.doRuntime(() -> rao.read(buf, 0, buf.length));
 
             if (readNow == IOUtils.EOF)
                 break;

@@ -33,7 +33,7 @@ public final class RleLiteralsEncode {
 
             int offs = in.getOffs();
             in.setOffs(0);
-            out.writeByte(in.getByte());
+            out.writeByte(in.readByte());
             in.setOffs(offs);
         }
     }

@@ -7,6 +7,8 @@ import io.airlift.compress.zstd.model.LiteralsSectionHeader;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.io.IOException;
+
 /**
  * @author Oleg Cherednik
  * @since 13.11.2026
@@ -24,7 +26,7 @@ public final class RawLiteralsEncode {
         }
     }
 
-    public static void encode(Out out, RandomAccess in) {
+    public static void encode(Out out, RandomAccess in) throws IOException {
         LiteralsSectionHeader.RawRle header = LiteralsSectionHeader.createForRaw();
         header.withRegeneratedSize(in.getOffs());
 

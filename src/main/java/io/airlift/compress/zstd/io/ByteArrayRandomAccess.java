@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_BYTE;
@@ -48,11 +49,45 @@ public class ByteArrayRandomAccess implements RandomAccess {
         Arrays.fill(buf, (byte) 0);
     }
 
+    // ---------- In ----------
+
+    @Override
+    public int readByte() {
+        int res = buf[offs] & 0xFF;
+        offs += SIZE_OF_BYTE;
+        return res;
+    }
+
+    @Override
+    public int readWord() {
+        return 0;
+    }
+
+    @Override
+    public long readDword() {
+        return 0;
+    }
+
+    @Override
+    public long readQword() {
+        return 0;
+    }
+
+    @Override
+    public long getPos() {
+        return 0;
+    }
+
     // ---------- Out ----------
 
     @Override
     public int available() {
         return limit - offs;
+    }
+
+    @Override
+    public int read(byte[] buf) throws IOException {
+        return 0;
     }
 
     @Override
@@ -84,7 +119,7 @@ public class ByteArrayRandomAccess implements RandomAccess {
     }
 
     @Override
-    public void copyMemory(RandomAccess rao) {
+    public void copyMemory(RandomAccess rao) throws IOException {
         int nowRead = rao.read(buf, offs, rao.available());
         offs += nowRead;
     }
@@ -108,13 +143,6 @@ public class ByteArrayRandomAccess implements RandomAccess {
         System.arraycopy(this.buf, this.offs, buf, offs, available);
         this.offs += available;
         return available;
-    }
-
-    @Override
-    public int getByte() {
-        int res = buf[offs] & 0xFF;
-        offs += SIZE_OF_BYTE;
-        return res;
     }
 
     // ---------- Objects ----------

@@ -39,7 +39,7 @@ public class Histogram {
 
     public void count(RandomAccess in) {
         while (in.available() > 0)
-            counts[in.getByte()]++;
+            counts[in.readByte()]++;
     }
 
     public int findMaxSymbol(int maxSymbol) {
