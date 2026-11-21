@@ -46,7 +46,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         int[] shortHashTable = context.blockCompressionState.chainTable;
         int shortHashBits = context.parameters.getChainLog();
 
-        final int inputEnd = in.getLimit();
+        final int inputEnd = raIn.getLimit();
         final long inputLimit = inputEnd - SIZE_OF_QWORD; // We read a long at a time for computing the hashes
 
         int inOffs = raIn.getOffs();
@@ -74,12 +74,10 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         }
 
         while (inOffs < inputLimit) {   // < instead of <=, because repcode check at (inOffs+1)
-            in.setOffs(inOffs);
             raIn.setOffs(inOffs);
             int shortHash = hash(raIn, shortHashBits, matchSearchLength);
             int shortMatchAddress = shortHashTable[shortHash];
 
-            in.setOffs(inOffs);
             raIn.setOffs(inOffs);
             int longHash = hash8(raIn, longHashBits);
             int longMatchAddress = longHashTable[longHash];
@@ -98,7 +96,6 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                         SIZE_OF_DWORD;
                 inOffs++;
                 // NOTE: in offs is moved (literals are copied long-at-a-time, so it can be moved beyond inOffs + literalLength)
-                in.setOffs(anchor);
                 raIn.setOffs(anchor);
                 context.sequenceStore.storeSequence(raIn, inOffs - anchor, 0, matchLength - MIN_MATCH);
             } else {
@@ -116,8 +113,6 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                         int nextOffsetHash = hash8(raIn, inOffs + 1, longHashBits);
                         int nextOffsetMatchAddress = longHashTable[nextOffsetHash];
                         longHashTable[nextOffsetHash] = current + 1;
-
-                        raIn.setOffs(in.getOffs());
 
                         // check prefix long +1 match
                         if (nextOffsetMatchAddress > windowBaseAddress &&
@@ -151,7 +146,6 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 offs0 = offset;
 
                 // NOTE: in offs is moved (literals are copied long-at-a-time, so it can be moved beyond inOffs + literalLength)
-                in.setOffs(anchor);
                 raIn.setOffs(anchor);
 
                 context.sequenceStore.storeSequence(raIn, inOffs - anchor, offset + REP_MOVE,
@@ -164,12 +158,10 @@ class DoubleFastBlockCompressor implements BlockCompressor {
             if (inOffs <= inputLimit) {
                 // Fill Table
                 longHashTable[hash8(raIn, current + 2, longHashBits)] = current + 2;
-                in.setOffs(current + 2);
                 raIn.setOffs(current + 2);
                 shortHashTable[hash(raIn, shortHashBits, matchSearchLength)] = current + 2;
 
                 longHashTable[hash8(raIn, inOffs - 2, longHashBits)] = inOffs - 2;
-                in.setOffs(inOffs - 2);
                 raIn.setOffs(inOffs - 2);
                 shortHashTable[hash(raIn, shortHashBits, matchSearchLength)] = inOffs - 2;
 
@@ -184,13 +176,11 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                     offs1 = offs0;
                     offs0 = temp;
 
-                    in.setOffs(inOffs);
                     raIn.setOffs(inOffs);
                     shortHashTable[hash(raIn, shortHashBits, matchSearchLength)] = inOffs;
                     longHashTable[hash8(raIn, inOffs, longHashBits)] = inOffs;
 
                     // NOTE: in offs is moved (literals are copied long-at-a-time, so it can be moved beyond inOffs + literalLength)
-                    in.setOffs(anchor);
                     raIn.setOffs(anchor);
                     context.sequenceStore.storeSequence(raIn, 0, 0, repetitionLength - MIN_MATCH);
 

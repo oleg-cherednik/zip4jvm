@@ -15,6 +15,10 @@ public interface Out extends Closeable {
 
     int available();
 
+    // TODO нужно в одном месте (посмотреть действительно ли нужно?)
+    @Deprecated
+    int getLimit();
+
     int getOffs();
 
     void writeByte(int x);
