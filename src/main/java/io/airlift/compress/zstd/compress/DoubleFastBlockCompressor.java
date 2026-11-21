@@ -103,11 +103,11 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 context.sequenceStore.storeSequence(in, inOffs - anchor, 0, matchLength - MIN_MATCH);
             } else {
                 // check prefix long match
-                if (longMatchAddress > windowBaseAddress && isLongEqual(in, longMatchAddress, inOffs)) {
+                if (longMatchAddress > windowBaseAddress && isQwordEqual(raIn, longMatchAddress, inOffs)) {
                     matchLength = count(raIn, inOffs + SIZE_OF_QWORD, inputEnd, longMatchAddress + SIZE_OF_QWORD) +
                             SIZE_OF_QWORD;
                     offset = inOffs - longMatchAddress;
-                    int extra = countBackward(in, inOffs, anchor, longMatchAddress, windowBaseAddress);
+                    int extra = countBackward(raIn, inOffs, anchor, longMatchAddress, windowBaseAddress);
                     inOffs -= extra;
                     matchLength += extra;
                 } else {
@@ -252,6 +252,23 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         return count;
     }
 
+    private static int countBackward(RandomAccess in, final int inOffs,
+                                     final int anchor,
+                                     final int matchAddress,
+                                     final long windowBaseAddress) {
+        // two backward cursors over the same buffer; in offs is not changed
+        RandomAccess input = in.slice(inOffs, in.getOffs() - inOffs);
+        RandomAccess match = in.slice(matchAddress, in.getOffs() - matchAddress);
+
+        int count = 0;
+
+        while (inOffs - count > anchor && matchAddress - count > windowBaseAddress
+                && match.readPrevByte() == input.readPrevByte())
+            count++;
+
+        return count;
+    }
+
     private static int hash(ByteArrayRandomAccessIn in, int bits, int matchSearchLength) {
         if (matchSearchLength == 5)
             return hash5(in.getLong(), bits);
@@ -324,6 +341,23 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         long a = in.getLong();
         in.setOffs(offsB);
         return a == in.getLong();
+    }
+
+    /**
+     * Compares 8 bytes at {@code offsA} and {@code offsB}. NOTE: in offs is moved.
+     */
+    private static boolean isQwordEqual(RandomAccess in, int offsA, int offsB) {
+        int offs = in.getOffs();
+
+        in.setOffs(offsA);
+        long a = in.readQword();
+
+        in.setOffs(offsB);
+        long b = in.readQword();
+
+        in.setOffs(offs);
+
+        return a == b;
     }
 
     private static final int PRIME_4_BYTES = 0x9E3779B1;

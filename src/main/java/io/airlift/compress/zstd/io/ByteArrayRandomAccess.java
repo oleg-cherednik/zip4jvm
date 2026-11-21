@@ -161,6 +161,12 @@ public class ByteArrayRandomAccess implements RandomAccess {
         return available;
     }
 
+    @Override
+    public int readPrevByte() {
+        offs -= SIZE_OF_BYTE;
+        return buf[offs] & 0xFF;
+    }
+
     // ---------- Objects ----------
 
     @Override

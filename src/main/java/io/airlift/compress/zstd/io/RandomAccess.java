@@ -15,6 +15,8 @@ public interface RandomAccess extends In, Out {
 
     void setOffs(int offs);
 
+    int readPrevByte();
+
     // ---------- Closeable ----------
 
     @Override
