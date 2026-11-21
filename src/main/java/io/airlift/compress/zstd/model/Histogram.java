@@ -13,6 +13,7 @@
  */
 package io.airlift.compress.zstd.model;
 
+import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import lombok.Getter;
 
@@ -32,6 +33,11 @@ public class Histogram {
     }
 
     public void count(ByteArrayWithOffs in) {
+        for (int i = 0; i < in.getOffs(); i++)
+            counts[in.buf[i] & 0xFF]++;
+    }
+
+    public void count(ByteArrayRandomAccessOut in) {
         for (int i = 0; i < in.getOffs(); i++)
             counts[in.buf[i] & 0xFF]++;
     }

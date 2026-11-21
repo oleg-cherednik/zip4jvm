@@ -36,13 +36,16 @@ public final class EncodeLiterals {
 
     public static boolean encodeLiterals(RandomAccessOut rao, CompressionContext context) throws IOException {
         final int offs = rao.getOffs();
-        boolean bypassCompression = context.parameters.isBypassCompression();
-        ByteArrayWithOffs literalsBuf = context.sequenceStore.literalsBuf;
-        ByteArrayRandomAccessOut literalsBuf1 = new ByteArrayRandomAccessOut(literalsBuf.buf,
-                                                                             literalsBuf.getOffs(),
-                                                                             literalsBuf.getOffs());
-        if (bypassCompression || literalsBuf1.getLimit() <= MINIMUM_LITERALS_SIZE)
-            RawLiteralsEncode.encode(rao, literalsBuf1);
+
+        ByteArrayRandomAccessOut literalsBuf =
+                new ByteArrayRandomAccessOut(context.sequenceStore.literalsBuf.buf,
+                                             context.sequenceStore.literalsBuf.getOffs(),
+                                             context.sequenceStore.literalsBuf.getOffs());
+
+        int literalsSize = literalsBuf.getOffs();
+
+        if (context.parameters.isBypassCompression() || literalsSize <= MINIMUM_LITERALS_SIZE)
+            RawLiteralsEncode.encode(rao, literalsBuf);
         else {
             Histogram histogram = new Histogram(HuffmanConst.MAX_SYMBOL_COUNT);
             histogram.count(literalsBuf);
@@ -50,14 +53,14 @@ public final class EncodeLiterals {
             int maxSymbol = histogram.findMaxSymbol(HuffmanConst.MAX_SYMBOL);
             int largestCount = histogram.findLargestCount(maxSymbol);
 
-            if (largestCount == literalsBuf.getOffs())
+            if (largestCount == literalsSize)
                 // all bytes in input are equal
                 RleLiteralsEncode.encode(rao, literalsBuf);
-            else if (largestCount <= (literalsBuf.getOffs() >>> 7) + 4)
+            else if (largestCount <= (literalsSize >>> 7) + 4)
                 // heuristic: probably not compressible enough
                 RawLiteralsEncode.encode(rao, literalsBuf);
             else {
-                int headerSize = LiteralsSectionHeader.CompressedTreeless.calcHeaderSize(literalsBuf.getOffs());
+                int headerSize = LiteralsSectionHeader.CompressedTreeless.calcHeaderSize(literalsSize);
 
                 if (rao.available() < headerSize + MAX_HUFFMAN_TABLE_DESCRIPTION_SIZE) {
                     // no room for a new Huffman tree description
