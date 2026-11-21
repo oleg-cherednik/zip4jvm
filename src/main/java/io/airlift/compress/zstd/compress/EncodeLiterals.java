@@ -1,11 +1,8 @@
 package io.airlift.compress.zstd.compress;
 
-import io.airlift.compress.zstd.In;
-import io.airlift.compress.zstd.InputStreamToInAdapter;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionTable;
 import io.airlift.compress.zstd.huffman.HuffmanCompressor;
 import io.airlift.compress.zstd.huffman.HuffmanConst;
-import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.io.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.io.RandomAccess;
 import io.airlift.compress.zstd.model.Histogram;
@@ -13,7 +10,6 @@ import io.airlift.compress.zstd.model.LiteralsSectionHeader;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 /**
@@ -71,8 +67,8 @@ public final class EncodeLiterals {
     private static void huffmanCompressing(RandomAccess rao, CompressionContext context,
                                            Histogram histogram, int maxSymbol) throws IOException {
         HuffmanCompressionTable prevTable = context.huffmanCompressionContext.getPrevTable();
-        ByteArrayWithOffs literalsBuf = context.sequenceStore.literalsBuf;
-        RandomAccess literalsBuf1 = context.sequenceStore.getLiteralsBufSlice();
+        int literalsSize = context.sequenceStore.getLiteralsSize();
+        RandomAccess literalsBuf = context.sequenceStore.getLiteralsBufSlice();
 
         HuffmanCompressionTable table;
         int serializedTableSize;
@@ -82,7 +78,7 @@ public final class EncodeLiterals {
         boolean preferReuse = context.isPreferReuse();
 
         HeaderDataOutDecorator hdod = new HeaderDataOutDecorator(rao);
-        hdod.setHeaderSize(LiteralsSectionHeader.CompressedTreeless.calcHeaderSize(literalsBuf1.getOffs()));
+        hdod.setHeaderSize(LiteralsSectionHeader.CompressedTreeless.calcHeaderSize(literalsSize));
 
         RandomAccess dataOut = hdod.getOutForData();
 
@@ -96,9 +92,7 @@ public final class EncodeLiterals {
             newTable.init(
                     histogram.getCounts(),
                     maxSymbol,
-                    HuffmanCompressionTable.optimalNumberOfBits(MAX_HUFFMAN_TABLE_LOG,
-                                                                literalsBuf1.getOffs(),
-                                                                maxSymbol),
+                    HuffmanCompressionTable.optimalNumberOfBits(MAX_HUFFMAN_TABLE_LOG, literalsSize, maxSymbol),
                     context.huffmanCompressionContext.getCompressionTableWorkspace());
 
             serializedTableSize = writeTable(dataOut, newTable);
@@ -123,19 +117,16 @@ public final class EncodeLiterals {
         if (hdod.getHeaderSize() + serializedTableSize + maxStreamsSize > rao.available()) {
             context.huffmanCompressionContext.discardTemporaryTable();
             hdod.reset();
-            RawLiteralsEncode.encode(rao, literalsBuf1);
+            RawLiteralsEncode.encode(rao, literalsBuf);
         } else {
-            In in = new InputStreamToInAdapter(new ByteArrayInputStream(literalsBuf.buf));
-            HuffmanCompressor huffmanCompressor = new HuffmanCompressor(in, table);
-            boolean singleStream = literalsBuf.getOffs() <= 0xFF;
-
-            int regeneratedSize = literalsBuf.getOffs();
-            int compressedSize = compressStream(dataOut, singleStream, huffmanCompressor, regeneratedSize);
+            HuffmanCompressor huffmanCompressor = new HuffmanCompressor(literalsBuf.slice(0, literalsSize), table);
+            boolean singleStream = literalsSize <= 0xFF;
+            int compressedSize = compressStream(dataOut, singleStream, huffmanCompressor, literalsSize);
 
             int dataSize = hdod.saveAndGetDataSize();
             int minimumGain = context.calculateMinimumGain();
 
-            if (compressedSize == 0 || dataSize >= literalsBuf.getOffs() - minimumGain) {
+            if (compressedSize == 0 || dataSize >= literalsSize - minimumGain) {
                 // incompressible or no savings
                 // discard any temporary table we might have borrowed above
                 context.huffmanCompressionContext.discardTemporaryTable();
@@ -145,7 +136,7 @@ public final class EncodeLiterals {
                 LiteralsSectionHeader.CompressedTreeless header =
                         reuseTable ? LiteralsSectionHeader.createForTreeless()
                                    : LiteralsSectionHeader.createForCompressed();
-                header.withSize(singleStream, regeneratedSize, dataSize);
+                header.withSize(singleStream, literalsSize, dataSize);
                 header.encode(hdod.getOutForHeader());
                 hdod.close();
             }
