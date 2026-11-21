@@ -36,12 +36,8 @@ public class SequenceStore {
     public LongField longLengthField;
     public int longLengthPosition;
 
-    public enum LongField {
-        LITERAL,
-        MATCH
-    }
-
-    private static final byte[] LITERAL_LENGTH_CODE = { 0, 1, 2, 3, 4, 5, 6, 7,
+    private static final byte[] LITERAL_LENGTH_CODE = {
+            0, 1, 2, 3, 4, 5, 6, 7,
             8, 9, 10, 11, 12, 13, 14, 15,
             16, 16, 17, 17, 18, 18, 19, 19,
             20, 20, 20, 20, 21, 21, 21, 21,
@@ -50,7 +46,8 @@ public class SequenceStore {
             24, 24, 24, 24, 24, 24, 24, 24,
             24, 24, 24, 24, 24, 24, 24, 24 };
 
-    private static final byte[] MATCH_LENGTH_CODE = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+    private static final byte[] MATCH_LENGTH_CODE = {
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
             16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
             32, 32, 33, 33, 34, 34, 35, 35, 36, 36, 36, 36, 37, 37, 37, 37,
             38, 38, 38, 38, 38, 38, 38, 38, 39, 39, 39, 39, 39, 39, 39, 39,
@@ -123,20 +120,15 @@ public class SequenceStore {
             matchLengthCodes[i] = (byte) matchLengthToCode(matchLengths[i]);
         }
 
-        if (longLengthField == LongField.LITERAL) {
+        if (longLengthField == LongField.LITERAL)
             literalLengthCodes[longLengthPosition] = Constants.MAX_LITERALS_LENGTH_SYMBOL;
-        }
-        if (longLengthField == LongField.MATCH) {
+        if (longLengthField == LongField.MATCH)
             matchLengthCodes[longLengthPosition] = Constants.MAX_MATCH_LENGTH_SYMBOL;
-        }
     }
 
     private static int literalLengthToCode(int literalLength) {
-        if (literalLength >= 64) {
-            return Util.highestBit(literalLength) + 19;
-        } else {
-            return LITERAL_LENGTH_CODE[literalLength];
-        }
+        return literalLength >= 64 ? Util.highestBit(literalLength) + 19
+                                   : LITERAL_LENGTH_CODE[literalLength];
     }
 
     /*
@@ -144,10 +136,12 @@ public class SequenceStore {
      * (that's how it's stored in SequenceStore)
      */
     private static int matchLengthToCode(int matchLengthBase) {
-        if (matchLengthBase >= 128) {
-            return Util.highestBit(matchLengthBase) + 36;
-        } else {
-            return MATCH_LENGTH_CODE[matchLengthBase];
-        }
+        return matchLengthBase >= 128 ? Util.highestBit(matchLengthBase) + 36
+                                      : MATCH_LENGTH_CODE[matchLengthBase];
+    }
+
+    public enum LongField {
+        LITERAL,
+        MATCH
     }
 }
