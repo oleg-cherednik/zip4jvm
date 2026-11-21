@@ -30,6 +30,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
 
     @Override
     public int compressBlock(ByteArrayRandomAccessIn in, CompressionContext context) {
+        RandomAccess ra = new ByteArrayRandomAccess(in.getBuf(), in.getOffs(), in.getLimit());
         int matchSearchLength = Math.max(context.parameters.getSearchLength(), 4);
 
         // Offsets in hash tables are relative to baseAddress. Hash tables can be reused across calls to compressBlock as long as
@@ -86,7 +87,6 @@ class DoubleFastBlockCompressor implements BlockCompressor {
 
             int matchLength;
             int offset;
-            RandomAccess ra = new ByteArrayRandomAccess(in.getBuf(), in.getOffs(), in.getLimit());
 
             if (offs0 > 0 && isIntEqual(in, inOffs + 1 - offs0, inOffs + 1)) {
                 // found a repeated sequence of at least 4 bytes, separated by offs0
