@@ -37,12 +37,8 @@ public final class EncodeLiterals {
     public static boolean encodeLiterals(RandomAccessOut rao, CompressionContext context) throws IOException {
         final int offs = rao.getOffs();
 
-        ByteArrayRandomAccessOut literalsBuf =
-                new ByteArrayRandomAccessOut(context.sequenceStore.literalsBuf.buf,
-                                             context.sequenceStore.literalsBuf.getOffs(),
-                                             context.sequenceStore.literalsBuf.getOffs());
-
-        int literalsSize = literalsBuf.getOffs();
+        int literalsSize = context.sequenceStore.getLiteralsSize();
+        ByteArrayRandomAccessOut literalsBuf = context.sequenceStore.getLiteralsBufSlice();
 
         if (context.parameters.isBypassCompression() || literalsSize <= MINIMUM_LITERALS_SIZE)
             RawLiteralsEncode.encode(rao, literalsBuf);

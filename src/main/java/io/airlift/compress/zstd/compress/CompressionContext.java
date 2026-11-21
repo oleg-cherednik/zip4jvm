@@ -65,12 +65,12 @@ public class CompressionContext {
 
     public boolean isPreferReuse() {
         CompressionParameters.Strategy strategy = parameters.getStrategy();
-        int literalsBufferOffs = sequenceStore.getLiteralsBufOffs();
+        int literalsBufferOffs = sequenceStore.getLiteralsSize();
         return strategy.ordinal() < CompressionParameters.Strategy.LAZY.ordinal() && literalsBufferOffs <= 1024;
     }
 
     public int calculateMinimumGain() {
-        return calculateMinimumGain(sequenceStore.getLiteralsBufOffs());
+        return calculateMinimumGain(sequenceStore.getLiteralsSize());
     }
 
     public int calculateMinimumGain(int inputSize) {
