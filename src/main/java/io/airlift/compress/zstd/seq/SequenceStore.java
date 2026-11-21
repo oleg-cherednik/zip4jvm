@@ -14,7 +14,7 @@
 package io.airlift.compress.zstd.seq;
 
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
-import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
+import io.airlift.compress.zstd.io.ByteArrayRandomAccess;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.model.Constants;
 import io.airlift.compress.zstd.model.Util;
@@ -70,10 +70,10 @@ public class SequenceStore {
         reset();
     }
 
-    public ByteArrayRandomAccessOut getLiteralsBufSlice() {
-        return new ByteArrayRandomAccessOut(literalsBuf.buf,
-                                            literalsBuf.getOffs(),
-                                            literalsBuf.getOffs());
+    public ByteArrayRandomAccess getLiteralsBufSlice() {
+        return new ByteArrayRandomAccess(literalsBuf.buf,
+                                         literalsBuf.getOffs(),
+                                         literalsBuf.getOffs());
     }
 
     public int getLiteralsSize() {

@@ -23,7 +23,7 @@ import io.airlift.compress.zstd.fse.FseCompressionTable;
 import io.airlift.compress.zstd.fse.compress.FiniteStateEntropyForCompress;
 import io.airlift.compress.zstd.io.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.Out;
-import io.airlift.compress.zstd.io.RandomAccessOut;
+import io.airlift.compress.zstd.io.RandomAccess;
 
 import java.util.Arrays;
 
@@ -200,7 +200,7 @@ public final class HuffmanCompressionTable {
 
     private static final int HEADER_SIZE_BYTES = 1;
 
-    public void write(RandomAccessOut rao) {
+    public void write(RandomAccess rao) {
         HeaderDataOutDecorator hdod = new HeaderDataOutDecorator(rao);
         hdod.setHeaderSize(HEADER_SIZE_BYTES);
 

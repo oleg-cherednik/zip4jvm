@@ -20,7 +20,7 @@ import io.airlift.compress.zstd.huffman.HuffmanDecompressor;
 import io.airlift.compress.zstd.io.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.io.BackwardDecorator;
 import io.airlift.compress.zstd.io.BoundIn;
-import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
+import io.airlift.compress.zstd.io.ByteArrayRandomAccess;
 import io.airlift.compress.zstd.io.SequencesInitializer;
 import io.airlift.compress.zstd.model.BlockHeader;
 import io.airlift.compress.zstd.model.FrameHeader;
@@ -584,7 +584,7 @@ public class ZstdFrameDecompressor implements AutoCloseable {
         literalsBase = literals;
         literalsLimit = header.getRegeneratedSize();
 
-        ByteArrayRandomAccessOut out = new ByteArrayRandomAccessOut(literalsBase, 0, literalsLimit);
+        ByteArrayRandomAccess out = new ByteArrayRandomAccess(literalsBase, 0, literalsLimit);
         In boundIn = BoundIn.create(in, inputLimit);
 
         if (header.isSingleStream())

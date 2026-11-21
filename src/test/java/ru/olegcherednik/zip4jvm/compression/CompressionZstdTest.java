@@ -31,9 +31,9 @@ import com.github.luben.zstd.Zstd;
 import com.github.luben.zstd.ZstdCompressCtx;
 import io.airlift.compress.zstd.ZstdCompressor;
 import io.airlift.compress.zstd.ZstdInputStream;
-import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
+import io.airlift.compress.zstd.io.ByteArrayRandomAccess;
 import io.airlift.compress.zstd.io.InByteArrayWithOffs;
-import io.airlift.compress.zstd.io.RandomAccessOut;
+import io.airlift.compress.zstd.io.RandomAccess;
 import org.apache.commons.io.IOUtils;
 import org.testng.annotations.Test;
 
@@ -164,13 +164,13 @@ public class CompressionZstdTest extends BaseTest {
             expected[i] = (byte) ("zip4jvm sliding window ".charAt(i % 23) + random.nextInt(3));
 
         ZstdCompressor compressor = new ZstdCompressor();
-        RandomAccessOut rao = new ByteArrayRandomAccessOut(compressor.maxCompressedLength(expected.length));
+        RandomAccess rao = new ByteArrayRandomAccess(compressor.maxCompressedLength(expected.length));
         compressor.compress(new InByteArrayWithOffs(expected), rao);
         assertThat(Zstd.decompress(readBuf(rao), expected.length)).isEqualTo(expected);
     }
 
-    private static byte[] readBuf(RandomAccessOut rao) {
-        RandomAccessOut slice = rao.slice(0, rao.getOffs());
+    private static byte[] readBuf(RandomAccess rao) {
+        RandomAccess slice = rao.slice(0, rao.getOffs());
         byte[] buf = new byte[slice.available()];
         slice.read(buf, 0, buf.length);
         return buf;
@@ -187,7 +187,7 @@ public class CompressionZstdTest extends BaseTest {
         byte[] expected = buf.toString().getBytes(StandardCharsets.UTF_8);
 
         ZstdCompressor compressor = new ZstdCompressor();
-        RandomAccessOut rao = new ByteArrayRandomAccessOut(compressor.maxCompressedLength(expected.length));
+        RandomAccess rao = new ByteArrayRandomAccess(compressor.maxCompressedLength(expected.length));
         compressor.compress(new InByteArrayWithOffs(expected), rao);
         assertThat(Zstd.decompress(readBuf(rao), expected.length)).isEqualTo(expected);
     }
@@ -198,7 +198,7 @@ public class CompressionZstdTest extends BaseTest {
         Arrays.fill(expected, (byte) 'a');
 
         ZstdCompressor compressor = new ZstdCompressor();
-        RandomAccessOut rao = new ByteArrayRandomAccessOut(compressor.maxCompressedLength(expected.length));
+        RandomAccess rao = new ByteArrayRandomAccess(compressor.maxCompressedLength(expected.length));
         compressor.compress(new InByteArrayWithOffs(expected), rao);
         assertThat(Zstd.decompress(readBuf(rao), expected.length)).isEqualTo(expected);
     }
@@ -215,7 +215,7 @@ public class CompressionZstdTest extends BaseTest {
                     expected[i] = (byte) (' ' + random.nextInt(distinct) % (1 + random.nextInt(distinct)));
 
                 ZstdCompressor compressor = new ZstdCompressor();
-                RandomAccessOut rao = new ByteArrayRandomAccessOut(compressor.maxCompressedLength(expected.length));
+                RandomAccess rao = new ByteArrayRandomAccess(compressor.maxCompressedLength(expected.length));
                 compressor.compress(new InByteArrayWithOffs(expected), rao);
 
                 assertThat(Zstd.decompress(readBuf(rao), expected.length))

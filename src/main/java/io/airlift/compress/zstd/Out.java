@@ -2,7 +2,7 @@ package io.airlift.compress.zstd;
 
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
-import io.airlift.compress.zstd.io.RandomAccessOut;
+import io.airlift.compress.zstd.io.RandomAccess;
 
 import java.io.Closeable;
 
@@ -26,7 +26,7 @@ public interface Out extends Closeable {
 
     void copyMemory(ByteArrayWithOffs in);
 
-    void copyMemory(RandomAccessOut rao);
+    void copyMemory(RandomAccess rao);
 
     void copyMemory(ByteArrayRandomAccessIn in, int size);
 

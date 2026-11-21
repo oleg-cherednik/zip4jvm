@@ -2,7 +2,7 @@ package io.airlift.compress.zstd.compress;
 
 import io.airlift.compress.zstd.Out;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
-import io.airlift.compress.zstd.io.RandomAccessOut;
+import io.airlift.compress.zstd.io.RandomAccess;
 import io.airlift.compress.zstd.model.LiteralsSectionHeader;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -24,7 +24,7 @@ public final class RawLiteralsEncode {
         }
     }
 
-    public static void encode(Out out, RandomAccessOut in) {
+    public static void encode(Out out, RandomAccess in) {
         LiteralsSectionHeader.RawRle header = LiteralsSectionHeader.createForRaw();
         header.withRegeneratedSize(in.getOffs());
 

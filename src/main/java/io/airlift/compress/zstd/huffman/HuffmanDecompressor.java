@@ -18,8 +18,8 @@ import io.airlift.compress.zstd.Out;
 import io.airlift.compress.zstd.fse.decompress.FiniteStateEntropyForDecompress;
 import io.airlift.compress.zstd.io.BackwardBitInputStream;
 import io.airlift.compress.zstd.io.BackwardDecorator;
-import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
-import io.airlift.compress.zstd.io.RandomAccessOut;
+import io.airlift.compress.zstd.io.ByteArrayRandomAccess;
+import io.airlift.compress.zstd.io.RandomAccess;
 import io.airlift.compress.zstd.model.Util;
 import lombok.RequiredArgsConstructor;
 
@@ -38,7 +38,7 @@ public class HuffmanDecompressor {
     private int tableLog = TABLE_NOT_LOADED;
     private final byte[] symbols = new byte[1 << HuffmanConst.MAX_TABLE_LOG];
     private final byte[] numbersOfBits = new byte[1 << HuffmanConst.MAX_TABLE_LOG];
-    private final ByteArrayRandomAccessOut weights = new ByteArrayRandomAccessOut(HuffmanConst.MAX_SYMBOL + 1);
+    private final ByteArrayRandomAccess weights = new ByteArrayRandomAccess(HuffmanConst.MAX_SYMBOL + 1);
     private final int[] ranks = new int[HuffmanConst.MAX_TABLE_LOG + 1];
 
     public boolean isLoaded() {
@@ -150,7 +150,7 @@ public class HuffmanDecompressor {
         bitStream.decodeTail(out);
     }
 
-    public void decode4Streams(In in, RandomAccessOut rao) throws IOException {
+    public void decode4Streams(In in, RandomAccess rao) throws IOException {
         verify(in.available() >= 10, "Input is corrupted"); // jump table + 1 byte per stream
 
         int size1 = in.readWord();
@@ -168,10 +168,10 @@ public class HuffmanDecompressor {
         BackwardBitInputStream bbis3 = createStream(in, size3);
         BackwardBitInputStream bbis4 = createStream(in, size4);
 
-        RandomAccessOut out1 = rao.slice(0, offsSegment2);
-        RandomAccessOut out2 = rao.slice(offsSegment2, offsSegment3);
-        RandomAccessOut out3 = rao.slice(offsSegment3, offsSegment4);
-        RandomAccessOut out4 = rao.slice(offsSegment4, rao.available());
+        RandomAccess out1 = rao.slice(0, offsSegment2);
+        RandomAccess out2 = rao.slice(offsSegment2, offsSegment3);
+        RandomAccess out3 = rao.slice(offsSegment3, offsSegment4);
+        RandomAccess out4 = rao.slice(offsSegment4, rao.available());
 
         while (rao.available() >= 8) {
             // 4 * 4 per loop

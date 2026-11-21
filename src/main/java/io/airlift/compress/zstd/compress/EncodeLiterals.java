@@ -7,7 +7,7 @@ import io.airlift.compress.zstd.huffman.HuffmanCompressor;
 import io.airlift.compress.zstd.huffman.HuffmanConst;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.io.HeaderDataOutDecorator;
-import io.airlift.compress.zstd.io.RandomAccessOut;
+import io.airlift.compress.zstd.io.RandomAccess;
 import io.airlift.compress.zstd.model.Histogram;
 import io.airlift.compress.zstd.model.LiteralsSectionHeader;
 import lombok.AccessLevel;
@@ -33,11 +33,11 @@ public final class EncodeLiterals {
     // for each of 4 streams (4) and rounding down of the estimated size (1)
     private static final int HUFFMAN_STREAMS_OVERHEAD = 6 + 4 + 1;
 
-    public static boolean encodeLiterals(RandomAccessOut rao, CompressionContext context) throws IOException {
+    public static boolean encodeLiterals(RandomAccess rao, CompressionContext context) throws IOException {
         final int offs = rao.getOffs();
 
         int literalsSize = context.sequenceStore.getLiteralsSize();
-        RandomAccessOut literalsBuf = context.sequenceStore.getLiteralsBufSlice();
+        RandomAccess literalsBuf = context.sequenceStore.getLiteralsBufSlice();
 
         if (context.parameters.isBypassCompression() || literalsSize <= MINIMUM_LITERALS_SIZE)
             RawLiteralsEncode.encode(rao, literalsBuf);
@@ -68,11 +68,11 @@ public final class EncodeLiterals {
         return rao.getOffs() > offs;
     }
 
-    private static void huffmanCompressing(RandomAccessOut rao, CompressionContext context,
+    private static void huffmanCompressing(RandomAccess rao, CompressionContext context,
                                            Histogram histogram, int maxSymbol) throws IOException {
         HuffmanCompressionTable prevTable = context.huffmanCompressionContext.getPrevTable();
         ByteArrayWithOffs literalsBuf = context.sequenceStore.literalsBuf;
-        RandomAccessOut literalsBuf1 = context.sequenceStore.getLiteralsBufSlice();
+        RandomAccess literalsBuf1 = context.sequenceStore.getLiteralsBufSlice();
 
         HuffmanCompressionTable table;
         int serializedTableSize;
@@ -84,7 +84,7 @@ public final class EncodeLiterals {
         HeaderDataOutDecorator hdod = new HeaderDataOutDecorator(rao);
         hdod.setHeaderSize(LiteralsSectionHeader.CompressedTreeless.calcHeaderSize(literalsBuf1.getOffs()));
 
-        RandomAccessOut dataOut = hdod.getOutForData();
+        RandomAccess dataOut = hdod.getOutForData();
 
         if (preferReuse && canReuse) {
             table = prevTable;
@@ -152,13 +152,13 @@ public final class EncodeLiterals {
         }
     }
 
-    private static int writeTable(RandomAccessOut rao, HuffmanCompressionTable newTable) {
+    private static int writeTable(RandomAccess rao, HuffmanCompressionTable newTable) {
         int loOffs = rao.getOffs();
         newTable.write(rao);
         return rao.getOffs() - loOffs;
     }
 
-    private static int compressStream(RandomAccessOut rao,
+    private static int compressStream(RandomAccess rao,
                                       boolean singleStream,
                                       HuffmanCompressor huffmanCompressor,
                                       int regeneratedSize) throws IOException {

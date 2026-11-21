@@ -23,7 +23,7 @@ import lombok.Setter;
  */
 public final class HeaderDataOutDecorator {
 
-    private final RandomAccessOut rao;
+    private final RandomAccess rao;
     @Getter
     private final int startOffs;
     @Setter
@@ -31,18 +31,18 @@ public final class HeaderDataOutDecorator {
     private int headerSize = -1;
     private int dataSize = -1;
 
-    public HeaderDataOutDecorator(RandomAccessOut rao) {
+    public HeaderDataOutDecorator(RandomAccess rao) {
         this.rao = rao;
         startOffs = rao.getOffs();
     }
 
-    public RandomAccessOut getOutForData() {
+    public RandomAccess getOutForData() {
         assert headerSize > 0;
         rao.setOffs(startOffs + headerSize);
         return rao;
     }
 
-    public RandomAccessOut getOutForHeader() {
+    public RandomAccess getOutForHeader() {
         rao.setOffs(startOffs);
         return rao;
     }

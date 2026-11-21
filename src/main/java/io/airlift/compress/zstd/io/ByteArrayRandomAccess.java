@@ -16,7 +16,7 @@ import static io.airlift.compress.zstd.model.Constants.SIZE_OF_WORD;
  */
 @Getter
 @Setter
-public class ByteArrayRandomAccessOut implements RandomAccessOut {
+public class ByteArrayRandomAccess implements RandomAccess {
 
     private static final int OFFS_ZERO = 0;
 
@@ -26,17 +26,17 @@ public class ByteArrayRandomAccessOut implements RandomAccessOut {
     private int offs;
     private int limit;
 
-    public ByteArrayRandomAccessOut(int limit) {
+    public ByteArrayRandomAccess(int limit) {
         this(new byte[limit], 0, limit);
     }
 
-    public ByteArrayRandomAccessOut(byte[] buf, int offs, int limit) {
+    public ByteArrayRandomAccess(byte[] buf, int offs, int limit) {
         this.buf = buf;
         this.offs = offs;
         this.limit = limit;
     }
 
-    public RandomAccessOut getOutForCopy() {
+    public RandomAccess getOutForCopy() {
         limit = offs;
         offs = OFFS_ZERO;
         return this;
@@ -84,7 +84,7 @@ public class ByteArrayRandomAccessOut implements RandomAccessOut {
     }
 
     @Override
-    public void copyMemory(RandomAccessOut rao) {
+    public void copyMemory(RandomAccess rao) {
         int nowRead = rao.read(buf, offs, rao.available());
         offs += nowRead;
     }
@@ -98,8 +98,8 @@ public class ByteArrayRandomAccessOut implements RandomAccessOut {
     // ---------- RandomAccessOut ----------
 
     @Override
-    public RandomAccessOut slice(int offs, int len) {
-        return new ByteArrayRandomAccessOut(buf, offs, Math.min(limit, len));
+    public RandomAccess slice(int offs, int len) {
+        return new ByteArrayRandomAccess(buf, offs, Math.min(limit, len));
     }
 
     @Override

@@ -16,8 +16,8 @@ package io.airlift.compress.zstd.compress;
 import io.airlift.compress.zstd.CompressIn;
 import io.airlift.compress.zstd.Out;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
-import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
-import io.airlift.compress.zstd.io.RandomAccessOut;
+import io.airlift.compress.zstd.io.ByteArrayRandomAccess;
+import io.airlift.compress.zstd.io.RandomAccess;
 import io.airlift.compress.zstd.model.BlockHeader;
 import io.airlift.compress.zstd.model.FrameHeader;
 import io.airlift.compress.zstd.seq.SequenceEncoder;
@@ -67,7 +67,7 @@ public class ZstdFrameCompressor {
         CompressionContext context = new CompressionContext(parameters, contentSize);
         BlockHeader blockHeader = new BlockHeader();
         // a block is compressed into this buffer first; it is copied to out only when the block is really compressed
-        ByteArrayRandomAccessOut barao = new ByteArrayRandomAccessOut(blockSize);
+        ByteArrayRandomAccess barao = new ByteArrayRandomAccess(blockSize);
         ByteArrayRandomAccessIn barai = new ByteArrayRandomAccessIn(parameters.getWindowSize(), blockSize);
         XXHash64 checksum = new XXHash64();
 
@@ -111,7 +111,7 @@ public class ZstdFrameCompressor {
         return checksum;
     }
 
-    private static boolean compressBlock(RandomAccessOut rao, CompressionContext context, ByteArrayRandomAccessIn raIn)
+    private static boolean compressBlock(RandomAccess rao, CompressionContext context, ByteArrayRandomAccessIn raIn)
             throws IOException {
         if (raIn.getSize() < MIN_BLOCK_SIZE + BlockHeader.HEADER_SIZE + 1)
             //  don't even attempt compression below a certain input size

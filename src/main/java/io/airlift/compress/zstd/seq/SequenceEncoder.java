@@ -21,7 +21,7 @@ import io.airlift.compress.zstd.fse.FseCompressionTable;
 import io.airlift.compress.zstd.fse.compress.FiniteStateEntropyForCompress;
 import io.airlift.compress.zstd.io.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.Out;
-import io.airlift.compress.zstd.io.RandomAccessOut;
+import io.airlift.compress.zstd.io.RandomAccess;
 
 import static io.airlift.compress.zstd.model.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
 import static io.airlift.compress.zstd.model.Constants.LITERALS_LENGTH_BITS;
@@ -81,7 +81,7 @@ public class SequenceEncoder {
     private SequenceEncoder() {
     }
 
-    public static boolean compressSequences(RandomAccessOut rao, CompressionContext context) {
+    public static boolean compressSequences(RandomAccess rao, CompressionContext context) {
         if (rao.available() < MAX_SEQUENCES_SECTION_HEADER_SIZE)
             return false;
 

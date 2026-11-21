@@ -18,7 +18,7 @@ import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.io.HuffmanBitOutputStream;
 import io.airlift.compress.zstd.io.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.Out;
-import io.airlift.compress.zstd.io.RandomAccessOut;
+import io.airlift.compress.zstd.io.RandomAccess;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class HuffmanCompressor {
     private final In in;
     private final HuffmanCompressionTable table;
 
-    public void compressFourStreams(RandomAccessOut rao, final int totalBytes) throws IOException {
+    public void compressFourStreams(RandomAccess rao, final int totalBytes) throws IOException {
         if (totalBytes <= 3 * SIZE_OF_WORD + 3 * SIZE_OF_BYTE) // jump table + one byte per stream
             return;  // no saving possible: input too small
 

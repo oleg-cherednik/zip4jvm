@@ -8,9 +8,9 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 17.11.2026
  */
-public interface RandomAccessOut extends Out {
+public interface RandomAccess extends Out {
 
-    RandomAccessOut slice(int offs, int len);
+    RandomAccess slice(int offs, int len);
 
     void setOffs(int offs);
 
