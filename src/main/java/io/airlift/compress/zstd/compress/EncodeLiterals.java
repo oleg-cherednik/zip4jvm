@@ -45,10 +45,11 @@ public final class EncodeLiterals {
             int maxSymbol = histogram.findMaxSymbol(HuffmanConst.MAX_SYMBOL);
             int largestCount = histogram.findLargestCount(maxSymbol);
 
-            if (largestCount == literalsSize)
+            if (largestCount == literalsSize) {
                 // all bytes in input are equal
-                RleLiteralsEncode.encode(rao, literals);
-            else if (largestCount <= (literalsSize >>> 7) + 4) {
+                RandomAccess iin = literals.slice(0, literals.getOffs());
+                RleLiteralsEncode.encode(rao, iin);
+            } else if (largestCount <= (literalsSize >>> 7) + 4) {
                 // heuristic: probably not compressible enough
                 RandomAccess iin = literals.slice(0, literals.getOffs());
                 RawLiteralsEncode.encode(rao, iin);

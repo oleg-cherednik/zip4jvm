@@ -26,7 +26,7 @@ public final class RleLiteralsEncode {
 
     public static void encode(Out out, RandomAccess in) {
         LiteralsSectionHeader.RawRle header = LiteralsSectionHeader.createForRle();
-        header.withRegeneratedSize(in.getOffs());
+        header.withRegeneratedSize(in.available());
 
         if (header.getHeaderSize() + 1 <= out.available()) {
             header.encode(out);
