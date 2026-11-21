@@ -4,6 +4,8 @@ import io.airlift.compress.zstd.CompressIn;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.IOException;
+
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_BYTE;
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_DWORD;
 import static io.airlift.compress.zstd.model.Constants.SIZE_OF_QWORD;
@@ -70,7 +72,7 @@ public final class ByteArrayRandomAccessIn {
      * Appends up to {@code want} bytes from {@code in} at {@link #pos}. Sets the current block view to the newly
      * read range. Returns the number of bytes read (0 at EOF).
      */
-    public int fill(CompressIn in, int want) {
+    public int fill(CompressIn in, int want) throws IOException {
         int toRead = Math.min(want, buf.length - pos);
         if (toRead <= 0)
             return 0;

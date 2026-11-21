@@ -129,12 +129,6 @@ public class ByteArrayRandomAccess implements RandomAccess {
     }
 
     @Override
-    public void copyMemory(ByteArrayWithOffs in) {
-        System.arraycopy(in.buf, 0, buf, offs, in.getOffs());
-        offs += in.getOffs();
-    }
-
-    @Override
     public void copyMemory(RandomAccess rao) throws IOException {
         int nowRead = rao.read(buf, offs, rao.available());
         offs += nowRead;

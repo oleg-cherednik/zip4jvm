@@ -1,7 +1,6 @@
 package io.airlift.compress.zstd.compress;
 
 import io.airlift.compress.zstd.Out;
-import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.io.RandomAccess;
 import io.airlift.compress.zstd.model.LiteralsSectionHeader;
 import lombok.AccessLevel;
@@ -13,16 +12,6 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RleLiteralsEncode {
-
-    public static void encode(Out out, ByteArrayWithOffs in) {
-        LiteralsSectionHeader.RawRle header = LiteralsSectionHeader.createForRle();
-        header.withRegeneratedSize(in.getOffs());
-
-        if (header.getHeaderSize() + 1 <= out.available()) {
-            header.encode(out);
-            out.writeByte(in.buf[0]);
-        }
-    }
 
     public static void encode(Out out, RandomAccess in) {
         LiteralsSectionHeader.RawRle header = LiteralsSectionHeader.createForRle();

@@ -121,6 +121,8 @@ public class InputStreamToInAdapter extends FilterInputStream implements In {
         return nowRead;
     }
 
+    // ---------- CompressIn ----------
+
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         int nowRead = getIn().read(buf, offs, len);

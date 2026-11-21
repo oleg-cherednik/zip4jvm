@@ -15,7 +15,6 @@ package io.airlift.compress.zstd.compress;
 
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
-import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.io.RandomAccess;
 import io.airlift.compress.zstd.model.Constants;
 
@@ -224,27 +223,6 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         }
 
         while (count < remaining && match1.readByte() == input1.readByte())
-            count++;
-
-        return count;
-    }
-
-    /**
-     * Counts how many bytes right before {@code inOffs} and {@code matchAddress} are equal, i.e. how far the match can
-     * be extended backward; it stops at {@code anchor} (not yet stored literals) and at the window start.
-     */
-    private static int countBackward(ByteArrayRandomAccessIn in, final int inOffs,
-                                     final int anchor,
-                                     final int matchAddress,
-                                     final long windowBaseAddress) {
-        // two backward cursors over the same buffer; in offs is not changed
-        ByteArrayWithOffs input = new ByteArrayWithOffs(in.getBuf(), inOffs);
-        ByteArrayWithOffs match = new ByteArrayWithOffs(in.getBuf(), matchAddress);
-
-        int count = 0;
-
-        while (inOffs - count > anchor && matchAddress - count > windowBaseAddress
-                && match.getBytePrev() == input.getBytePrev())
             count++;
 
         return count;

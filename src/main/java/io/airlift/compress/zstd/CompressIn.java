@@ -1,10 +1,13 @@
 package io.airlift.compress.zstd;
 
+import java.io.Closeable;
+import java.io.IOException;
+
 /**
  * @author Oleg Cherednik
  * @since 17.11.2026
  */
-public interface CompressIn {
+public interface CompressIn extends Closeable {
 
     int available();
 
@@ -13,6 +16,12 @@ public interface CompressIn {
      * Returns the number of bytes read, or {@code -1} at end of input when
      * nothing was read.
      */
-    int read(byte[] buf, int offs, int len);
+    int read(byte[] buf, int offs, int len) throws IOException;
+
+    // ---------- Closeable ----------
+
+    @Override
+    default void close() throws IOException {
+    }
 
 }

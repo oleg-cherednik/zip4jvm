@@ -1,11 +1,10 @@
 package io.airlift.compress.zstd.fse.decompress;
 
-import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.In;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Forward (little-endian, least significant bit first) bit reader over {@link ByteArrayWithOffs}.
+ * Forward (little-endian, least significant bit first) bit reader over {@link In}.
  * <p>
  * Bytes are pulled from the input <b>lazily, one at a time, and only when their bits are actually
  * required</b>, therefore the input offset is always {@code ceil(readBits / 8)} bytes ahead of the

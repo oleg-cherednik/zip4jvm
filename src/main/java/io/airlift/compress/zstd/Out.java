@@ -1,6 +1,5 @@
 package io.airlift.compress.zstd;
 
-import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessIn;
 import io.airlift.compress.zstd.io.RandomAccess;
 
@@ -26,8 +25,6 @@ public interface Out extends Closeable {
     void writeWord(int x);
 
     void writeDword(long x);
-
-    void copyMemory(ByteArrayWithOffs in);
 
     void copyMemory(RandomAccess rao) throws IOException;
 
