@@ -65,7 +65,6 @@ public class SequenceStore {
         matchLengthCodes = new byte[maxSequences];
         offsetCodes = new byte[maxSequences];
         literalsBuf = new ByteArrayWithOffs(new byte[blockSize]);
-        reset();
     }
 
     public RandomAccess getLiteralsBufSlice() {
