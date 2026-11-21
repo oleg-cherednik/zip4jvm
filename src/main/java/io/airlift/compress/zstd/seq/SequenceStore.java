@@ -86,7 +86,6 @@ public class SequenceStore {
                               int literalLength,
                               int offsetCode,
                               int matchLengthBase) {
-
         literalsBuf.copyMemory(in, literalLength);
 
         if (literalLength > 65535) {
