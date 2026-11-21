@@ -99,8 +99,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 inOffs++;
                 // NOTE: in offs is moved (literals are copied long-at-a-time, so it can be moved beyond inOffs + literalLength)
                 in.setOffs(anchor);
-                raIn.setOffs(inOffs);
-                context.sequenceStore.storeSequence(in, inOffs - anchor, 0, matchLength - MIN_MATCH);
+                raIn.setOffs(anchor);
+                context.sequenceStore.storeSequence(raIn, inOffs - anchor, 0, matchLength - MIN_MATCH);
             } else {
                 // check prefix long match
                 if (longMatchAddress > windowBaseAddress && isQwordEqual(raIn, longMatchAddress, inOffs)) {
