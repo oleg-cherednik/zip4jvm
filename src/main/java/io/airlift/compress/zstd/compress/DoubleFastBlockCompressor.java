@@ -165,13 +165,13 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 // Fill Table
                 longHashTable[hash8(raIn, current + 2, longHashBits)] = current + 2;
                 in.setOffs(current + 2);
-                shortHashTable[hash(in, shortHashBits, matchSearchLength)] = current + 2;
+                shortHashTable[hash(raIn, shortHashBits, matchSearchLength)] = current + 2;
 
-                longHashTable[hash8(in, inOffs - 2, longHashBits)] = inOffs - 2;
+                longHashTable[hash8(raIn, inOffs - 2, longHashBits)] = inOffs - 2;
                 in.setOffs(inOffs - 2);
-                shortHashTable[hash(in, shortHashBits, matchSearchLength)] = inOffs - 2;
+                shortHashTable[hash(raIn, shortHashBits, matchSearchLength)] = inOffs - 2;
 
-                while (inOffs <= inputLimit && offs1 > 0 && isIntEqual(in, inOffs, inOffs - offs1)) {
+                while (inOffs <= inputLimit && offs1 > 0 && isDwordEqual(raIn, inOffs, inOffs - offs1)) {
                     int repetitionLength = count(raIn,
                                                  inOffs + SIZE_OF_DWORD,
                                                  inputEnd,
@@ -183,11 +183,13 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                     offs0 = temp;
 
                     in.setOffs(inOffs);
-                    shortHashTable[hash(in, shortHashBits, matchSearchLength)] = inOffs;
-                    longHashTable[hash8(in, inOffs, longHashBits)] = inOffs;
+                    raIn.setOffs(inOffs);
+                    shortHashTable[hash(raIn, shortHashBits, matchSearchLength)] = inOffs;
+                    longHashTable[hash8(raIn, inOffs, longHashBits)] = inOffs;
 
                     // NOTE: in offs is moved (literals are copied long-at-a-time, so it can be moved beyond inOffs + literalLength)
                     in.setOffs(anchor);
+                    raIn.setOffs(anchor);
                     context.sequenceStore.storeSequence(in, 0, 0, repetitionLength - MIN_MATCH);
 
                     inOffs += repetitionLength;
