@@ -16,7 +16,7 @@ import static io.airlift.compress.zstd.model.Constants.SIZE_OF_WORD;
  */
 @Getter
 @Setter
-public class ByteArrayRandomAccessOut implements RandomAccessOut {
+public class ByteArrayRandomAccessOut implements RandomAccessOut, RandomAccessHuffman {
 
     private static final int OFFS_ZERO = 0;
 
@@ -115,6 +115,15 @@ public class ByteArrayRandomAccessOut implements RandomAccessOut {
         System.arraycopy(this.buf, this.offs, buf, offs, available);
         this.offs += available;
         return available;
+    }
+
+    // ---------- RandomAccessHuffman ----------
+
+    @Override
+    public int getByte() {
+        int res = buf[offs] & 0xFF;
+        offs += SIZE_OF_BYTE;
+        return res;
     }
 
     // ---------- Objects ----------

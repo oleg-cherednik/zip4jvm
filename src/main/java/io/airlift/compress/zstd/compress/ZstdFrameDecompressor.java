@@ -576,8 +576,10 @@ public class ZstdFrameDecompressor implements AutoCloseable {
         long inputLimit = in.getPos() + header.getCompressedSize();
 
         // 3.1.1.3.1.5. Huffman_Tree_Description
-        if (!header.isTreelessBlock())
+        if (!header.isTreelessBlock()) {
+            huffmanDecompressor.reset();
             huffmanDecompressor.readTable(in);
+        }
 
         literalsBase = literals;
         literalsLimit = header.getRegeneratedSize();

@@ -24,6 +24,7 @@ import io.airlift.compress.zstd.model.Util;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import static io.airlift.compress.zstd.model.Util.isPowerOf2;
 import static io.airlift.compress.zstd.model.Util.verify;
@@ -37,6 +38,8 @@ public class HuffmanDecompressor {
     private int tableLog = TABLE_NOT_LOADED;
     private final byte[] symbols = new byte[1 << HuffmanConst.MAX_TABLE_LOG];
     private final byte[] numbersOfBits = new byte[1 << HuffmanConst.MAX_TABLE_LOG];
+    private final ByteArrayRandomAccessOut weights = new ByteArrayRandomAccessOut(HuffmanConst.MAX_SYMBOL + 1);
+    private final int[] ranks = new int[HuffmanConst.MAX_TABLE_LOG + 1];
 
     public boolean isLoaded() {
         return tableLog != TABLE_NOT_LOADED;
@@ -44,29 +47,29 @@ public class HuffmanDecompressor {
 
     public void reset() {
         tableLog = TABLE_NOT_LOADED;
+        weights.reset();
+        Arrays.fill(ranks, 0);
     }
 
     // see 4.2.1.1
     public int readTable(In in) throws IOException {
-        byte[] weights = new byte[HuffmanConst.MAX_SYMBOL + 1];
-        int[] ranks = new int[HuffmanConst.MAX_TABLE_LOG + 1];
-
         int headerByte = in.readByte();
 
-        ByteArrayRandomAccessOut weights1 = new ByteArrayRandomAccessOut(weights);
-
         if (headerByte >= 128) {
-            readWeightsAsDirect(in, headerByte, weights1);
-            headerByte = weights1.getOffs() / 2;
+            readWeightsAsDirect(in, headerByte, weights);
+            headerByte = weights.getOffs() / 2;
         } else
-            readWeightsAsFse(in, headerByte, weights1);
+            readWeightsAsFse(in, headerByte, weights);
 
-        int outputSize = weights1.getOffs();
+        int totalBytes = weights.getOffs();
         int totalWeight = 0;
 
-        for (int i = 0; i < outputSize; i++) {
-            ranks[weights[i]]++;
-            totalWeight += (1 << weights[i]) >> 1;
+        weights.setOffs(0);
+
+        for (int i = 0; i < totalBytes; i++) {
+            int w = weights.getByte();
+            ranks[w]++;
+            totalWeight += (1 << w) >> 1;
         }
 
         verify(totalWeight != 0, "Input is corrupted");
@@ -74,44 +77,44 @@ public class HuffmanDecompressor {
         tableLog = Util.highestBit(totalWeight) + 1;
         verify(tableLog <= HuffmanConst.MAX_TABLE_LOG, "Input is corrupted");
 
-        int total = 1 << tableLog;
-        int rest = total - totalWeight;
+        int rest = (1 << tableLog) - totalWeight;
         verify(isPowerOf2(rest), "Input is corrupted");
 
         int lastWeight = Util.highestBit(rest) + 1;
-
-        weights[outputSize] = (byte) lastWeight;
+        weights.writeByte((byte) lastWeight);
         ranks[lastWeight]++;
 
-        int numberOfSymbols = outputSize + 1;
+        int numberOfSymbols = totalBytes + 1;
 
         // populate table
-        int nextRankStart = 0;
-        for (int i = 1; i < tableLog + 1; ++i) {
-            int current = nextRankStart;
+        for (int i = 1, nextRankStart = 0; i < tableLog + 1; i++) {
+            int cur = nextRankStart;
             nextRankStart += ranks[i] << (i - 1);
-            ranks[i] = current;
+            ranks[i] = cur;
         }
 
-        for (int n = 0; n < numberOfSymbols; n++) {
-            int weight = weights[n];
+        weights.setOffs(0);
+
+        for (int i = 0; i < numberOfSymbols; i++) {
+            int weight = weights.getByte();
             int length = (1 << weight) >> 1;
 
-            byte symbol = (byte) n;
+            byte symbol = (byte) i;
             byte numberOfBits = (byte) (tableLog + 1 - weight);
-            for (int i = ranks[weight]; i < ranks[weight] + length; i++) {
-                symbols[i] = symbol;
-                numbersOfBits[i] = numberOfBits;
+
+            for (int j = ranks[weight]; j < ranks[weight] + length; j++) {
+                symbols[j] = symbol;
+                numbersOfBits[j] = numberOfBits;
             }
+
             ranks[weight] += length;
         }
 
         verify(ranks[1] >= 2 && (ranks[1] & 1) == 0, "Input is corrupted");
-
         return headerByte + 1;
     }
 
-    private static int readWeightsAsDirect(In in, int headerByte, Out weights) {
+    private static void readWeightsAsDirect(In in, int headerByte, Out weights) {
         int numberOfSymbols = headerByte - 127;
 
         for (int i = 0; i < numberOfSymbols; i += 2) {
@@ -121,15 +124,13 @@ public class HuffmanDecompressor {
             if (i + 1 < numberOfSymbols)
                 weights.writeByte((byte) (b & 0xF));
         }
-
-        return numberOfSymbols;
     }
 
-    private static void readWeightsAsFse(In in, int totalBytes, Out weights) throws IOException {
+    private static void readWeightsAsFse(In in, int totalBytes, Out out) throws IOException {
         long lo = in.getPos();
         FiniteStateEntropyForDecompress fse = new FiniteStateEntropyForDecompress().readFseTable(in, totalBytes);
         totalBytes -= (int) (in.getPos() - lo);
-        fse.decompress(new BackwardDecorator(in, totalBytes), weights);
+        fse.decompress(new BackwardDecorator(in, totalBytes), out);
     }
 
     public void decodeSingleStream(In in, Out out) throws IOException {
