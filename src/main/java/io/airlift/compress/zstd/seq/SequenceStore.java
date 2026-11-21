@@ -78,8 +78,8 @@ public class SequenceStore {
     }
 
     public void appendLiterals(byte[] in, int offs, int inputSize) {
-        System.arraycopy(in, offs, literalsBuf.buf, literalsBuf.getOffs(), inputSize);
-        literalsBuf.setOffs(literalsBuf.getOffs() + inputSize);
+        for (int i = 0; i < inputSize; i++)
+            literalsBuf.putByte(in[offs + i]);
     }
 
     public void storeSequence(ByteArrayRandomAccessIn in,
