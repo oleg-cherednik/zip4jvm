@@ -86,14 +86,17 @@ public class SequenceStore {
                               int literalLength,
                               int offsetCode,
                               int matchLengthBase) {
-        literalsBuf.copyMemory(in, literalLength);
+        for (int i = 0; i < literalLength; i++)
+            literalsBuf.putByte((byte) in.getByte());
+
+//        literalsBuf.copyMemory(in, literalLength);
 
         if (literalLength > 65535) {
             longLengthField = LongField.LITERAL;
             longLengthPosition = sequenceCount;
         }
-        literalLengths[sequenceCount] = literalLength;
 
+        literalLengths[sequenceCount] = literalLength;
         offsets[sequenceCount] = offsetCode + 1;
 
         if (matchLengthBase > 65535) {
