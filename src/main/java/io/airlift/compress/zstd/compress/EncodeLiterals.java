@@ -33,34 +33,31 @@ public final class EncodeLiterals {
         final int offs = rao.getOffs();
 
         RandomAccess literals = context.sequenceStore.getLiteralsBufSlice();
+        RandomAccess iin = literals.slice(0, literals.getOffs());
         int literalsSize = context.sequenceStore.getLiteralsSize();
 
-        if (context.parameters.isBypassCompression() || literalsSize <= MINIMUM_LITERALS_SIZE) {
-            RandomAccess iin = literals.slice(0, literals.getOffs());
+        if (context.parameters.isBypassCompression() || literalsSize <= MINIMUM_LITERALS_SIZE)
             RawLiteralsEncode.encode(rao, iin);
-        } else {
+        else {
             Histogram histogram = new Histogram(HuffmanConst.MAX_SYMBOL_COUNT);
             histogram.count(literals.slice(0, literalsSize));
 
             int maxSymbol = histogram.findMaxSymbol(HuffmanConst.MAX_SYMBOL);
             int largestCount = histogram.findLargestCount(maxSymbol);
 
-            if (largestCount == literalsSize) {
+            if (largestCount == literalsSize)
                 // all bytes in input are equal
-                RandomAccess iin = literals.slice(0, literals.getOffs());
                 RleLiteralsEncode.encode(rao, iin);
-            } else if (largestCount <= (literalsSize >>> 7) + 4) {
+            else if (largestCount <= (literalsSize >>> 7) + 4)
                 // heuristic: probably not compressible enough
-                RandomAccess iin = literals.slice(0, literals.getOffs());
                 RawLiteralsEncode.encode(rao, iin);
-            } else {
+            else {
                 int headerSize = LiteralsSectionHeader.CompressedTreeless.calcHeaderSize(literalsSize);
 
-                if (rao.available() < headerSize + MAX_HUFFMAN_TABLE_DESCRIPTION_SIZE) {
+                if (rao.available() < headerSize + MAX_HUFFMAN_TABLE_DESCRIPTION_SIZE)
                     // no room for a new Huffman tree description
-                    RandomAccess iin = literals.slice(0, literals.getOffs());
                     RawLiteralsEncode.encode(rao, iin);
-                } else
+                else
                     huffmanCompressing(rao, context, histogram, maxSymbol);
             }
         }
