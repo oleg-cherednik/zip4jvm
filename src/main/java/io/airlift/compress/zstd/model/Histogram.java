@@ -13,8 +13,8 @@
  */
 package io.airlift.compress.zstd.model;
 
-import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
+import io.airlift.compress.zstd.io.RandomAccessOut;
 import lombok.Getter;
 
 public class Histogram {
@@ -37,9 +37,9 @@ public class Histogram {
             counts[in.buf[i] & 0xFF]++;
     }
 
-    public void count(ByteArrayRandomAccessOut in) {
-        for (int i = 0; i < in.getOffs(); i++)
-            counts[in.buf[i] & 0xFF]++;
+    public void count(RandomAccessOut in) {
+        while (in.available() > 0)
+            counts[in.getByte()]++;
     }
 
     public int findMaxSymbol(int maxSymbol) {

@@ -5,7 +5,6 @@ import io.airlift.compress.zstd.InputStreamToInAdapter;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionTable;
 import io.airlift.compress.zstd.huffman.HuffmanCompressor;
 import io.airlift.compress.zstd.huffman.HuffmanConst;
-import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.io.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.io.RandomAccessOut;
@@ -38,13 +37,13 @@ public final class EncodeLiterals {
         final int offs = rao.getOffs();
 
         int literalsSize = context.sequenceStore.getLiteralsSize();
-        ByteArrayRandomAccessOut literalsBuf = context.sequenceStore.getLiteralsBufSlice();
+        RandomAccessOut literalsBuf = context.sequenceStore.getLiteralsBufSlice();
 
         if (context.parameters.isBypassCompression() || literalsSize <= MINIMUM_LITERALS_SIZE)
             RawLiteralsEncode.encode(rao, literalsBuf);
         else {
             Histogram histogram = new Histogram(HuffmanConst.MAX_SYMBOL_COUNT);
-            histogram.count(literalsBuf);
+            histogram.count(literalsBuf.slice(0, literalsSize));
 
             int maxSymbol = histogram.findMaxSymbol(HuffmanConst.MAX_SYMBOL);
             int largestCount = histogram.findLargestCount(maxSymbol);

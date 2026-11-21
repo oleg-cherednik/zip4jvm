@@ -14,6 +14,8 @@ public interface Out extends Closeable {
 
     int available();
 
+//    int getLimit();
+
     int getOffs();
 
     void writeByte(int x);
