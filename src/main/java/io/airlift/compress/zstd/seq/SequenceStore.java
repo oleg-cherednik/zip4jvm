@@ -23,6 +23,7 @@ import io.airlift.compress.zstd.model.Util;
 public class SequenceStore {
 
     private final ByteArrayWithOffs literalsBuf;
+    private final ByteArrayRandomAccess literalsBuf1;
 
     public final int[] offsets;
     public final int[] literalLengths;
@@ -65,6 +66,7 @@ public class SequenceStore {
         matchLengthCodes = new byte[maxSequences];
         offsetCodes = new byte[maxSequences];
         literalsBuf = new ByteArrayWithOffs(new byte[blockSize]);
+        literalsBuf1 = new ByteArrayRandomAccess(literalsBuf.buf, literalsBuf.getOffs(), literalsBuf.getLimit());
     }
 
     public RandomAccess getLiteralsBufSlice() {
@@ -80,6 +82,8 @@ public class SequenceStore {
     public void appendLiterals(byte[] in, int offs, int inputSize) {
         for (int i = 0; i < inputSize; i++)
             literalsBuf.putByte(in[offs + i]);
+
+        literalsBuf1.setOffs(literalsBuf.getOffs());
     }
 
     public void storeSequence(ByteArrayRandomAccessIn in,
@@ -88,6 +92,8 @@ public class SequenceStore {
                               int matchLengthBase) {
         for (int i = 0; i < literalLength; i++)
             literalsBuf.putByte((byte) in.getByte());
+
+        literalsBuf1.setOffs(literalsBuf.getOffs());
 
 //        literalsBuf.copyMemory(in, literalLength);
 
@@ -110,6 +116,7 @@ public class SequenceStore {
 
     public void reset() {
         literalsBuf.setOffs(0);
+        literalsBuf1.reset();
         sequenceCount = 0;
         longLengthField = null;
     }
