@@ -14,6 +14,8 @@ public interface RandomAccessOut extends Out {
 
     void setOffs(int offs);
 
+    int getByte();
+
     default int read(byte[] buf, int offs, int len) {
         return -1;
     }

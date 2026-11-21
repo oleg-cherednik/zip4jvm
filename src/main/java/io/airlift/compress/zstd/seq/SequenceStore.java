@@ -69,6 +69,10 @@ public class SequenceStore {
         reset();
     }
 
+    public int getLiteralsBufOffs() {
+        return literalsBuf.getOffs();
+    }
+
     public void appendLiterals(byte[] in, int offs, int inputSize) {
         System.arraycopy(in, offs, literalsBuf.buf, literalsBuf.getOffs(), inputSize);
         literalsBuf.setOffs(literalsBuf.getOffs() + inputSize);
